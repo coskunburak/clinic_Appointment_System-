@@ -1,9 +1,10 @@
-JAVA HASTANE/KLINIK RANDEVU SISTEMI — DOCS ZIP
-Tarih: 2026-11-02
+JAVA HASTANE/KLINIK RANDEVU SISTEMI — DOKÜMANTASYON MERKEZİ
+Tarih: 2026-11-02 (Sprint S00 kapsamında normalize edildi)
 
-1. docs/README.md ile baslayin.
-2. docs/00-baslangic/01-kararlar-ve-varsayimlar.md dosyasindaki tasarim tercihlerini kontrol edin.
-3. docs/07-sprintler/README.md ve S00.md ile uygulama planini baslatin.
-4. Repo olusturunca docs/ klasorunu proje kokune kopyalayin.
-5. Bu paket uygulama kodu DEGILDIR; mimari ve uygulama teslim planidir.
-6. Ders: En az 10 farkli gercek gunde commit; GitHub+SABIS ve sunuma katilim.
+1. Dokümantasyon ana giriş noktası: docs/README.md
+2. Tasarım kararları ve varsayımlar: docs/00-baslangic/01-kararlar-ve-varsayimlar.md
+3. Gereksinim ve izlenebilirlik matrisi: docs/01-urun/01-gereksinim-matrisi.md
+4. Sprint yürütme planı: docs/07-sprintler/README.md ve docs/07-sprintler/S00.md
+5. GitHub commit ve teslim takvimi: docs/08-teslim/01-github-commit-takvimi.md
+6. Not: Dokümantasyon ağacı docs/ altında normalize edilmiştir (docs/docs/ kaldırılmıştır).
+7. Ders kuralı: En az 10 farklı gerçek günde commit; GitHub + SABİS teslimi ve sunuma katılım.

@@ -5,8 +5,8 @@
 | Teknoloji / konu | Önerilen sürüm veya doküman | URL |
 |---|---|---|
 | JDK | Java 21 LTS (Temurin veya uygun OpenJDK dağıtımı) | https://www.oracle.com/java/technologies/downloads/ |
-| Spring Boot | 4.1.2 resmî referans / Java 21 uyumluluğu | https://docs.spring.io/spring-boot/system-requirements.html |
-| Boot starter isimleri | Boot 4 `spring-boot-starter-webmvc`, validation, Thymeleaf, security, data-jpa | https://docs.spring.io/spring-boot/reference/using/build-systems.html |
+| Spring Boot | 3.4.2 resmî referans / Java 21 uyumluluğu | https://docs.spring.io/spring-boot/system-requirements.html |
+| Boot starter isimleri | Boot 3 `spring-boot-starter-web`, validation, Thymeleaf, security, data-jpa | https://docs.spring.io/spring-boot/reference/using/build-systems.html |
 | Boot test | Spring Boot Test / MVC slice tests | https://docs.spring.io/spring-boot/reference/testing/ |
 | PostgreSQL | 17 dokümantasyonu, row locks | https://www.postgresql.org/docs/17/explicit-locking.html |
 | Java JDK API | `java.time`, `java.math.BigDecimal` | https://docs.oracle.com/en/java/javase/21/docs/api/ |

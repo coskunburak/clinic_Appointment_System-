@@ -3,7 +3,7 @@
 ## Onaylanan taslak kararlar
 | ID | Karar | Gerekçe / durum |
 |---|---|---|
-| D-01 | Java 21 + Spring Boot 4.1.2 | Java OOP ile akademik uyum; sürümler uygulamaya geçerken tekrar doğrulanır |
+| D-01 | Java 21 + Spring Boot 3.4.2 | Java OOP ile akademik uyum; Spring Boot 3 resmî kararlı sürümü |
 | D-02 | Tek deploy edilebilir Spring MVC monoliti | Tek/iki geliştirici için düşük operasyon yükü |
 | D-03 | Thymeleaf + Bootstrap | React/Node ekosistemi olmadan Java odaklı demo |
 | D-04 | PostgreSQL + Flyway | kalıcı ilişkisel veri ve gerçek transaction testleri |

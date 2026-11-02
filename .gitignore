@@ -31,3 +31,27 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### macOS ###
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+### Environment and Secrets ###
+.env
+.env.*
+*.env
+application-local.properties
+application-local.yml
+*.pem
+*.key
+
+### Logs and Runtime ###
+*.log
+
+### Editor Temporary Files ###
+*.swp
+*.swo
+*~
