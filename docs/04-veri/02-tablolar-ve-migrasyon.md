@@ -3,37 +3,38 @@
 ## Tablo/kolon sözleşmeleri
 | Tablo | Önemli kolonlar | Bütünlük |
 |---|---|---|
-| `organization` | id UUID, name, active | name boş olamaz |
-| `branch` | id, organization_id, name, time_zone, address, active | FK organization |
-| `branch_opening_hours` | id, branch_id, weekday, start_time, end_time | start < end; gerekirse gün içinde birden fazla aralık |
-| `department` | id, branch_id, name, active | unique(branch_id,name) |
-| `service_definition` | id, organization_id, name, description, active | org-scoped unique name |
-| `branch_service` | id, branch_id, service_definition_id, duration_minutes, fee_amount DECIMAL(12,2), currency CHAR(3), active | duration>0; fee>=0 |
-| `user_account` | id, email, password_hash, enabled, created_at | unique email (normalize), hash not plaintext |
-| `membership` | id, user_id, organization_id, branch_id nullable, role | permitted scope; 1 membership can span org |
-| `patient_profile` | id, user_id, full_name, phone | user FK unique |
-| `staff_profile` | id, user_id, full_name, phone, staff_type, specialty, active | type required |
-| `staff_assignment` | id, staff_id, branch_id, department_id, active | branch/department scope |
-| `staff_service_eligibility` | id, assignment_id, branch_service_id | unique(assignment_id,branch_service_id) |
-| `weekly_availability` | id, assignment_id, weekday, start_time, end_time | start<end |
-| `availability_exception` | id, assignment_id, local_date, kind, start_time nullable, end_time nullable | leave full day or bounded interval |
-| `appointment` | id, patient_id, staff_id, branch_id, branch_service_id, start_at_utc TIMESTAMPTZ, end_at_utc TIMESTAMPTZ, status, service_name_snapshot, duration_minutes_snapshot, fee_amount_snapshot, currency_snapshot, version, created_at | end>start; status enum check; FK |
-| `appointment_status_history` | id, appointment_id, from_status, to_status, actor_user_id, reason, occurred_at | append-only |
-| `booking_request` | id, patient_id, request_key, body_hash, appointment_id | optional SHOULD; unique(patient_id,request_key) |
+| `organization` | id UUID, name, active, created_at | name boş olamaz (`chk_organization_name_not_blank`) |
+| `branch` | id, organization_id, name, time_zone, address, active, created_at | FK organization (`fk_branch_organization`), composite `uq_branch_id_org_id` |
+| `branch_opening_hours` | id, branch_id, weekday, start_time, end_time | FK branch, `start_time < end_time`, weekday 1..7 |
+| `department` | id, branch_id, name, active, created_at | FK branch, unique(branch_id, name) |
+| `service_definition` | id, organization_id, name, description, active | org-scoped unique name (S03 / V2) |
+| `branch_service` | id, branch_id, service_definition_id, duration_minutes, fee_amount DECIMAL(12,2), currency CHAR(3), active | duration>0; fee>=0 (S03 / V2) |
+| `user_account` | id, email, password_hash, enabled, created_at | unique email, hash not plaintext, not blank |
+| `membership` | id, user_id, organization_id, branch_id nullable, role, created_at | FK user, FK org, composite FK branch+org (`fk_membership_branch_org`) |
+| `patient_profile` | id, user_id, full_name, phone, created_at | user FK unique (`uq_patient_profile_user_id`) |
+| `staff_profile` | id, user_id, full_name, phone, staff_type, specialty, active, created_at | user FK unique (`uq_staff_profile_user_id`), type required |
+| `staff_assignment` | id, staff_id, branch_id, department_id, active | branch/department scope (S05 / V2) |
+| `staff_service_eligibility` | id, assignment_id, branch_service_id | unique(assignment_id, branch_service_id) (S05 / V2) |
+| `weekly_availability` | id, assignment_id, weekday, start_time, end_time | start<end (S05 / V2) |
+| `availability_exception` | id, assignment_id, local_date, kind, start_time nullable, end_time nullable | leave full day or bounded interval (S05 / V2) |
+| `appointment` | id, patient_id, staff_id, branch_id, branch_service_id, start_at_utc TIMESTAMPTZ, end_at_utc TIMESTAMPTZ, status, service_name_snapshot, duration_minutes_snapshot, fee_amount_snapshot, currency_snapshot, version, created_at | end>start; status enum check; FK (S06 / V3) |
+| `appointment_status_history` | id, appointment_id, from_status, to_status, actor_user_id, reason, occurred_at | append-only (S07 / V3) |
+| `booking_request` | id, patient_id, request_key, body_hash, appointment_id | optional SHOULD; unique(patient_id,request_key) (S06 / V4) |
 
-## Önerilen migration sırası
-- `V1__create_organization_and_identity.sql` : organization, branch, department, account, membership, profiles.
-- `V2__create_catalog_staff_and_availability.sql` : branch services, assignment, eligibility, schedules/exceptions.
-- `V3__create_appointments.sql` : appointment/history, index ve check.
-- `V4__add_idempotency.sql` : SHOULD; yalnız uygulanıyorsa.
-- `V5__add_postgres_exclusion_guard.sql` : opsiyonel ve sadece testle ispatlandıysa.
+## Gerçekleşen ve Önerilen Migration Sırası
+- `V1__create_organization_and_identity.sql` : **(S01'de uygulandı)** `organization`, `branch`, `branch_opening_hours`, `department`, `user_account`, `membership`, `patient_profile`, `staff_profile`.
+- `V2__create_catalog_staff_and_availability.sql` : *(S03/S05)* branch services, assignment, eligibility, schedules/exceptions.
+- `V3__create_appointments.sql` : *(S06/S07)* appointment/history, index ve check.
+- `V4__add_idempotency.sql` : *(S06)* SHOULD; yalnız uygulanıyorsa.
+- `V5__add_postgres_exclusion_guard.sql` : *(S06)* opsiyonel ve sadece testle ispatlandıysa.
 
 ## Migration kuralları
 - Mevcut uygulanmış migration düzenlenmez; yeni migration eklenir.
 - `spring.jpa.hibernate.ddl-auto=validate`; şema Flyway tarafından yönetilir.
+- `spring.flyway.clean-disabled=true`; üretim ve test güvenliği için temizleme engellenir.
 - Varsayılan prod profile demo kullanıcı eklenmez; sahte demo seed yalnız dev/test profile.
 - `TIMESTAMPTZ` mutlak an saklar; şubenin `time_zone` alanı yerel gösterim için kullanılır. Tarih okuma yazma JDBC/ORM tarafında UTC olarak yapılandırılır.
 - `@Version` ile status update yarışı kontrol edilir; commit sırasında unique/FK ihlalleri anlamlı uygulama hatasına çevrilir.
 
-## Önemli veri bütünlüğü uyarısı
-FK'ler aynı şube eşleşmesini otomatik garanti etmez; `branch_service` ve `staff_assignment` kimliklerinin şubeye ait olmasını servis seviyesinde yeniden doğrula, gerekiyorsa kompozit unique + foreign key ekle. Böylece sadece UI doğrulamasına güvenilmez.
+## Çok Kiracılı Veri Bütünlüğü Kuralı
+Yalnızca bağımsız tekil yabancı anahtarlar (`branch_id` ve `organization_id`) kiracı izolasyonunu garanti etmez. V1 migrasyonunda `branch` tablosuna `uq_branch_id_org_id (id, organization_id)` tanımlanmış ve `membership` tablosuna `fk_membership_branch_org FOREIGN KEY (branch_id, organization_id) REFERENCES branch(id, organization_id)` kompozit kısıtı eklenmiştir. Böylece kullanıcının bir kuruma aitken başka kurumun şubesine bağlanması veritabanı seviyesinde fiziksel olarak engellenmiştir.

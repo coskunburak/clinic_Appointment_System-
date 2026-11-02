@@ -42,6 +42,7 @@ build/
 ### Environment and Secrets ###
 .env
 .env.*
+!.env.example
 *.env
 application-local.properties
 application-local.yml

@@ -8,33 +8,33 @@
 
 | Metrik | Değer | Açıklama |
 |---|---|---|
-| **Toplam Kayıtlı Commit Sayısı** | 3 | Başlangıç ve dokümantasyon yüklemesi |
-| **Tespit Edilen Commit Tarihleri** | 2026-11-02 (Tüm 3 commit) | `cdd87b6`, `215a542`, `3b2dd1c` |
-| **Benzersiz Takvim Günü Sayısı** | **1** | Kural gereği aynı gün atılan 3 commit 1 gün sayılır |
+| **Toplam Kayıtlı Commit Sayısı** | 4 | Başlangıç, dokümanlar ve S00 yerel commit'i |
+| **Tespit Edilen Commit Tarihleri** | 2026-11-02 (Tüm 4 commit) | `cdd87b6`, `215a542`, `3b2dd1c`, `23b7d28` |
+| **Benzersiz Takvim Günü Sayısı** | **1** | Kural gereği aynı gün (2026-11-02) atılan 4 commit 1 gün sayılır |
 | **Hedefe Ulaşma Durumu** | **1 / 10** | Tamamlanması gereken en az 9 benzersiz gün bulunmaktadır |
-| **Kural Uyum Riski** | Yüksek (Zaman planlaması yapılmazsa) | Sprintlerin farklı günlere planlanması zorunludur |
+| **Kural Uyum Riski** | Yüksek (Zaman planlaması yapılmazsa) | S01 commit'i **ertesi gün veya sonraki takvim gününde** atılmalıdır |
 
 ---
 
 ## 2. Gerçek Gün Bazlı Geliştirme ve Commit Takvimi
 
-Teslim son tarihi henüz açıklanmadığından (`PENDING_OWNER_CONFIRMATION`), geliştirme adımları sprint bazında günlere dağıtılmıştır:
+Ders kapsamında 10 farklı gün kuralını karşılamak için önerilen sprint-gün dağılımı:
 
 | Gün No | Sprint | Beklenen Anlamlı Değişiklik | Önerilen Commit Mesajı | Durum |
 |---|---|---|---|---|
-| **Gün-1** | S00 | Repo iskeleti, dokümantasyon normalizasyonu, README ve kapsam | `docs(s00): establish repository foundation and academic scope` | Tamamlandı (2026-11-02) |
-| **Gün-2** | S01 | PostgreSQL Docker, Flyway V1 şeması ve paket mimarisi | `feat(db): bootstrap flyway v1 schema and package structure` | Planlandı |
-| **Gün-3** | S02 | OOP domain çekirdeği (BaseEntity, Value Objects, hiyerarşi) | `feat(domain): implement core entity models and value objects` | Planlandı |
-| **Gün-4** | S03 | Kurum, şube, bölüm ve hizmet kataloğu yönetimi | `feat(catalog): implement branch and healthcare services` | Planlandı |
-| **Gün-5** | S04 | Kimlik doğrulama, Spring Security ve rol yetkilendirmesi | `feat(security): configure role-based access control` | Planlandı |
-| **Gün-6** | S05 | Doktor ve personel mesai saatleri, haftalık uygunluk | `feat(schedule): add staff availability and working hours` | Planlandı |
-| **Gün-7** | S06 | Randevu slot hesaplama ve çakışma önleme (pessimistic lock) | `feat(booking): prevent overlapping reservations with locking` | Planlandı |
-| **Gün-8** | S07 | Randevu onay yaşam döngüsü ve işlem geçmişi (state machine) | `feat(booking): add appointment approval lifecycle` | Planlandı |
-| **Gün-9** | S08 | Spring MVC ve Thymeleaf arayüz ekranları | `feat(web): add thymeleaf appointment flow screens` | Planlandı |
-| **Gün-10** | S09 | Entegrasyon testleri, eşzamanlılık doğrulaması ve demo seed verisi | `test: cover concurrent booking and provide demo seed` | Planlandı |
-| **Gün-11** | S10 | Son kalite kapısı, sunum dokümanları ve akademik rapor | `docs(s10): finalize presentation materials and report` | Planlandı |
+| **Gün-1** | S00 | Repo iskeleti, dokümantasyon normalizasyonu, README ve kapsam | `docs(s00): establish repository foundation, academic scope and fix build dependencies` | Tamamlandı (`23b7d28` — 2026-11-02) |
+| **Gün-2** | S01 | PostgreSQL 17 Docker, Flyway V1 şeması, JPA ve CI | `feat(s01): establish PostgreSQL, Flyway, JPA and CI foundation` | **Uygulandı — Yeni Günde Commit Bekliyor** |
+| **Gün-3** | S02 | OOP domain çekirdeği (BaseEntity, Value Objects, hiyerarşi) | `feat(s02): implement core entity models, value objects and domain guards` | Planlandı |
+| **Gün-4** | S03 | Kurum, şube, bölüm ve hizmet kataloğu yönetimi | `feat(s03): implement branch, department and service catalog management` | Planlandı |
+| **Gün-5** | S04 | Kimlik doğrulama, Spring Security ve 3 rol yetkilendirmesi | `feat(s04): configure spring security and multi-tenant access control` | Planlandı |
+| **Gün-6** | S05 | Doktor ve personel mesai saatleri, haftalık uygunluk slotları | `feat(s05): implement staff availability schedules and working hours` | Planlandı |
+| **Gün-7** | S06 | Randevu slot hesaplama, pesimist satır kilidi ve çakışma önleme | `feat(s06): enforce pessimistic locking and conflict-free booking` | Planlandı |
+| **Gün-8** | S07 | Randevu onay yaşam döngüsü, durum makinesi ve snapshot | `feat(s07): implement appointment approval state machine and audit log` | Planlandı |
+| **Gün-9** | S08 | Spring MVC ve Thymeleaf kullanıcı arayüz ekranları | `feat(s08): deliver thymeleaf views for patient, doctor and admin` | Planlandı |
+| **Gün-10** | S09 | Entegrasyon testleri, eşzamanlılık doğrulaması ve demo seed verisi | `test(s09): verify concurrent reservation and seed demo dataset` | Planlandı |
+| **Gün-11** | S10 | Son kalite kapısı, sunum dokümanları ve akademik nihai rapor | `docs(s10): finalize presentation materials and academic report` | Planlandı |
 
-> **Önemli Tavsiye:** Hedef 10 yerine en az 11–12 farklı gerçek gün olarak planlanmıştır. Günler art arda olmak zorunda değildir; önemli olan commit'lerin gerçek takvim günlerinde ve anlamlı kod/doküman ilerlemesiyle atılmasıdır.
+> **Önemli Akademik Tavsiye:** Hedef 10 yerine 11 farklı gerçek takvim günü olarak planlanmıştır. Günlerin art arda olması zorunlu değildir; önemli olan commit'lerin farklı takvim günlerinde ve anlamlı kod/doküman ilerlemesiyle atılmasıdır.
 
 ---
 
@@ -45,14 +45,14 @@ Teslim son tarihi henüz açıklanmadığından (`PENDING_OWNER_CONFIRMATION`), 
 | 1 | 2026-11-02 | S00 | `cdd87b6` | first commit | Tarihçe denetlendi |
 | 2 | 2026-11-02 | S00 | `215a542` | first comit | Tarihçe denetlendi |
 | 3 | 2026-11-02 | S00 | `3b2dd1c` | docs | Tarihçe denetlendi |
-| 4 | *Öğrenci belirleyecek* | S00 | *Oluşacak* | `docs(s00): establish repository foundation and academic scope` | Manuel test sonrası commit edilecek |
-| 5 | *Öğrenci belirleyecek* | S01 | *Oluşacak* | `feat(db): ...` | Bekliyor |
+| 4 | 2026-11-02 | S00 | `23b7d28` | docs(s00): establish repository foundation... | Yerelde commit edildi (ahead 1) |
+| 5 | *Yeni Gün (Ör: 2026-11-03)* | S01 | *Oluşacak* | `feat(s01): establish PostgreSQL, Flyway, JPA and CI foundation` | Manuel test sonrası atılacak |
 
 ---
 
 ## 4. Git Kontrol Komutları
 
-Benzersiz geliştirme gün sayısını yerel terminalinizde kontrol etmek için:
+Benzersiz geliştirme gün sayısını yerel terminalinizde anlık olarak kontrol etmek için:
 
 ```bash
 git log --format='%h %as %s' --reverse
@@ -68,4 +68,4 @@ git status --short
 
 - **GitHub Teslimi:** Depo açık (public) veya öğretim elemanına yetki verilmiş olmalıdır.
 - **SABİS Teslimi:** Proje zip arşivi ve GitHub repo URL bağlantısı süresi içinde yüklenmelidir.
-- **Kesin Teslim Tarihi:** Duyurulduğunda buraya işlenecektir (`PENDING_OWNER_CONFIRMATION`).
+- **Canlı Sunum:** 7. haftadan itibaren sunumlar başlayacaktır. Sunuma katılmayan öğrenci puan alamaz.

@@ -1,0 +1,13 @@
+spring:
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+    clean-disabled: true
+
+logging:
+  level:
+    com.example.clinic: DEBUG
+    org.flywaydb: INFO

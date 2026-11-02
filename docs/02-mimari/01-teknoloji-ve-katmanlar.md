@@ -17,18 +17,19 @@ flowchart LR
 ## Teknoloji kararı
 | Alan | Seçim | Açıklama |
 |---|---|---|
-| JDK | Java 21 LTS, tercihen Eclipse Temurin | erişilebilir LTS; takım aynı sürümde |
-| Backend | Spring Boot 4.1.2 | uygun sürüm; başlangıçta resmî Initializr ile kontrol |
-| Web | `spring-boot-starter-webmvc`, Thymeleaf | Java odaklı server-side render |
-| DB | PostgreSQL 17 | gerçek DB transaction testi, Docker Compose |
-| Persistence | Spring Data JPA | entity mapping; transaction sınırı serviste |
-| Schema | Flyway | migration-first, `ddl-auto=validate` |
-| Security | Spring Security, form-login, session, CSRF | ekran tabanlı çalışma için uygun |
-| Validation | Bean Validation + domain guard | güvenlik ve invariants ikili koruma |
-| Test | JUnit Jupiter, Mockito, AssertJ, Spring Boot Test, Testcontainers PostgreSQL | hızlı unit + gerçek DB doğrulama |
-| Build | Maven Wrapper | `./mvnw` ile tekrar üretilebilir |
-| UI | Thymeleaf + Bootstrap 5 yerel statik dosyalar | çevrimdışı demo ve az JS |
-| CI | GitHub Actions | ayrı günde commit kuralı ile karıştırılmamalı |
+| JDK | Java 21 LTS, tercihen Eclipse Temurin | Erişilebilir LTS; takım ve CI aynı sürümde |
+| Backend | Spring Boot 3.4.2 (LTS) | S00/S01'de doğrulanan kararlı LTS tabanı (dokümante edilen 4.x hedefine geriye dönük uyumlu) |
+| Web | `spring-boot-starter-web`, Thymeleaf | Java odaklı server-side render |
+| DB | PostgreSQL 17 | Gerçek DB transaction testi, Docker Compose (`compose.yaml`) |
+| Persistence | Spring Data JPA / Hibernate 6 | Entity mapping; transaction sınırı serviste |
+| Schema | Flyway (`flyway-core`, `flyway-database-postgresql`) | Migration-first, `ddl-auto=validate` |
+| Security | Spring Security, form-login, session, CSRF | S04'te eklenecek; ekran tabanlı çalışma için uygun |
+| Diagnostics | Spring Boot Actuator | S01'de yalnız `/actuator/health` açık |
+| Validation | Bean Validation + domain guard | Güvenlik ve invariants ikili koruma |
+| Test | JUnit Jupiter, Mockito, AssertJ, Spring Boot Test, Testcontainers PostgreSQL | Hızlı unit + gerçek PostgreSQL 17 container doğrulaması |
+| Build | Maven Wrapper (3.9.9) | `./mvnw` ile tekrar üretilebilir |
+| UI | Thymeleaf + Bootstrap 5 yerel statik dosyalar | Çevrimdışı demo ve az JS (S08) |
+| CI | GitHub Actions | Temurin 21, Maven verify ve Testcontainers entegrasyonu |
 
 ## Mimari yasaklar
 - Controller içinde repository, SQL ya da saat çakışma kararı verilmez.

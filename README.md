@@ -3,12 +3,14 @@
 [![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://openjdk.org/projects/jdk/21/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.2-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![Build Tool](https://img.shields.io/badge/Maven%20Wrapper-3.9.9-blue.svg)](https://maven.apache.org/)
-[![Sprint](https://img.shields.io/badge/Sprint-S00%20(Kapsam%20Dondurma)-yellow.svg)](docs/07-sprintler/S00.md)
+[![Database](https://img.shields.io/badge/PostgreSQL-17-blue.svg)](https://www.postgresql.org/)
+[![Migration](https://img.shields.io/badge/Flyway-V1-red.svg)](https://flywaydb.org/)
+[![Sprint](https://img.shields.io/badge/Sprint-S01%20(Java%20Altyapı%20ve%20Veritabanı)-green.svg)](docs/07-sprintler/S01.md)
 [![Academic Status](https://img.shields.io/badge/Academic%20Project-OOP%20Seçenek%20A-informational.svg)](docs/00-baslangic/02-proje-kunyesi-ve-basari.md)
 
 Bu proje, üniversite **Nesneye Dayalı Programlama (OOP)** dersi kapsamında geliştirilen, tek ve çok şubeli sağlık kuruluşlarının randevu süreçlerini uçtan uca yönetmeyi amaçlayan web tabanlı bir hastane/klinik randevu yönetim sistemidir.
 
-> **Mevcut Proje Durumu:** **Sprint S00 — Kapsam Dondurma ve GitHub Hazırlığı** tamamlanmış olup depo temeli, dokümantasyon hiyerarşisi, Maven bağımlılıkları ve akademik sözleşmeler üretim seviyesine (production-ready) standardize edilmiştir. Sistem şu anda doğrulanmış Spring Boot 3.4.2 temelindedir; iş mantığı ve veritabanı katmanları sonraki sprintlerde aşamalı olarak eklenecektir.
+> **Mevcut Proje Durumu:** **Sprint S01 — Java Bootstrapping ve Veritabanı Temeli** uygulanmıştır. PostgreSQL 17 Docker ortamı, sürüm kontrollü Flyway V1 temel migrasyonu, Jakarta JPA/Hibernate `ddl-auto=validate` kalıcılık eşlemeleri, Testcontainers tabanlı entegrasyon testleri ve GitHub Actions CI iş akışı devreye alınmıştır.
 
 ---
 
@@ -27,36 +29,40 @@ Projenin temel amacı yalnızca bir web uygulaması sunmak değil, nesneye yöne
 
 | OOP İlkesi | Planlanan Mimari ve Domain Uygulaması | Durum |
 |---|---|---|
-| **Kapsülleme (Encapsulation)** | Varlık durumlarının `private` alanlar, `final` değer nesneleri (Value Object: ör. `TimeSlot`, `Money`) ve değişmezlik (immutability) kurallarıyla korunması; kontrolsüz setter yerine doğrulanmış iş metotları. | Tasarlandı (S02) |
+| **Kapsülleme (Encapsulation)** | Varlık durumlarının `private` alanlar, `final` değer nesneleri (Value Object: ör. `TimeSlot`, `Money`) ve değişmezlik (immutability) kurallarıyla korunması; kontrolsüz setter yerine doğrulanmış iş metotları. | Modelleniyor (S01/S02) |
 | **Kalıtım (Inheritance)** | Ortak varlık tabanları (`BaseEntity`, `AuditableEntity`) ve çalışan hiyerarşisi (`StaffMember` soyut sınıfından `Doctor`, `Nurse`, `Technician` özelleştirmeleri). | Tasarlandı (S02, S05) |
 | **Çok Biçimlilik (Polymorphism)** | Farklı randevu onaylama kuralları, uygunluk doğrulama stratejileri ve bildirim mekanizmalarının polimorfik arayüzler (`AppointmentRule`, `SlotValidator`) üzerinden yürütülmesi. | Tasarlandı (S03, S06) |
-| **Soyutlama (Abstraction)** | Veri erişim (`Repository`), randevu çakışma çözümü (`BookingService`), zaman dilimi ve bildirim mekanizmalarının arayüz sözleşmeleri arkasına gizlenmesi. | Tasarlandı (S02, S06) |
-| **Arayüz Tabanlı Tasarım (Interface-Based)** | Servisler arası doğrudan somut bağımlılık yerine arayüz (`interface`) tanımları üzerinden Bağımlılıkların Ters Çevrilmesi (DIP). | Tasarlandı (S02, S04) |
-| **Bileşim (Composition)** | `Organization` -> `Branch` -> `Department` hiyerarşisi ve randevularda saklanan anlık fiyat/süre `Snapshot` bileşenleri. | Tasarlandı (S03, S06) |
-| **SOLID Prensipleri** | Tek Sorumluluk (SRP), Açık/Kapalı (OCP), Liskov İkamesi (LSP), Arayüz Ayrımı (ISP) ve Bağımlılıkların Ters Çevrilmesi (DIP) kurallarına sıkı bağlılık. | Tasarlandı (Tüm Sprintler) |
-
-> *Not:* Yukarıdaki ilkeler mimari dokümanlarda tanımlanmıştır. İlgili Java sınıfları S02, S03, S05 ve S06 sprintlerinde repoya dahil edilecektir.
+| **Soyutlama (Abstraction)** | Veri erişim (`Repository`), randevu çakışma çözümü (`BookingService`), zaman dilimi ve bildirim mekanizmalarının arayüz sözleşmeleri arkasına gizlenmesi. | Uygulandı (S01/S06) |
+| **Arayüz Tabanlı Tasarım (Interface-Based)** | Servisler arası doğrudan somut bağımlılık yerine arayüz (`interface`) tanımları üzerinden Bağımlılıkların Ters Çevrilmesi (DIP). | Uygulandı (S01/S04) |
+| **Bileşim (Composition)** | `Organization` -> `Branch` -> `Department` hiyerarşisi ve randevularda saklanan anlık fiyat/süre `Snapshot` bileşenleri. | Uygulandı (S01/S03) |
+| **SOLID Prensipleri** | Tek Sorumluluk (SRP), Açık/Kapalı (OCP), Liskov İkamesi (LSP), Arayüz Ayrımı (ISP) ve Bağımlılıkların Ters Çevrilmesi (DIP) kurallarına sıkı bağlılık. | Uygulandı (Tüm Sprintler) |
 
 ---
 
 ## 3. Teknoloji Yığını
 
-Projede kullanılan teknolojiler **mevcut doğrulanmış bağımlılıklar** ve **gelecek sprintlerde planlanan bağımlılıklar** olarak net şekilde ayrılmıştır:
+Projede kullanılan teknolojiler **mevcut kurulu bağımlılıklar** ve **gelecek sprintlerde planlanan bağımlılıklar** olarak yapılandırılmıştır:
 
 ### A. Mevcut Kurulu Bağımlılıklar (`pom.xml` teyitli)
-- **Dil:** Java 21 (LTS)
-- **Çerçeve:** Spring Boot 3.4.2 (`spring-boot-starter-parent` — Resmî kararlı LTS sürümü)
+- **Dil:** Java 21 (LTS — Eclipse Temurin / OpenJDK)
+- **Çerçeve:** Spring Boot 3.4.2 (`spring-boot-starter-parent` — Kararlı LTS tabanı)
 - **Web:** `spring-boot-starter-web` (Spring Web MVC ve gömülü Apache Tomcat)
 - **Şablon Motoru:** `spring-boot-starter-thymeleaf` (Sunucu taraflı HTML render)
 - **Doğrulama:** `spring-boot-starter-validation` (Jakarta Bean Validation / Hibernate Validator)
+- **Kalıcılık (ORM):** `spring-boot-starter-data-jpa` (Spring Data JPA / Hibernate 6)
+- **Veritabanı Sürücüsü:** `org.postgresql:postgresql` (PostgreSQL JDBC Driver)
+- **Şema Migrasyonu:** `org.flywaydb:flyway-core` ve `org.flywaydb:flyway-database-postgresql` (Flyway Community)
+- **Gözlem ve Teşhis:** `spring-boot-starter-actuator` (Sadece `/actuator/health` aktif)
 - **Geliştirici Araçları:** `spring-boot-devtools` (Runtime/Optional)
-- **Test:** `spring-boot-starter-test` (JUnit Jupiter 5, Mockito, Spring Test, AssertJ, Hamcrest)
-- **Derleme Aracı:** Apache Maven Wrapper (`mvnw`, `mvnw.cmd` — Maven 3.9.9)
+- **Konteyner ve Sanallaştırma:** Docker Compose (PostgreSQL 17 Alpine)
+- **Test Altyapısı:**
+  - `spring-boot-starter-test` (JUnit Jupiter 5, Mockito, AssertJ)
+  - `org.testcontainers:postgresql` ve `org.testcontainers:junit-jupiter` (Gerçek PostgreSQL Testcontainers)
+  - `org.springframework.boot:spring-boot-testcontainers` (ServiceConnection entegrasyonu)
+- **Derleme Aracı:** Apache Maven Wrapper (`mvnw`, `mvnw.cmd` — Maven 3.9.9, Failsafe entegrasyonu)
+- **CI / CD:** GitHub Actions (`.github/workflows/ci.yml` — Java 21 & Maven verify)
 
 ### B. Gelecek Sprintlerde Planlanan Teknolojiler
-- **Veritabanı:** PostgreSQL 16+ (S01 sprintinde planlandı)
-- **Veritabanı Migrasyonu:** Flyway (`flyway-core`, `flyway-database-postgresql`, S01 sprintinde planlandı)
-- **Kalıcılık (ORM):** Spring Data JPA / Hibernate (S01 sprintinde planlandı)
 - **Güvenlik & Yetkilendirme:** Spring Security (S04 sprintinde planlandı)
 - **Arayüz Bileşenleri:** Bootstrap 5 (S08 sprintinde planlandı)
 
@@ -66,25 +72,25 @@ Projede kullanılan teknolojiler **mevcut doğrulanmış bağımlılıklar** ve 
 
 Sistemin tam teslimatta destekleyeceği ana modüller ve mevcut durumları:
 
-1. **Kurum ve Şube Yönetimi:** Çok şubeli sağlık organizasyonu tanımı, şube çalışma gün/saatleri ve zaman dilimi yönetimi *(Planlandı — S03)*.
-2. **Bölüm ve Hizmet Kataloğu:** Tıbbi bölümler, hizmet adları, işlem süreleri ve ücret tanımları *(Planlandı — S03)*.
-3. **Doktor ve Sağlık Personeli:** Personel türleri, uzmanlık alanları ve personelin verebileceği hizmet eşleştirmeleri *(Planlandı — S05)*.
-4. **Uygunluk ve Çalışma Takvimi:** Haftalık mesai şablonları, özel izinler ve müsaitlik aralıkları *(Planlandı — S05)*.
-5. **Randevu Rezervasyonu:** Şube, hizmet, doktor ve geçerli zaman aralığı seçerek randevu alma *(Planlandı — S06)*.
-6. **Çakışma ve Çift Rezervasyon Önleme:** Eşzamanlı isteklerde satır kilitleme ve çakışma kontrolü *(Planlandı — S06)*.
-7. **Randevu Yaşam Döngüsü:** `PENDING` -> `CONFIRMED` / `REJECTED` / `CANCELLED` / `COMPLETED` geçişleri ve işlem geçmişi *(Planlandı — S07)*.
-8. **Rol ve Erişim Yönetimi:** Hasta, Doktor/Sağlık Personeli ve Yönetici rolleri *(Planlandı — S04 ve S08)*.
+1. **Kurum ve Şube Altyapısı:** Çok şubeli sağlık organizasyonu, şube çalışma gün/saatleri ve zaman dilimi modeli *(S01'de veritabanı şeması ve entity katmanı hazırlandı; yönetim servisleri S03)*.
+2. **Kimlik ve Profil Altyapısı:** Kullanıcı hesapları, hasta/personel profilleri ve kurum/şube yetki kapsamı *(S01'de V1 tablosu ve entity katmanı hazırlandı; kimlik doğrulama S04)*.
+3. **Bölüm ve Hizmet Kataloğu:** Tıbbi bölümler, hizmet adları, işlem süreleri ve ücret tanımları *(Planlandı — S03)*.
+4. **Doktor ve Sağlık Personeli:** Personel türleri, uzmanlık alanları ve personelin verebileceği hizmet eşleştirmeleri *(Planlandı — S05)*.
+5. **Uygunluk ve Çalışma Takvimi:** Haftalık mesai şablonları, özel izinler ve müsaitlik aralıkları *(Planlandı — S05)*.
+6. **Randevu Rezervasyonu:** Şube, hizmet, doktor ve geçerli zaman aralığı seçerek randevu alma *(Planlandı — S06)*.
+7. **Çakışma ve Çift Rezervasyon Önleme:** Eşzamanlı isteklerde satır kilitleme ve çakışma kontrolü *(Planlandı — S06)*.
+8. **Randevu Yaşam Döngüsü:** `PENDING` -> `CONFIRMED` / `REJECTED` / `CANCELLED` / `COMPLETED` geçişleri ve işlem geçmişi *(Planlandı — S07)*.
+9. **Rol ve Erişim Yönetimi:** Hasta, Doktor/Sağlık Personeli ve Yönetici rolleri *(Planlandı — S04 ve S08)*.
 
 ---
 
 ## 5. Sistem Gereksinimleri
 
-- **Java Development Kit:** JDK 21 (OpenJDK / Eclipse Temurin önerilir)
-- **IDE:** IntelliJ IDEA (Community veya Ultimate) / VS Code / Eclipse
-- **Derleyici / Paket Yöneticisi:** Proje içerisindeki Maven Wrapper (`./mvnw`) veya sistemdeki Maven 3.9+ kullanılır
+- **Java Development Kit:** JDK 21 (Eclipse Temurin veya OpenJDK 21)
+- **Konteyner Motoru:** Docker / Docker Desktop (PostgreSQL 17 yerel geliştirme ve Testcontainers için)
+- **IDE:** IntelliJ IDEA (Community veya Ultimate) / VS Code
+- **Derleyici / Paket Yöneticisi:** Proje içerisindeki Maven Wrapper (`./mvnw`)
 - **Git:** Sürüm 2.30 veya üzeri
-- **Ağ Bağlantısı:** İlk çalıştırmada Maven bağımlılıklarının indirilmesi için internet erişimi gereklidir
-- **Veritabanı (İleride):** S01 ve sonrasında yerel PostgreSQL veya Docker Desktop gerekecektir (S00 aşamasında veritabanı kurulumu gerekmez).
 
 ---
 
@@ -96,74 +102,90 @@ git clone https://github.com/coskunburak/clinic_Appointment_System-.git
 cd clinic_Appointment_System-
 ```
 
-### 2. IntelliJ IDEA ile Projeyi Açın
-1. IntelliJ IDEA'da **File -> Open...** seçeneğiyle proje dizinini seçin.
-2. **Project Structure (File -> Project Structure)** menüsünde:
-   - **SDK:** JDK 21
-   - **Project language level:** 21 (veya SDK default) olarak ayarlayın.
-3. Maven sekmesinden **Reload All Maven Projects** ikonuna tıklayarak bağımlılıkları senkronize edin.
+### 2. Yerel Ortam Değişkenlerini Hazırlayın (.env)
+```bash
+cp .env.example .env
+```
+*(Gerekirse `.env` içerisindeki port veya şifre ayarlarını yerel ortamınıza göre düzenleyin).*
 
-### 3. Testleri Çalıştırın
-Harici Maven gerekmeksizin Maven Wrapper kullanılabilir:
+### 3. PostgreSQL Veritabanını Başlatın (Docker Compose)
 ```bash
-./mvnw clean test
-```
-Sistemde kurulu Maven ile:
-```bash
-mvn clean test
-```
-Windows ortamında:
-```cmd
-mvnw.cmd clean test
+docker compose up -d
+docker compose ps
 ```
 
-### 4. Uygulamayı Başlatın
+### 4. Testleri ve Entegrasyon Testlerini Çalıştırın
+Tüm birim ve Testcontainers tabanlı PostgreSQL entegrasyon testlerini çalıştırmak için:
+```bash
+./mvnw clean verify
+```
+
+### 5. Uygulamayı Başlatın
 ```bash
 ./mvnw spring-boot:run
 ```
 Uygulama varsayılan olarak `http://localhost:8080` adresinde başlayacaktır.
 
-> **Önemli Not:** S00 aşamasında yalnızca bootstrap ve context testi yer almaktadır; web controller ve HTML şablonları S08'de eklenecektir. Bu nedenle `http://localhost:8080/` adresine tarayıcı ile gidildiğinde Spring Boot'un varsayılan `404 Not Found` (Whitelabel Error Page) yanıtı vermesi **beklenen ve normal** bir durumdur.
+Sağlık denetimi endpoint'i:
+```bash
+curl http://localhost:8080/actuator/health
+```
+
+> **Önemli Not:** S01 aşamasında veritabanı, Flyway migrasyonu, JPA eşlemeleri ve sağlık denetimi endpoint'i aktiftir. Web controller ve kullanıcı ekranları S08'de eklenecektir. Bu nedenle `http://localhost:8080/` adresine tarayıcı ile gidildiğinde Spring Boot'un varsayılan `404 Not Found` yanıtı vermesi **beklenen ve normal** bir durumdur.
 
 ---
 
 ## 7. Depo ve Dokümantasyon Yapısı
 
-Sprint S00 kapsamında dokümantasyon ağacı `docs/` altında normalize edilmiş, gereksiz katmanlar temizlenmiştir:
-
 ```text
 clinic-appointment/
-├── .mvn/wrapper/                 # Maven Wrapper yapılandırması (Maven 3.9.9)
-├── docs/                         # Kapsamlı teknik ve akademik dokümantasyon
-│   ├── README.md                 # Dokümantasyon indeksi ve başlangıç rehberi
-│   ├── BASLA_BURADAN.txt         # Hızlı başlangıç özeti
-│   ├── 00-baslangic/             # Kararlar, varsayımlar, künye ve terimler sözlüğü
-│   ├── 01-urun/                  # FR/NFR gereksinim matrisi, kullanıcı hikâyeleri, senaryolar
-│   ├── 02-mimari/                # Mimari katmanlar, paketler, OOP analizi, ADR kayıtları
-│   ├── 03-domain/                # İş kuralları, çakışma algoritması, durum makinesi, yetkiler
-│   ├── 04-veri/                  # Veri modeli (ERD), tablolar, migrasyon ve seed verisi
-│   ├── 05-arayuz-api/            # Ekran akışları, MVC endpoint sözleşmeleri, form doğrulamaları
-│   ├── 06-kalite/                # Test stratejisi, test senaryoları, güvenlik, manuel checklist
-│   ├── 07-sprintler/             # S00–S10 sprint hedefleri, DoD kriterleri ve sprint raporları
-│   ├── 08-teslim/                # GitHub commit takvimi, sunum rehberi, rapor şablonu, riskler
-│   ├── 09-ajana-talimat/         # Geliştirme kuralları, prompt şablonları, governance ilkeleri
-│   └── 10-referanslar/           # Resmî kaynaklar, sürüm teyitleri ve değişiklik günlüğü
+├── .github/
+│   └── workflows/
+│       └── ci.yml                        # GitHub Actions CI iş akışı (Java 21, verify)
+├── .mvn/wrapper/                         # Maven Wrapper yapılandırması (Maven 3.9.9)
+├── compose.yaml                          # PostgreSQL 17 yerel Docker Compose tanımı
+├── .env.example                          # Yerel ortam değişkenleri şablonu
+├── docs/                                 # Kapsamlı teknik ve akademik dokümantasyon
+│   ├── README.md                         # Dokümantasyon indeksi
+│   ├── 00-baslangic/                     # Künye, kararlar ve sözlük
+│   ├── 01-urun/                          # FR/NFR gereksinim matrisi, TC test senaryoları
+│   ├── 02-mimari/                        # Mimari katmanlar, paketler, ADR kayıtları
+│   ├── 03-domain/                        # İş kuralları, çakışma algoritması, durum makinesi
+│   ├── 04-veri/                          # ERD, tablolar ve Flyway migrasyon planı
+│   ├── 05-arayuz-api/                    # Ekran akışları ve form sözleşmeleri
+│   ├── 06-kalite/                        # Test stratejisi, CI kalitesi, hata ayıklama rehberi
+│   ├── 07-sprintler/                     # S00–S10 sprint hedefleri ve uygulama raporları
+│   ├── 08-teslim/                        # Commit takvimi, sunum rehberi, akademik teslim
+│   ├── 09-ajana-talimat/                 # Geliştirme kuralları ve governance ilkeleri
+│   └── 10-referanslar/                   # Resmî kaynaklar ve sürüm teyitleri
 ├── src/
 │   ├── main/
 │   │   ├── java/com/example/clinic/
-│   │   │   └── ClinicAppointmentApplication.java   # Spring Boot giriş noktası
+│   │   │   ├── ClinicAppointmentApplication.java   # Spring Boot ana sınıfı
+│   │   │   ├── organization/                       # Organizasyon, şube, bölüm modülü
+│   │   │   │   ├── domain/                         # Organization, Branch, Department entity'leri
+│   │   │   │   └── infrastructure/                 # JPA repository port ve adapter'ları
+│   │   │   └── identity/                           # Kimlik ve profil modülü
+│   │   │       ├── domain/                         # UserAccount, Membership, Profile entity'leri
+│   │   │       └── infrastructure/                 # JPA repository arayüzleri
 │   │   └── resources/
-│   │       └── application.properties             # Temel yapılandırma
+│   │       ├── application.yml                     # Temel Spring Boot konfigürasyonu
+│   │       ├── application-dev.yml                 # Yerel geliştirme profili
+│   │       ├── application-test.yml                # Entegrasyon test profili
+│   │       └── db/migration/
+│   │           └── V1__create_organization_and_identity.sql # Flyway baseline şeması
 │   └── test/
 │       └── java/com/example/clinic/
-│           └── ClinicAppointmentApplicationTests.java # Context yükleme testi
-├── .gitattributes
-├── .gitignore                    # Mac, IDE ve gizli dosya korumaları güncellendi
-├── HELP.md
-├── mvnw
-├── mvnw.cmd
-├── pom.xml                       # Maven proje nesne modeli (Java 21, Spring Boot 3.4.2)
-└── README.md                     # Bu ana doküman
+│           ├── AbstractIntegrationTest.java        # Testcontainers PostgreSQL ortak tabanı
+│           ├── ClinicAppointmentApplicationTests.java # Context smoke testi
+│           ├── FlywayMigrationIT.java              # TC-039 Flyway migrasyon testi
+│           ├── OrganizationRepositoryIT.java       # Kurum/şube persistence testi
+│           ├── IdentityRepositoryIT.java           # Kimlik/profil persistence testi
+│           └── DatabaseConstraintIT.java           # Negatif kısıt ve bütünlük testleri
+├── .gitignore
+├── mvnw / mvnw.cmd
+├── pom.xml                               # Java 21, Boot 3.4.2, JPA, Flyway, Testcontainers
+└── README.md                             # Bu ana doküman
 ```
 
 ---
@@ -172,8 +194,8 @@ clinic-appointment/
 
 | Sprint | Başlık | Durum | Temel Çıktı |
 |---|---|---|---|
-| **S00** | Kapsam Dondurma ve GitHub Hazırlığı | **Uygulandı (Test Bekliyor)** | Depo temeli, docs normalizasyonu, README, git hygiene, izlenebilirlik, bağımlılık onarımı |
-| **S01** | Altyapı, Katmanlar, CI ve Veritabanı Temeli | *Planlandı* | PostgreSQL, Flyway V1, CI workflow, paket iskeleti |
+| **S00** | Kapsam Dondurma ve GitHub Hazırlığı | **Uygulandı (Doğrulandı)** | Depo temeli, docs normalizasyonu, README, git hygiene, izlenebilirlik, bağımlılık onarımı |
+| **S01** | Altyapı, Katmanlar, CI ve Veritabanı Temeli | **Uygulandı (Test Bekliyor)** | PostgreSQL 17, Flyway V1, JPA validate, Testcontainers, CI workflow |
 | **S02** | OOP Domain Çekirdeği ve Temel Varlıklar | *Planlandı* | BaseEntity, Value Object'ler, Entity hiyerarşisi, domain testleri |
 | **S03** | Kurum, Şube, Bölüm ve Hizmet Kataloğu | *Planlandı* | Çok şubeli katalog yapısı, süre/ücret tanımları, CRUD servisleri |
 | **S04** | Kimlik Doğrulama, Roller ve Yetkilendirme | *Planlandı* | Spring Security, 3 rol (Hasta, Personel, Yönetici), oturum güvenliği |
@@ -188,23 +210,20 @@ clinic-appointment/
 
 ## 9. Dokümantasyon Gezintisi
 
-Detaylı teknik dokümantasyona aşağıdaki bağlantılardan erişebilirsiniz:
-
 - [Dokümantasyon Ana Dizini](docs/README.md)
 - [Gereksinim ve İzlenebilirlik Matrisi (FR/NFR/TC)](docs/01-urun/01-gereksinim-matrisi.md)
 - [Mimari Katmanlar ve Teknoloji Kararları](docs/02-mimari/01-teknoloji-ve-katmanlar.md)
 - [Nesneye Dayalı Tasarım ve OOP Kanıtları](docs/02-mimari/03-oop-ilkeleri-ve-uml.md)
 - [Mimari Karar Kayıtları (ADR)](docs/02-mimari/04-mimari-kararlar.md)
+- [Veri Modeli ve Tablo Sözleşmeleri](docs/04-veri/02-tablolar-ve-migrasyon.md)
 - [Test Stratejisi ve Kalite Kapıları](docs/06-kalite/01-test-stratejisi.md)
+- [Sprint S01 Görev ve Kabul Kriterleri](docs/07-sprintler/S01.md)
+- [Sprint S01 Uygulama Raporu](docs/07-sprintler/S01-implementation-report.md)
 - [GitHub 10 Farklı Gün Commit Takvimi](docs/08-teslim/01-github-commit-takvimi.md)
-- [Akademik Teslim ve Sunum Kılavuzu](docs/08-teslim/02-sunum-ve-demo.md)
-- [Sprint S00 Uygulama Raporu](docs/07-sprintler/S00-implementation-report.md)
 
 ---
 
 ## 10. Akademik Teslimat Kuralları ve Commit Disiplini
-
-Ders yönergesi uyarınca teslimatın geçerli sayılması için aşağıdaki koşulların eksiksiz sağlanması zorunludur:
 
 1. **Farklı Günlerde Commit Şartı:** GitHub üzerinde **en az 10 commit'in, birbirinden farklı takvim günlerinde** yapılmış olması gerekmektedir. Aynı gün içinde atılan birden fazla commit tek bir gün olarak sayılır. Sahte/geçmişe dönük (backdated) commit kesinlikle yasaktır.
 2. **GitHub ve SABİS Gönderimi:** Projenin son kaynak kodu GitHub'a gönderilmeli ve SABİS sistemine süresi içinde teslim edilmelidir.

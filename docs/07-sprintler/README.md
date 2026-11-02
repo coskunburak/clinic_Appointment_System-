@@ -1,45 +1,57 @@
-# Master sprint yol haritası (S00–S10)
+# Master Sprint Yol Haritası ve Mimari Yönetişim (S00 – S10)
 
-## Planlama varsayımı
-Bu **11 sprint** süreleri 1/2 kişilik öğrenci işi için tahmini etkin çalışma günleridir; gerçek ders teslim tarihleri henüz bilinmiyor. Sprintler **küçük iterasyonlar** olarak tasarlanmıştır; 10 farklı gün commit şartı ile birebir gün eşleştirilmek zorunda değildir. Önce akademik MUST, sonra SHOULD, en son COULD.
+Bu dizin, **Sakarya Üniversitesi Nesneye Dayalı Programlama (OOP) Seçenek A — Hastane/Klinik Randevu Sistemi** dönem projesinin baştan sona tüm iterasyonlarını, iş paketlerini, kabul kriterlerini ve akademik denetim sözleşmelerini tanımlar.
 
-| Sprint | Hedef | Önkoşul | Öngörülen etkin gün | Teslim çıktısı |
+---
+
+## 1. Master Sprint Matrisi (S00 – S10)
+
+| Sprint | Başlık | Temel Odak ve Akademik Hedef | İlişkili Şartname & OOP İlkesi | Durum |
 |---|---|---|---|---|
-| [S00](./S00.md) | Kapsam dondurma ve GitHub hazırlığı | Öğretim elemanının Seçenek A metni; Java seçimi. | 1–2 gün | GitHub repo URL |
-| [S01](./S01.md) | Java Bootstrapping ve veritabanı temeli | S00 scope onayı. | 2–3 gün | V1 migration |
-| [S02](./S02.md) | Saf domain modeli ve OOP kanıtları | S01 build ve migration. | 2–3 gün | Java sınıfları + tests |
-| [S03](./S03.md) | Kurum, şube, bölüm ve hizmet kataloğu | S02 Money, temel domain. | 3–4 gün | Organization/Catalog tests |
-| [S04](./S04.md) | Kullanıcı, üç rol, güvenlik ve kaynak bazlı yetki | S03 kurum/şube kimlikleri ve S01 user_account migration. | 3–4 gün | Role matrix geçiş testleri |
-| [S05](./S05.md) | Personel yönetimi, yetkinlik ve müsaitlik | S03 katalog; S04 identity ve yetki. | 3–4 gün | Staff/availability testleri |
-| [S06](./S06.md) | Randevu transaction, snapshot ve eşzamanlılık | S03 katalog + S04 auth + S05 availability; V3 migration. | 4–5 gün | BookingServiceTest |
-| [S07](./S07.md) | Onay/ret/iptal/tamamla ve audit history | S06 booking ve S04 AccessPolicy. | 2–3 gün | StateTest |
-| [S08](./S08.md) | Üç rol için tamamlanmış web arayüzü | S03–S07 tamamlanmış business flow. | 4–5 gün | 3 rol ekran görüntüleri |
-| [S09](./S09.md) | Regression, hardening ve tekrarlanabilir demo | S08 kullanıcı akışı tamamlanmış. | 3–4 gün | UAT checklist |
-| [S10](./S10.md) | Rapor, GitHub/SABİS ve sınıf içi sunum | S09 UAT temiz; 10 farklı gerçek gün ilerlemesi tamamlanmış olmalı. | 2–3 gün (+ son 4 haftadaki sunum tarihi) | git log date check |
+| **[S00](./S00.md)** | **Kapsam Dondurma ve GitHub Hazırlığı** | Dokümantasyon normalizasyonu, README, git hygiene, izlenebilirlik matrisi, Boot 3.4.2 temeli. | Depo yönetimi ve akademik kapsam dondurma | **Uygulandı (Doğrulandı)** |
+| **[S01](./S01.md)** | **Java Bootstrapping ve Veritabanı Temeli** | PostgreSQL 17 Docker Compose, Flyway V1 baseline şeması, JPA validate, Testcontainers, Actuator, CI. | `NFR-003`, `TC-039` / Altyapı ve Veritabanı | **Uygulandı (Test Bekliyor)** |
+| **[S02](./S02.md)** | **Saf OOP Domain Çekirdeği ve Kural Motoru** | Immutable `Money`, `TimeInterval`, `PersonProfile` kalıtımı, `SchedulingConstraint` polimorfik stratejileri. | `FR-016`, `NFR-010` / Kalıtım, Kapsülleme, Polimorfizm | *Planlandı* |
+| **[S03](./S03.md)** | **Kurum, Şube, Bölüm ve Hizmet Kataloğu** | Çok şubeli ve tekil klinik yönetimi, mesai saatleri, tıbbi bölümler, genel muayene/radyoloji/laboratuvar hizmetleri. | `FR-001` .. `FR-006` / Kurum & Katalog | *Planlandı* |
+| **[S04](./S04.md)** | **Kimlik Doğrulama, Roller ve Güvenlik** | 3 Kullanıcı Rolü (Hasta, Doktor, Yönetici), BCrypt şifre hash, session, CSRF, IDOR / çok kiracılı yetki denetimi. | `FR-022` .. `FR-026`, `NFR-001` / Güvenlik | *Planlandı* |
+| **[S05](./S05.md)** | **Personel Yönetimi ve Müsaitlik Takvimi** | Hekim kaydı, uzmanlık alanı, hizmet yetkinlik eşleştirmesi (`StaffServiceEligibility`), haftalık mesai ve izin istisnaları. | `FR-007` .. `FR-011` / Çalışan Yönetimi | *Planlandı* |
+| **[S06](./S06.md)** | **Randevu Rezervasyonu ve Çakışma Önleme** | Pesimist satır kilidi (`PESSIMISTIC_WRITE`), yarı açık aralık çakışma önleme, snapshot fiyat dondurma, PostgreSQL concurrency testi. | `FR-012` .. `FR-017` / Eşzamanlılık & Çakışma | *Planlandı* |
+| **[S07](./S07.md)** | **Randevu Onay Döngüsü ve Durum Makinesi** | Onay (`CONFIRMED`), red (`REJECTED`), iptal (`CANCELLED`), tamamlama (`COMPLETED`) durum makinesi, append-only denetim izi. | `FR-018` .. `FR-021`, `FR-030` / Durum Makinesi | *Planlandı* |
+| **[S08](./S08.md)** | **Spring MVC ve Thymeleaf Kullanıcı Ekranları** | Hasta, hekim ve yönetici için sunucu taraflı HTML arayüzleri, form doğrulama, yerel Bootstrap 5 varlıkları (çevrimdışı demo). | `FR-027`, `FR-028`, `NFR-009` / Kullanıcı Arayüzü | *Planlandı* |
+| **[S09](./S09.md)** | **Regresyon, Dayanıklılık ve Demo Tohumu** | Tam regresyon suite (`verify`), eşzamanlı rezervasyon stres testi, tek tıkla çalışan zengin kurmaca demo verisi (`demo-seed`). | `NFR-004`, `NFR-005` / Kalite & Demo Hazırlığı | *Planlandı* |
+| **[S10](./S10.md)** | **Nihai Kalite, SABİS Teslimi ve Canlı Savunma** | 10 farklı gün commit doğrulaması, SABİS zip ve PDF raporu, 7 slaytlık sunum ve canlı akademik savunma (7. haftadan itibaren). | `NFR-006`, `NFR-007` / Teslimat ve Savunma | *Planlandı* |
 
-## Critical path
-`S00 → S01 → S02 → S03 + S04 → S05 → S06 → S07 → S08 → S09 → S10`. S03 ve S04 bazı işleri paralel yürütebilir; S06 öncesi katalog + kullanıcı + personel uygunluğu tamamlanmalıdır.
+---
 
-## MVP kapısı
-S08 sonunda hasta isteği + personel onayı + admin kurum yönetimi gösterilebilir olmalı. S09 kalite/regression, S10 teslim. **S06 bitmeden “randevu çakışması çözüldü” denemez**; concurrency integration test kanıtı gerekir.
+## 2. Kritik Yol (Critical Path) ve Bağımlılık Akışı
 
-## Her sprint sonu protokol
-1. İlgili FR ve TC listesini kontrol et.
-2. Kod + gerekli migration + test + doküman güncellemelerini hazırla.
-3. Komutları öğrenci manuel çalıştırır; hata çıktısı geri gelir.
-4. Ancak test kanıtı sonrası `Done` işaretlenir, gerçek gün commit/push yapılır.
-5. Sonraki sprint bağımlılığı tamamlanmadan geçiş yok.
-
-## Sprint review özeti şablonu
-```text
-Sprint: S__
-Branch / HEAD:
-Changes (classes, paths):
-Covered FR/TC:
-Manual commands supplied:
-Owner-reported test results (PASS/FAIL/NOT_RUN):
-Migrations / security effect:
-Known risks / TODO:
-Commit date and GitHub link:
-Next sprint gate:
+```mermaid
+flowchart TD
+    S00[S00: Kapsam Dondurma] --> S01[S01: Java & DB Temeli]
+    S01 --> S02[S02: Saf Domain Modeli & OOP]
+    S02 --> S03[S03: Kurum, Şube & Hizmet Kataloğu]
+    S02 --> S04[S04: Güvenlik & 3 Rol Kapsamı]
+    S03 --> S05[S05: Personel & Müsaitlik Takvimi]
+    S04 --> S05
+    S03 --> S06[S06: Randevu & Pesimist Kilitleme]
+    S04 --> S06
+    S05 --> S06
+    S06 --> S07[S07: Onay Döngüsü & Durum Makinesi]
+    S07 --> S08[S08: Thymeleaf Ekranları - 3 Rol]
+    S08 --> S09[S09: Regresyon & Demo Seed]
+    S09 --> S10[S10: SABİS Teslim & Canlı Savunma]
 ```
+
+- **Kritik Eşik 1 (S01):** PostgreSQL, Flyway ve Testcontainers çalışmadan hiçbir servis geliştirilemez.
+- **Kritik Eşik 2 (S06):** Rezervasyon pesimist kilidi ve gerçek PostgreSQL çok iş parçacıklı testi yeşil olmadan "çakışma çözüldü" denemez.
+- **Kritik Eşik 3 (S10):** En az 10 farklı takvim gününde commit bulunmadan ve canlı sunuma bizzat katılmadan dersten geçilemez.
+
+---
+
+## 3. Sprint Sonu Akademik Protokolü
+
+Her sprint tamamlandığında aşağıdaki disiplin zorunludur:
+1. İlgili FR ve TC testlerinin tamamı çalıştırılır.
+2. `git diff --check` çalıştırılarak whitespace hatası olmadığı doğrulanır.
+3. Test komutları geliştirici tarafından manuel çalıştırılıp çıktı doğrulanır (Ajan test çalıştırmaz).
+4. Commit mesajı Conventional Commits standardına uygun yazılır.
+5. **Akademik Kural:** 10 farklı gün şartını sağlamak için commit'ler gerçek takvim günlerinde atılır.

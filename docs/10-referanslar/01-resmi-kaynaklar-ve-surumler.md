@@ -1,24 +1,22 @@
 # Resmî teknik kaynaklar ve sürüm notu
 
-**Araştırma tarihi:** 2026-11-02. Başlangıçta sürümler güncel görünse de `pom.xml` yazılmadan önce Spring Initializr/resmî docs ile kesin bağımlılık isimleri teyit edilmelidir.
+**Araştırma tarihi:** 2026-11-02. S00 ve S01 denetimlerinde teyit edilen üretim seviyesi kütüphane sürümleri ve koordinatları:
 
-| Teknoloji / konu | Önerilen sürüm veya doküman | URL |
+| Teknoloji / konu | Seçilen sürüm ve koordinat | URL |
 |---|---|---|
-| JDK | Java 21 LTS (Temurin veya uygun OpenJDK dağıtımı) | https://www.oracle.com/java/technologies/downloads/ |
+| JDK | Java 21 LTS (Eclipse Temurin / OpenJDK 21) | https://www.oracle.com/java/technologies/downloads/ |
 | Spring Boot | 3.4.2 resmî referans / Java 21 uyumluluğu | https://docs.spring.io/spring-boot/system-requirements.html |
-| Boot starter isimleri | Boot 3 `spring-boot-starter-web`, validation, Thymeleaf, security, data-jpa | https://docs.spring.io/spring-boot/reference/using/build-systems.html |
-| Boot test | Spring Boot Test / MVC slice tests | https://docs.spring.io/spring-boot/reference/testing/ |
-| PostgreSQL | 17 dokümantasyonu, row locks | https://www.postgresql.org/docs/17/explicit-locking.html |
-| Java JDK API | `java.time`, `java.math.BigDecimal` | https://docs.oracle.com/en/java/javase/21/docs/api/ |
-| Spring Security | authentication, authorization, method/URL security | https://docs.spring.io/spring-security/reference/ |
-| Flyway | SQL migration referansı | https://documentation.red-gate.com/fd |
-| Thymeleaf | Spring+Thymeleaf reference | https://www.thymeleaf.org/documentation.html |
-| Testcontainers | PostgreSQL module / Java testing | https://java.testcontainers.org/modules/databases/postgres/ |
-| Maven | official build user guide | https://maven.apache.org/guides/ |
+| Boot starter isimleri | `spring-boot-starter-web`, `spring-boot-starter-validation`, `spring-boot-starter-thymeleaf`, `spring-boot-starter-data-jpa`, `spring-boot-starter-actuator` | https://docs.spring.io/spring-boot/reference/using/build-systems.html |
+| PostgreSQL | 17 (Docker `postgres:17-alpine`) & JDBC `org.postgresql:postgresql` | https://www.postgresql.org/docs/17/ |
+| Flyway | `org.flywaydb:flyway-core`, `org.flywaydb:flyway-database-postgresql` | https://documentation.red-gate.com/fd |
+| Test Altyapısı | `spring-boot-starter-test`, `org.testcontainers:postgresql`, `org.springframework.boot:spring-boot-testcontainers` | https://java.testcontainers.org/modules/databases/postgres/ |
+| Java JDK API | `java.time`, `java.math.BigDecimal`, `java.util.UUID` | https://docs.oracle.com/en/java/javase/21/docs/api/ |
+| Spring Security | S04'te eklenecek | https://docs.spring.io/spring-security/reference/ |
+| Maven Wrapper | 3.9.9 (`mvnw`, `mvnw.cmd`) | https://maven.apache.org/guides/ |
 | OWASP ASVS | 5.0.0 stable güvenlik yaklaşımı | https://asvs.owasp.org/ |
 
-## Lisans / dağıtım notu
-Java 21'in önceki LTS olması ve Oracle JDK dağıtım/lisans koşullarının sürüm bazında değişmesi nedeniyle, ders projesinde uygun açık OpenJDK dağıtımı (ör. Eclipse Temurin) seçmek pratik olabilir; sürümü ve lisansı yeniden kontrol et. Oracle'ın resmî açıklaması: https://blogs.oracle.com/java/jdk-21-approaches-end-of-permissive-license .
+## Lisans / Dağıtım Notu
+Java 21 LTS sürümünde Eclipse Temurin açık kaynak OpenJDK dağıtımı hedeflenmiştir. CI ve yerel geliştirme Temurin 21 üzerinde hizalanmıştır.
 
-## Tasarım notu
-Gereksinimde dil/teknoloji serbest olduğu için Java 21 ve Spring MVC bilinçli tercihtir; öğretim elemanı belirli JDK versiyonu zorunlu kılarsa değiştirilebilir.
+## Spring Boot Sürüm Uzlaşısı (Version Reconciliation)
+Eski planlama dokümanlarında geçen Boot 4.1.2 referansına karşılık, yerel depo ve S00 kapanışında kararlı çalışan Spring Boot 3.4.2 LTS sürümü korunmuştur. Bağımlılık adları (`flyway-database-postgresql`, `spring-boot-testcontainers`, `spring-boot-starter-web`) Boot 3.4.2 uyumlu yapılandırılmıştır.
