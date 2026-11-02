@@ -1,0 +1,9 @@
+JAVA HASTANE/KLINIK RANDEVU SISTEMI — DOCS ZIP
+Tarih: 2026-11-02
+
+1. docs/README.md ile baslayin.
+2. docs/00-baslangic/01-kararlar-ve-varsayimlar.md dosyasindaki tasarim tercihlerini kontrol edin.
+3. docs/07-sprintler/README.md ve S00.md ile uygulama planini baslatin.
+4. Repo olusturunca docs/ klasorunu proje kokune kopyalayin.
+5. Bu paket uygulama kodu DEGILDIR; mimari ve uygulama teslim planidir.
+6. Ders: En az 10 farkli gercek gunde commit; GitHub+SABIS ve sunuma katilim.
