@@ -1,22 +1,17 @@
 package com.example.clinic.identity.domain;
 
+import com.example.clinic.common.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
 @Entity
 @Table(name = "user_account")
-public class UserAccount {
-
-    @Id
-    @Column(name = "id", nullable = false, updatable = false)
-    private UUID id;
+public class UserAccount extends BaseEntity {
 
     @NotBlank
     @Column(name = "email", nullable = false, unique = true)
@@ -29,11 +24,8 @@ public class UserAccount {
     @Column(name = "enabled", nullable = false)
     private boolean enabled = true;
 
-    @NotNull
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private Instant createdAt;
-
     protected UserAccount() {
+        super();
     }
 
     public UserAccount(String email, String passwordHash) {
@@ -41,15 +33,10 @@ public class UserAccount {
     }
 
     public UserAccount(UUID id, String email, String passwordHash, boolean enabled, Instant createdAt) {
-        this.id = Objects.requireNonNull(id, "UserAccount id must not be null");
+        super(id, createdAt);
         this.email = Objects.requireNonNull(email, "email must not be null");
         this.passwordHash = Objects.requireNonNull(passwordHash, "passwordHash must not be null");
         this.enabled = enabled;
-        this.createdAt = Objects.requireNonNull(createdAt, "createdAt must not be null");
-    }
-
-    public UUID getId() {
-        return id;
     }
 
     public String getEmail() {
@@ -57,7 +44,7 @@ public class UserAccount {
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        this.email = Objects.requireNonNull(email, "email must not be null");
     }
 
     public String getPasswordHash() {
@@ -65,7 +52,7 @@ public class UserAccount {
     }
 
     public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
+        this.passwordHash = Objects.requireNonNull(passwordHash, "passwordHash must not be null");
     }
 
     public boolean isEnabled() {
@@ -76,30 +63,13 @@ public class UserAccount {
         this.enabled = enabled;
     }
 
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof UserAccount that)) return false;
-        return id != null && id.equals(that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
-
     @Override
     public String toString() {
-        // Strict security: Never expose passwordHash in toString()
         return "UserAccount{" +
-                "id=" + id +
+                "id=" + getId() +
                 ", email='" + email + '\'' +
                 ", enabled=" + enabled +
-                ", createdAt=" + createdAt +
+                ", createdAt=" + getCreatedAt() +
                 '}';
     }
 }

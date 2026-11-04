@@ -1,11 +1,11 @@
 package com.example.clinic.identity.domain;
 
+import com.example.clinic.common.domain.BaseEntity;
 import com.example.clinic.organization.domain.Branch;
 import com.example.clinic.organization.domain.Organization;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -17,11 +17,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "membership")
-public class Membership {
-
-    @Id
-    @Column(name = "id", nullable = false, updatable = false)
-    private UUID id;
+public class Membership extends BaseEntity {
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -41,11 +37,8 @@ public class Membership {
     @Column(name = "role", nullable = false, length = 50)
     private String role;
 
-    @NotNull
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private Instant createdAt;
-
     protected Membership() {
+        super();
     }
 
     public Membership(UserAccount userAccount, Organization organization, Branch branch, String role) {
@@ -53,16 +46,11 @@ public class Membership {
     }
 
     public Membership(UUID id, UserAccount userAccount, Organization organization, Branch branch, String role, Instant createdAt) {
-        this.id = Objects.requireNonNull(id, "Membership id must not be null");
+        super(id, createdAt);
         this.userAccount = Objects.requireNonNull(userAccount, "UserAccount must not be null");
         this.organization = Objects.requireNonNull(organization, "Organization must not be null");
         this.branch = branch;
-        this.role = Objects.requireNonNull(role, "Role must not be null");
-        this.createdAt = Objects.requireNonNull(createdAt, "createdAt must not be null");
-    }
-
-    public UUID getId() {
-        return id;
+        this.role = Objects.requireNonNull(role, "role must not be null");
     }
 
     public UserAccount getUserAccount() {
@@ -97,28 +85,12 @@ public class Membership {
         this.role = Objects.requireNonNull(role, "role must not be null");
     }
 
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Membership that)) return false;
-        return id != null && id.equals(that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
-
     @Override
     public String toString() {
         return "Membership{" +
-                "id=" + id +
+                "id=" + getId() +
                 ", role='" + role + '\'' +
-                ", createdAt=" + createdAt +
+                ", createdAt=" + getCreatedAt() +
                 '}';
     }
 }

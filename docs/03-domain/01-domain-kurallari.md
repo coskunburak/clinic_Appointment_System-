@@ -31,7 +31,7 @@
 - **BKG-03:** Aynı çalışanda PENDING/CONFIRMED/(geçmiş) COMPLETED randevu varken çakışan yeni rezervasyon yasaktır.
 - **BKG-04:** Farklı personelin aynı zaman aralığında işlemi olabilir. Aynı hastanın iki randevusu olmaması SHOULD kapsamındadır.
 - **BKG-05:** Yeni randevu PENDING açılır; onay yetkili personel veya yönetici tarafından yapılır.
-- **BKG-06:** Randevu iptal/ret statüleri slotu serbest bırakır; tekrar açmak için yeni istek gerekir.
+- **BKG-06:** Randevu iptal/ret statüleri slotu serbest bırakır; tekrar açmak için yeni istek gerekir. İptal randevu başlangıcından önce gerçekleştirilmelidir (`now < startAt`; S02'de tartışılan 2 saatlik kısıt önerisi genel kural lehine korunmuştur).
 - **BKG-07:** Yanlış durum geçişi 409; yetkisiz kişi için 403 veya kaynak varlığını gizlemek amacıyla 404.
 - **BKG-08:** İptal/ret/completed işlemleri audit history kaydeder ve aynı transaction'da commit edilir.
 - **BKG-09:** Sunucudan gelen hasta kimliği oturumdan türetilir, formdan güvenilmez.

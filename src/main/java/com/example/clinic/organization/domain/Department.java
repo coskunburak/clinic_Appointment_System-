@@ -1,9 +1,9 @@
 package com.example.clinic.organization.domain;
 
+import com.example.clinic.common.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -18,11 +18,7 @@ import java.util.UUID;
 @Table(name = "department", uniqueConstraints = {
         @UniqueConstraint(name = "uq_department_branch_name", columnNames = {"branch_id", "name"})
 })
-public class Department {
-
-    @Id
-    @Column(name = "id", nullable = false, updatable = false)
-    private UUID id;
+public class Department extends BaseEntity {
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -36,11 +32,8 @@ public class Department {
     @Column(name = "active", nullable = false)
     private boolean active = true;
 
-    @NotNull
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private Instant createdAt;
-
     protected Department() {
+        super();
     }
 
     public Department(Branch branch, String name) {
@@ -48,15 +41,10 @@ public class Department {
     }
 
     public Department(UUID id, Branch branch, String name, boolean active, Instant createdAt) {
-        this.id = Objects.requireNonNull(id, "Department id must not be null");
+        super(id, createdAt);
         this.branch = Objects.requireNonNull(branch, "Branch must not be null");
         this.name = Objects.requireNonNull(name, "Department name must not be null");
         this.active = active;
-        this.createdAt = Objects.requireNonNull(createdAt, "createdAt must not be null");
-    }
-
-    public UUID getId() {
-        return id;
     }
 
     public Branch getBranch() {
@@ -64,7 +52,7 @@ public class Department {
     }
 
     public void setBranch(Branch branch) {
-        this.branch = Objects.requireNonNull(branch, "branch must not be null");
+        this.branch = Objects.requireNonNull(branch, "Branch must not be null");
     }
 
     public String getName() {
@@ -72,7 +60,7 @@ public class Department {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = Objects.requireNonNull(name, "Department name must not be null");
     }
 
     public boolean isActive() {
@@ -83,29 +71,13 @@ public class Department {
         this.active = active;
     }
 
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Department that)) return false;
-        return id != null && id.equals(that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
-
     @Override
     public String toString() {
         return "Department{" +
-                "id=" + id +
+                "id=" + getId() +
                 ", name='" + name + '\'' +
                 ", active=" + active +
-                ", createdAt=" + createdAt +
+                ", createdAt=" + getCreatedAt() +
                 '}';
     }
 }

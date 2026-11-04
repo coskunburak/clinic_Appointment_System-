@@ -11,7 +11,7 @@
 - **Doğrudan Setter Yasağı:** `Appointment` sınıfında kontrolsüz `setStatus(...)` veya `setStartAt(...)` bulunmaz. Bunun yerine duruma uygun iş davranışı metotları (`approve(actor, clock)`, `reject(actor, reason)`, `cancel(actor, reason)`) kullanılır. Bu metotlar durum geçiş kurallarını ve değişmezleri (invariants) bizzat doğrular.
 - **Değişmez Değer Nesneleri (Immutable Value Objects):**
   - `Money`: Tutar (`BigDecimal`) ve ISO para birimini (`Currency`) kapsüller; negatif tutar oluşmasını kurucuda engeller.
-  - `TimeSlot`: Başlangıç (`Instant`) ve bitiş (`Instant`) anlarını kapsüller; `start >= end` durumunda nesnenin oluşmasına izin vermez, iki aralığın çakışıp çakışmadığını (`overlapsWith(...)`) kendi metoduyla hesaplar.
+  - `TimeInterval`: Başlangıç (`Instant`) ve bitiş (`Instant`) anlarını kapsüller; `start >= end` durumunda nesnenin oluşmasına izin vermez, iki aralığın çakışıp çakışmadığını (`overlapsWith(...)`) kendi metoduyla hesaplar.
 - **Hassas Bilgi Gizleme:** `UserAccount` sınıfında parola hash'i nesne içinde kapsüllenir; `toString()` veya serileştirme metotlarında asla dışarı sızdırılmaz.
 
 ### 1.2. Kalıtım (Inheritance)
@@ -41,7 +41,7 @@
 
 | İlke | Projedeki Somut Uygulama | Kanıt ve Mimari Karşılık |
 |---|---|---|
-| **S — Single Responsibility (Tek Sorumluluk)** | Her sınıfın tek bir değişim gerekçesi vardır. `BookingService` randevu orkestrasyonunu yönetirken, `AvailabilityCalculator` slot matematiğini çözer; `AdminBranchController` ise yalnızca HTTP isteklerini karşılar. | [BookingService & AvailabilityCalculator](file:///Users/burakcoskun/Downloads/clinic-appointment/docs/02-mimari/02-paket-agaci-ve-sinirlari.md) |
+| **S — Single Responsibility (Tek Sorumluluk)** | Her sınıfın tek bir değişim gerekçesi vardır. `BookingService` randevu orkestrasyonunu yönetirken, `AvailabilityCalculator` slot matematiğini çözer; `AdminBranchController` ise yalnızca HTTP isteklerini karşılar. | [BookingService & AvailabilityCalculator](02-paket-agaci-ve-sinirlari.md) |
 | **O — Open/Closed (Açık/Kapalı)** | Sistem gelişime açık, değişime kapalıdır. Yeni bir randevu kuralı (örneğin: `OfficialHolidayConstraint`) eklendiğinde mevcut rezervasyon kodu değiştirilmez; sadece yeni bir `SchedulingConstraint` sınıfı yazılarak listeye eklenir. | `SchedulingConstraint` Polimorfizmi |
 | **L — Liskov Substitution (Liskov İkamesi)** | `PersonProfile` soyut sınıfından türeyen `PatientProfile` ve `StaffProfile`, temel sınıfın yerine geçtiğinde programın beklenen davranışı bozulmaz. İkisi de aynı doğrulama ve kimlik sözleşmesine uyar. | `PersonProfile` Hiyerarşisi |
 | **I — Interface Segregation (Arayüz Ayrımı)** | Tek bir devasa "God Interface" yerine küçük, odaklanmış arayüzler kullanılır. Örneğin okuma ve yazma operasyonları için odaklanmış repository portları tanımlanır. | Modüler Repository Arayüzleri |
@@ -142,37 +142,82 @@ classDiagram
         -boolean active
     }
 
+    class TimeInterval {
+        -Instant startAt
+        -Instant endAt
+        +overlapsWith(TimeInterval) boolean
+        +contains(Instant) boolean
+        +duration() Duration
+    }
+
+    class Money {
+        -BigDecimal amount
+        -Currency currency
+        +add(Money) Money
+        +subtract(Money) Money
+        +multiply(BigDecimal) Money
+    }
+
+    class ServiceSnapshot {
+        -UUID serviceId
+        -String serviceName
+        -int durationMinutes
+        -Money fee
+    }
+
+    class AppointmentStatus {
+        <<enumeration>>
+        PENDING
+        CONFIRMED
+        REJECTED
+        CANCELLED
+        COMPLETED
+    }
+
     class Appointment {
-        -Instant startAtUtc
-        -Instant endAtUtc
+        -UUID id
+        -UUID patientId
+        -UUID staffId
+        -UUID branchId
+        -UUID branchServiceId
+        -TimeInterval interval
+        -ServiceSnapshot serviceSnapshot
         -AppointmentStatus status
-        -String serviceNameSnapshot
-        -BigDecimal feeSnapshot
-        -int durationMinutesSnapshot
-        +approve(actor, clock) void
-        +reject(actor, reason) void
-        +cancel(actor, reason) void
+        -Instant createdAt
+        +approve(UUID actorId, Clock clock) void
+        +reject(UUID actorId, String reason, Clock clock) void
+        +cancel(UUID actorId, String reason, Clock clock) void
+        +complete(UUID actorId, Clock clock) void
     }
 
     class SchedulingConstraint {
         <<interface>>
-        +validate(BookingContext context) void
+        +validate(BookingValidationContext context) void
     }
 
     class OpeningHoursConstraint {
-        +validate(BookingContext context) void
+        +validate(BookingValidationContext context) void
     }
 
     class StaffAvailabilityConstraint {
-        +validate(BookingContext context) void
+        +validate(BookingValidationContext context) void
+    }
+
+    class StaffServiceEligibilityConstraint {
+        +validate(BookingValidationContext context) void
     }
 
     class NoOverlapConstraint {
-        +validate(BookingContext context) void
+        +validate(BookingValidationContext context) void
+    }
+
+    class SchedulingValidator {
+        -List~SchedulingConstraint~ constraints
+        +validate(BookingValidationContext context) void
     }
 
     class BookingService {
-        -List~SchedulingConstraint~ constraints
+        -SchedulingValidator schedulingValidator
         -AppointmentRepository appointmentRepo
         +createAppointment(BookingRequest request) Appointment
     }
@@ -188,11 +233,11 @@ classDiagram
     BaseEntity <|-- Membership
     BaseEntity <|-- ServiceDefinition
     BaseEntity <|-- BranchService
-    BaseEntity <|-- Appointment
 
     %% Çok Biçimlilik (Polymorphism)
     SchedulingConstraint <|.. OpeningHoursConstraint
     SchedulingConstraint <|.. StaffAvailabilityConstraint
+    SchedulingConstraint <|.. StaffServiceEligibilityConstraint
     SchedulingConstraint <|.. NoOverlapConstraint
 
     %% Bileşim ve İlişkiler (Composition & Associations)
@@ -206,8 +251,12 @@ classDiagram
     Branch "0..1" <-- "many" Membership : restricts
     PatientProfile "1" <-- "many" Appointment : books
     StaffProfile "1" <-- "many" Appointment : serves
-    BranchService "1" <-- "many" Appointment : targets
-    BookingService o-- SchedulingConstraint : validates
+    Appointment *-- "1" TimeInterval : bounded by
+    Appointment *-- "1" ServiceSnapshot : captures
+    Appointment -- "1" AppointmentStatus : state
+    ServiceSnapshot *-- "1" Money : fee
+    SchedulingValidator o-- SchedulingConstraint : executes
+    BookingService o-- SchedulingValidator : validates
     BookingService ..> Appointment : manages
 ```
 

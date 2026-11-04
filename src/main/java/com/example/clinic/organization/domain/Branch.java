@@ -1,9 +1,9 @@
 package com.example.clinic.organization.domain;
 
+import com.example.clinic.common.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -15,11 +15,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "branch")
-public class Branch {
-
-    @Id
-    @Column(name = "id", nullable = false, updatable = false)
-    private UUID id;
+public class Branch extends BaseEntity {
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -40,11 +36,8 @@ public class Branch {
     @Column(name = "active", nullable = false)
     private boolean active = true;
 
-    @NotNull
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private Instant createdAt;
-
     protected Branch() {
+        super();
     }
 
     public Branch(Organization organization, String name, String timeZone, String address) {
@@ -52,17 +45,12 @@ public class Branch {
     }
 
     public Branch(UUID id, Organization organization, String name, String timeZone, String address, boolean active, Instant createdAt) {
-        this.id = Objects.requireNonNull(id, "Branch id must not be null");
+        super(id, createdAt);
         this.organization = Objects.requireNonNull(organization, "Organization must not be null");
         this.name = Objects.requireNonNull(name, "Branch name must not be null");
-        this.timeZone = (timeZone != null && !timeZone.isBlank()) ? timeZone : "Europe/Istanbul";
+        this.timeZone = Objects.requireNonNull(timeZone, "timeZone must not be null");
         this.address = address;
         this.active = active;
-        this.createdAt = Objects.requireNonNull(createdAt, "createdAt must not be null");
-    }
-
-    public UUID getId() {
-        return id;
     }
 
     public Organization getOrganization() {
@@ -70,7 +58,7 @@ public class Branch {
     }
 
     public void setOrganization(Organization organization) {
-        this.organization = Objects.requireNonNull(organization, "organization must not be null");
+        this.organization = Objects.requireNonNull(organization, "Organization must not be null");
     }
 
     public String getName() {
@@ -78,7 +66,7 @@ public class Branch {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = Objects.requireNonNull(name, "Branch name must not be null");
     }
 
     public String getTimeZone() {
@@ -86,7 +74,7 @@ public class Branch {
     }
 
     public void setTimeZone(String timeZone) {
-        this.timeZone = timeZone;
+        this.timeZone = Objects.requireNonNull(timeZone, "timeZone must not be null");
     }
 
     public String getAddress() {
@@ -105,30 +93,14 @@ public class Branch {
         this.active = active;
     }
 
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Branch that)) return false;
-        return id != null && id.equals(that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
-
     @Override
     public String toString() {
         return "Branch{" +
-                "id=" + id +
+                "id=" + getId() +
                 ", name='" + name + '\'' +
                 ", timeZone='" + timeZone + '\'' +
                 ", active=" + active +
-                ", createdAt=" + createdAt +
+                ", createdAt=" + getCreatedAt() +
                 '}';
     }
 }

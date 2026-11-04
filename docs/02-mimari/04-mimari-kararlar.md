@@ -49,3 +49,13 @@
 **Durum:** Kabul Edildi (Sprint S00 kararı).
 **Karar:** Yapay zekâ ajanı kaynak kod ve test sınıflarını hazırlar, statik analizini yapar; ancak test komutlarını doğrudan otomatik olarak çalıştırmaz. Geliştiriciye tek bir yorumsuz `bash` bloğu halinde komut listesi sunar. Geliştirici çıktıyı terminalden alıp ajana iletir.
 **Gerekçe:** Kontrollü maliyet, deterministik test kanıtı ve öğrencinin geliştirme ortamına tam hakimiyeti.
+
+## ADR-009 — Saf Domain Çekirdeği, Değişmez Değer Nesneleri ve Polimorfik Kural Motoru
+**Durum:** Kabul Edildi (Sprint S02 kararı).
+**Bağlam:** Sprint S02 saf nesneye dayalı programlama (OOP), zengin domain modeli ve kalıtım/polimorfizm ilkelerini kanıtlamayı hedefler. S01'de uygulanan PostgreSQL V1 şeması ve JPA kalıcılık altyapısı mevcuttur.
+**Karar:**
+1. **Saf POJO ve Kalıcılık Ayrımı:** `Money`, `TimeInterval`, `ServiceSnapshot`, `Appointment` ve `SchedulingConstraint` motoru Spring, Hibernate ve JPA bağımlılığı taşımayan saf POJO olarak inşa edilmiştir. `BaseEntity` ve `PersonProfile` ise mevcut V1 şeması ile uyumlu `@MappedSuperclass` hiyerarşisi olarak modellenmiştir; yeni bir `person_profile` tablosu veya discriminator kolonu eklenmemiştir. `branch_opening_hours` tablosunda `created_at` kolonu bulunmadığından `BranchOpeningHours` sınıfı `BaseEntity`'den türetilmemiştir.
+2. **Kanonik Zaman Aralığı:** `TimeSlot` yerine mutlak zaman aralıkları için `[startAt, endAt)` yarı açık kuralını işleten `TimeInterval` kanonik sınıf olarak seçilmiştir.
+3. **İptal Zaman Politikası:** S02 önerisinde geçen "2 saat kala iptal engeli" henüz onaylı bir ADR ile karara bağlanmadığı için genel kural olan "başlamadan önce iptal edilebilir" politikası aggregate seviyesinde işletilmiştir.
+4. **Durum Makinesi:** `AppointmentStatus` enum'ı ve `Appointment` içindeki iş davranış metotları (`approve`, `reject`, `cancel`, `complete`) ile kontrolsüz setter'lar engellenmiş, durum geçişleri deterministik `Clock` ile korunmuştur.
+5. **Polimorfizm:** `SchedulingConstraint` arayüzü ve `SchedulingValidator` koordinatörü ile Açık/Kapalı Prensibi (OCP) uygulanmış, `instanceof` veya `switch` kullanılmaksızın kural işletimi sağlanmıştır.

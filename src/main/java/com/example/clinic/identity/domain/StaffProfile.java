@@ -2,36 +2,19 @@ package com.example.clinic.identity.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * Concrete medical/clinic staff profile entity extending the shared {@link PersonProfile} abstraction.
+ * Encapsulates staff-specific attributes such as staff type, medical specialty, and active status.
+ */
 @Entity
 @Table(name = "staff_profile")
-public class StaffProfile {
-
-    @Id
-    @Column(name = "id", nullable = false, updatable = false)
-    private UUID id;
-
-    @NotNull
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false, unique = true)
-    private UserAccount userAccount;
-
-    @NotBlank
-    @Column(name = "full_name", nullable = false)
-    private String fullName;
-
-    @Column(name = "phone", length = 50)
-    private String phone;
+public class StaffProfile extends PersonProfile {
 
     @NotBlank
     @Column(name = "staff_type", nullable = false, length = 50)
@@ -43,54 +26,34 @@ public class StaffProfile {
     @Column(name = "active", nullable = false)
     private boolean active = true;
 
-    @NotNull
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private Instant createdAt;
-
     protected StaffProfile() {
+        super();
     }
 
     public StaffProfile(UserAccount userAccount, String fullName, String phone, String staffType, String specialty) {
         this(UUID.randomUUID(), userAccount, fullName, phone, staffType, specialty, true, Instant.now());
     }
 
-    public StaffProfile(UUID id, UserAccount userAccount, String fullName, String phone, String staffType, String specialty, boolean active, Instant createdAt) {
-        this.id = Objects.requireNonNull(id, "StaffProfile id must not be null");
-        this.userAccount = Objects.requireNonNull(userAccount, "UserAccount must not be null");
-        this.fullName = Objects.requireNonNull(fullName, "fullName must not be null");
-        this.phone = phone;
-        this.staffType = Objects.requireNonNull(staffType, "staffType must not be null");
-        this.specialty = specialty;
+    public StaffProfile(UUID id, UserAccount userAccount, String fullName, String phone,
+                        String staffType, String specialty, boolean active, Instant createdAt) {
+        super(id, userAccount, fullName, phone, createdAt);
+        this.staffType = validateStaffType(staffType);
+        this.specialty = validateSpecialty(this.staffType, specialty);
         this.active = active;
-        this.createdAt = Objects.requireNonNull(createdAt, "createdAt must not be null");
     }
 
-    public UUID getId() {
-        return id;
+    public static String validateStaffType(String staffType) {
+        if (staffType == null || staffType.isBlank()) {
+            throw new IllegalArgumentException("staffType must not be null or blank");
+        }
+        return staffType.strip();
     }
 
-    public UserAccount getUserAccount() {
-        return userAccount;
-    }
-
-    public void setUserAccount(UserAccount userAccount) {
-        this.userAccount = Objects.requireNonNull(userAccount, "userAccount must not be null");
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
+    public static String validateSpecialty(String staffType, String specialty) {
+        if (specialty == null || specialty.isBlank()) {
+            return null;
+        }
+        return specialty.strip();
     }
 
     public String getStaffType() {
@@ -98,7 +61,7 @@ public class StaffProfile {
     }
 
     public void setStaffType(String staffType) {
-        this.staffType = Objects.requireNonNull(staffType, "staffType must not be null");
+        this.staffType = validateStaffType(staffType);
     }
 
     public String getSpecialty() {
@@ -106,7 +69,11 @@ public class StaffProfile {
     }
 
     public void setSpecialty(String specialty) {
-        this.specialty = specialty;
+        this.specialty = validateSpecialty(this.staffType, specialty);
+    }
+
+    public void changeSpecialty(String newSpecialty) {
+        this.specialty = validateSpecialty(this.staffType, newSpecialty);
     }
 
     public boolean isActive() {
@@ -117,31 +84,24 @@ public class StaffProfile {
         this.active = active;
     }
 
-    public Instant getCreatedAt() {
-        return createdAt;
+    public void deactivate() {
+        this.active = false;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof StaffProfile that)) return false;
-        return id != null && id.equals(that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
+    public void activate() {
+        this.active = true;
     }
 
     @Override
     public String toString() {
         return "StaffProfile{" +
-                "id=" + id +
-                ", fullName='" + fullName + '\'' +
+                "id=" + getId() +
+                ", fullName='" + getFullName() + '\'' +
+                ", phone='" + getPhone() + '\'' +
                 ", staffType='" + staffType + '\'' +
                 ", specialty='" + specialty + '\'' +
                 ", active=" + active +
-                ", createdAt=" + createdAt +
+                ", createdAt=" + getCreatedAt() +
                 '}';
     }
 }

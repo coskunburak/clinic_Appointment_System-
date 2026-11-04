@@ -56,3 +56,4 @@
 - Görev ID ve test ID bir uygulama oluşturulduğu anlamına gelmez; geliştirme sırasında kanıt bağlantısı işlenir.
 - `06-kalite/02-test-senaryolari.md` dosyasındaki TC kayıtları ile çapraz kontrol yapılır.
 - `07-sprintler` dosyalarından her bir sprintin Done kriterlerine bağlanır.
+- **Sprint S02 İzlenebilirlik Notu:** S02 kapsamında `Appointment`, `TimeInterval`, `ServiceSnapshot` ve `Money` ile FR-016 ve TC-016'nın bellek-içi zengin domain temeli (`DOMAIN_FOUNDATION_IMPLEMENTED`) kurulmuş; veritabanı şeması ve repository kalıcılığı ise planlandığı gibi S06'ya (`PERSISTENCE_DEFERRED_TO_S06`) bırakılmıştır. NFR-010/TC-046 için paket mimari sınır testi (`DomainArchitectureTest`) ile saf domain çekirdeği doğrulanmıştır.

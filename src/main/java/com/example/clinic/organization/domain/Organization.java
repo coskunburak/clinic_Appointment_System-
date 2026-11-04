@@ -1,22 +1,17 @@
 package com.example.clinic.organization.domain;
 
+import com.example.clinic.common.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
 @Entity
 @Table(name = "organization")
-public class Organization {
-
-    @Id
-    @Column(name = "id", nullable = false, updatable = false)
-    private UUID id;
+public class Organization extends BaseEntity {
 
     @NotBlank
     @Column(name = "name", nullable = false)
@@ -25,12 +20,8 @@ public class Organization {
     @Column(name = "active", nullable = false)
     private boolean active = true;
 
-    @NotNull
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private Instant createdAt;
-
     protected Organization() {
-        // Protected default constructor for JPA/Hibernate
+        super();
     }
 
     public Organization(String name) {
@@ -38,14 +29,9 @@ public class Organization {
     }
 
     public Organization(UUID id, String name, boolean active, Instant createdAt) {
-        this.id = Objects.requireNonNull(id, "Organization id must not be null");
+        super(id, createdAt);
         this.name = Objects.requireNonNull(name, "Organization name must not be null");
         this.active = active;
-        this.createdAt = Objects.requireNonNull(createdAt, "createdAt must not be null");
-    }
-
-    public UUID getId() {
-        return id;
     }
 
     public String getName() {
@@ -53,7 +39,7 @@ public class Organization {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = Objects.requireNonNull(name, "Organization name must not be null");
     }
 
     public boolean isActive() {
@@ -64,29 +50,21 @@ public class Organization {
         this.active = active;
     }
 
-    public Instant getCreatedAt() {
-        return createdAt;
+    public void deactivate() {
+        this.active = false;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Organization that)) return false;
-        return id != null && id.equals(that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
+    public void activate() {
+        this.active = true;
     }
 
     @Override
     public String toString() {
         return "Organization{" +
-                "id=" + id +
+                "id=" + getId() +
                 ", name='" + name + '\'' +
                 ", active=" + active +
-                ", createdAt=" + createdAt +
+                ", createdAt=" + getCreatedAt() +
                 '}';
     }
 }
