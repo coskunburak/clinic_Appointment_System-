@@ -133,6 +133,10 @@ classDiagram
         -String name
         -String description
         -boolean active
+        +rename(String newName) void
+        +changeDescription(String newDescription) void
+        +activate() void
+        +deactivate() void
     }
 
     class BranchService {
@@ -140,6 +144,21 @@ classDiagram
         -BigDecimal feeAmount
         -String currency
         -boolean active
+        +changePrice(Money newPrice) void
+        +changeDuration(int newDurationMinutes) void
+        +toSnapshot() ServiceSnapshot
+        +activate() void
+        +deactivate() void
+    }
+
+    class BranchOpeningHours {
+        -UUID id
+        -short weekday
+        -LocalTime startTime
+        -LocalTime endTime
+        +getWeekday() short
+        +getStartTime() LocalTime
+        +getEndTime() LocalTime
     }
 
     class TimeInterval {
@@ -243,6 +262,7 @@ classDiagram
     %% Bileşim ve İlişkiler (Composition & Associations)
     Organization "1" *-- "many" Branch : contains
     Branch "1" *-- "many" Department : contains
+    Branch "1" *-- "many" BranchOpeningHours : defines
     Branch "1" *-- "many" BranchService : offers
     ServiceDefinition "1" <-- "many" BranchService : references
     UserAccount "1" *-- "1" PersonProfile : identifies

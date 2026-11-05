@@ -23,12 +23,12 @@ class FlywayMigrationIT extends AbstractIntegrationTest {
     private DataSource dataSource;
 
     @Test
-    @DisplayName("TC-039 / NFR-003: Flyway V1 migration executes cleanly and creates expected baseline tables")
-    void baselineMigration_createsExpectedTables() {
+    @DisplayName("TC-039 / NFR-003: Flyway V1 and V2 migrations execute cleanly and create expected tables")
+    void migrations_createExpectedTables() {
         MigrationInfo current = flyway.info().current();
         assertThat(current).isNotNull();
-        assertThat(current.getVersion().getVersion()).isEqualTo("1");
-        assertThat(current.getDescription()).isEqualTo("create organization and identity");
+        assertThat(current.getVersion().getVersion()).isEqualTo("2");
+        assertThat(current.getDescription()).isEqualTo("create catalog tables");
 
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
         List<String> tableNames = jdbcTemplate.queryForList(
@@ -45,19 +45,21 @@ class FlywayMigrationIT extends AbstractIntegrationTest {
                 "user_account",
                 "membership",
                 "patient_profile",
-                "staff_profile"
+                "staff_profile",
+                "service_definition",
+                "branch_service"
         );
     }
 
     @Test
-    @DisplayName("TC-039 / NFR-003: Subsequent migration call is idempotent and does not re-execute V1")
+    @DisplayName("TC-039 / NFR-003: Subsequent migration call is idempotent and does not re-execute migrations")
     void subsequentMigration_isIdempotent() {
         MigrateResult result = flyway.migrate();
         assertThat(result.migrationsExecuted).isZero();
 
         MigrationInfo current = flyway.info().current();
         assertThat(current).isNotNull();
-        assertThat(current.getVersion().getVersion()).isEqualTo("1");
+        assertThat(current.getVersion().getVersion()).isEqualTo("2");
     }
 
     @Test

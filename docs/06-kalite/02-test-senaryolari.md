@@ -4,12 +4,12 @@
 
 | Test | Gereksinim | Adımlar / fixture | Beklenen sonuç |
 |---|---|---|---|
-| TC-001 | FR-001 | ADMIN yeni kurum oluşturur; ad ve aktiflik alanlarını kaydeder | kayıt kalıcı, aynı kimlikle geri okunabilir |
-| TC-002 | FR-002 | Tek ve iki şubeli kurum fixture kur; iki şube ayrı listelenir | şubeler aynı kurumla ilişkilidir, ek Java değişikliği gerekmez |
-| TC-003 | FR-003 | Pzt 09:00–17:00 tanımla; 17:00 dışındaki slotu iste | mesai kaydı görünür; dışarıdaki slot reddedilir |
-| TC-004 | FR-004 | Merkez şubesine Kardiyoloji ve Radyoloji ekle | kayıtlar yalnız ilgili şubede gösterilir |
-| TC-005 | FR-005 | Genel Muayene kataloğu oluştur; başka kurum hesabından iste | katalog görünür, scope dışından erişilemez |
-| TC-006 | FR-006 | 30 dakika/800.00 TRY kaydet; 0dk ve negatif fiyat gönder | geçerli kabul; geçersiz alan 422 |
+| TC-001 | FR-001 | ADMIN yeni kurum oluşturur; ad ve aktiflik alanlarını kaydeder | kayıt kalıcı, aynı kimlikle geri okunabilir (`OrganizationAdminServiceIT.shouldCreateAndUpdateOrganization` — Otomatize / OWNER_TEST_PENDING) |
+| TC-002 | FR-002 | Tek ve iki şubeli kurum fixture kur; iki şube ayrı listelenir | şubeler aynı kurumla ilişkilidir, ek Java değişikliği gerekmez (`OrganizationAdminServiceIT.shouldSupportSingleAndMultiBranchOrganizations` — Otomatize / OWNER_TEST_PENDING) |
+| TC-003 | FR-003 | Pzt 09:00–17:00 tanımla; 17:00 dışındaki slotu iste | mesai kaydı görünür; dışarıdaki slot reddedilir (`OrganizationAdminServiceIT.shouldConfigureWeeklyOpeningHoursAtomically` — Otomatize / OWNER_TEST_PENDING) |
+| TC-004 | FR-004 | Merkez şubesine Kardiyoloji ve Radyoloji ekle | kayıtlar yalnız ilgili şubede gösterilir (`OrganizationAdminServiceIT.shouldManageDepartmentsAcrossBranches` — Otomatize / OWNER_TEST_PENDING) |
+| TC-005 | FR-005 | Genel Muayene kataloğu oluştur; başka kurum hesabından iste | katalog görünür, scope dışından erişilemez (`CatalogManagementServiceIT.shouldDefineAndRetrieveOrganizationService` — Otomatize / OWNER_TEST_PENDING) |
+| TC-006 | FR-006 | 30 dakika/800.00 TRY kaydet; 0dk ve negatif fiyat gönder | geçerli kabul; geçersiz alan reddedilir (`CatalogManagementServiceIT.shouldAllowDifferentPricingAndDurationsAcrossBranches`, `BranchServiceTest` — Otomatize / OWNER_TEST_PENDING) |
 | TC-007 | FR-007 | Doktor ve teknisyen kaydet | iki kayıt staff_type ile ayrılır |
 | TC-008 | FR-008 | Doktora Kardiyoloji uzmanlığı gir; boş uzmanlıkla doktor kaydet | uzmanlık gösterilir; doktor için boş alan 422 |
 | TC-009 | FR-009 | Doktora Muayene ver, Ultrason verilmeyen hizmeti iste | yetkili listede görünür; yetkisiz hizmet reddedilir |

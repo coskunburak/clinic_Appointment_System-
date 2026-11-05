@@ -23,10 +23,11 @@
 
 ## Gerçekleşen ve Önerilen Migration Sırası
 - `V1__create_organization_and_identity.sql` : **(S01'de uygulandı)** `organization`, `branch`, `branch_opening_hours`, `department`, `user_account`, `membership`, `patient_profile`, `staff_profile`.
-- `V2__create_catalog_staff_and_availability.sql` : *(S03/S05)* branch services, assignment, eligibility, schedules/exceptions.
-- `V3__create_appointments.sql` : *(S06/S07)* appointment/history, index ve check.
-- `V4__add_idempotency.sql` : *(S06)* SHOULD; yalnız uygulanıyorsa.
-- `V5__add_postgres_exclusion_guard.sql` : *(S06)* opsiyonel ve sadece testle ispatlandıysa.
+- `V2__create_catalog_tables.sql` : **(S03'te uygulandı)** `service_definition`, `branch_service` (kompozit kiracı izolasyonu ve kontroller).
+- `V3__create_staff_and_availability.sql` : *(S05)* `staff_assignment`, `staff_service_eligibility`, `weekly_availability`, `availability_exception`.
+- `V4__create_appointments.sql` : *(S06/S07)* `appointment`, `appointment_status_history`, index ve check.
+- `V5__add_idempotency.sql` : *(S06)* SHOULD; yalnız uygulanıyorsa.
+- `V6__add_postgres_exclusion_guard.sql` : *(S06)* opsiyonel ve sadece testle ispatlandıysa.
 
 ## Migration kuralları
 - Mevcut uygulanmış migration düzenlenmez; yeni migration eklenir.
@@ -37,4 +38,5 @@
 - `@Version` ile status update yarışı kontrol edilir; commit sırasında unique/FK ihlalleri anlamlı uygulama hatasına çevrilir.
 
 ## Çok Kiracılı Veri Bütünlüğü Kuralı
-Yalnızca bağımsız tekil yabancı anahtarlar (`branch_id` ve `organization_id`) kiracı izolasyonunu garanti etmez. V1 migrasyonunda `branch` tablosuna `uq_branch_id_org_id (id, organization_id)` tanımlanmış ve `membership` tablosuna `fk_membership_branch_org FOREIGN KEY (branch_id, organization_id) REFERENCES branch(id, organization_id)` kompozit kısıtı eklenmiştir. Böylece kullanıcının bir kuruma aitken başka kurumun şubesine bağlanması veritabanı seviyesinde fiziksel olarak engellenmiştir.
+Yalnızca bağımsız tekil yabancı anahtarlar (`branch_id` ve `organization_id`) kiracı izolasyonunu garanti etmez. V1 migrasyonunda `branch` tablosuna `uq_branch_id_org_id (id, organization_id)` tanımlanmış ve `membership` tablosuna `fk_membership_branch_org FOREIGN KEY (branch_id, organization_id) REFERENCES branch(id, organization_id)` kompozit kısıtı eklenmiştir.
+S03'te bu kural katalog katmanına genişletilmiştir: `service_definition` tablosuna `uq_service_definition_id_org_id (id, organization_id)` kısıtı eklenmiş; `branch_service` tablosuna hem `fk_branch_service_branch_org FOREIGN KEY (branch_id, organization_id) REFERENCES branch(id, organization_id)` hem de `fk_branch_service_def_org FOREIGN KEY (service_definition_id, organization_id) REFERENCES service_definition(id, organization_id)` kompozit yabancı anahtarları bağlanmıştır. Böylece A Kurumunun şubesine B Kurumunun hizmetinin atanması veritabanı motoru seviyesinde fiziksel olarak engellenmiştir.

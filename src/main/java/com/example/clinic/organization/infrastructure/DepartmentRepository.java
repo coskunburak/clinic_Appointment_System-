@@ -10,6 +10,10 @@ import java.util.UUID;
 
 @Repository
 public interface DepartmentRepository extends JpaRepository<Department, UUID> {
+
     List<Department> findByBranchId(UUID branchId);
+
+    List<Department> findByBranchIdAndActiveTrue(UUID branchId);
+
     Optional<Department> findByBranchIdAndName(UUID branchId, String name);
 }

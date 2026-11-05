@@ -1,10 +1,10 @@
-﻿requirement_id,priority,requirement,sprint,test_id,implementation_status,owner_test_status
-FR-001,MUST,Yönetici kurum tanımlayabilir ve güncelleyebilir,S03,TC-001,PLANNED,NOT_RUN
-FR-002,MUST,Kurum çok sayıda şube tanımlayabilir; tek şube de çalışır,S03,TC-002,PLANNED,NOT_RUN
-FR-003,MUST,Şube haftalık çalışma saatleri yönetilir,S03,TC-003,PLANNED,NOT_RUN
-FR-004,MUST,Şubede bölümler tanımlanır,S03,TC-004,PLANNED,NOT_RUN
-FR-005,MUST,Katalog hizmeti adı ve açıklaması tanımlanır,S03,TC-005,PLANNED,NOT_RUN
-FR-006,MUST,Şubede hizmet süresi dakika ve ücret BigDecimal olarak tanımlanır,S03,TC-006,PLANNED,NOT_RUN
+requirement_id,priority,requirement,sprint,test_id,implementation_status,owner_test_status
+FR-001,MUST,Yönetici kurum tanımlayabilir ve güncelleyebilir,S03,TC-001,APPLICATION_SERVICE_IMPLEMENTED,OWNER_TEST_PENDING
+FR-002,MUST,Kurum çok sayıda şube tanımlayabilir; tek şube de çalışır,S03,TC-002,APPLICATION_SERVICE_IMPLEMENTED,OWNER_TEST_PENDING
+FR-003,MUST,Şube haftalık çalışma saatleri yönetilir,S03,TC-003,APPLICATION_SERVICE_IMPLEMENTED,OWNER_TEST_PENDING
+FR-004,MUST,Şubede bölümler tanımlanır,S03,TC-004,APPLICATION_SERVICE_IMPLEMENTED,OWNER_TEST_PENDING
+FR-005,MUST,Katalog hizmeti adı ve açıklaması tanımlanır,S03,TC-005,APPLICATION_SERVICE_IMPLEMENTED,OWNER_TEST_PENDING
+FR-006,MUST,Şubede hizmet süresi dakika ve ücret BigDecimal olarak tanımlanır,S03,TC-006,APPLICATION_SERVICE_IMPLEMENTED,OWNER_TEST_PENDING
 FR-007,MUST,Doktor/sağlık personeli kaydı ve personel türü tutulur,S05,TC-007,PLANNED,NOT_RUN
 FR-008,MUST,Doktorun uzmanlık alanı tutulur,S05,TC-008,PLANNED,NOT_RUN
 FR-009,MUST,Çalışanın sağlayabileceği hizmetler şube bazında tanımlanır,S05,TC-009,PLANNED,NOT_RUN
