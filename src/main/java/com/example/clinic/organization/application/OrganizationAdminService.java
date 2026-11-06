@@ -1,5 +1,11 @@
 package com.example.clinic.organization.application;
 
+import com.example.clinic.common.security.SecurityContextFacade;
+import com.example.clinic.identity.application.AccessPolicy;
+import com.example.clinic.identity.domain.Membership;
+import com.example.clinic.identity.domain.Role;
+import com.example.clinic.identity.domain.UserAccount;
+import com.example.clinic.identity.infrastructure.MembershipRepository;
 import com.example.clinic.organization.application.dto.BranchResponse;
 import com.example.clinic.organization.application.dto.CreateBranchCommand;
 import com.example.clinic.organization.application.dto.CreateDepartmentCommand;
@@ -29,7 +35,8 @@ import java.util.stream.Collectors;
 
 /**
  * Application service orchestrating organization, branch, opening hours, and department management.
- * Satisfies FR-001, FR-002, FR-003, and FR-004.
+ * Integrated with {@link AccessPolicy} and {@link SecurityContextFacade} to enforce strict tenant scoping
+ * and eliminate Insecure Direct Object Reference (IDOR) vulnerabilities (WP-S04-08, FR-024, FR-026, TC-024, TC-026, TC-038).
  */
 @Service
 @Transactional(readOnly = true)
@@ -39,32 +46,69 @@ public class OrganizationAdminService {
     private final BranchRepository branchRepository;
     private final DepartmentRepository departmentRepository;
     private final BranchOpeningHoursRepository branchOpeningHoursRepository;
+    private final MembershipRepository membershipRepository;
+    private final AccessPolicy accessPolicy;
+    private final SecurityContextFacade securityContextFacade;
 
     public OrganizationAdminService(OrganizationRepository organizationRepository,
                                   BranchRepository branchRepository,
                                   DepartmentRepository departmentRepository,
-                                  BranchOpeningHoursRepository branchOpeningHoursRepository) {
+                                  BranchOpeningHoursRepository branchOpeningHoursRepository,
+                                  MembershipRepository membershipRepository,
+                                  AccessPolicy accessPolicy,
+                                  SecurityContextFacade securityContextFacade) {
         this.organizationRepository = organizationRepository;
         this.branchRepository = branchRepository;
         this.departmentRepository = departmentRepository;
         this.branchOpeningHoursRepository = branchOpeningHoursRepository;
+        this.membershipRepository = membershipRepository;
+        this.accessPolicy = accessPolicy;
+        this.securityContextFacade = securityContextFacade;
     }
 
     // =========================================================================
-    // 1. Organization Management (FR-001 / TC-001)
+    // 1. Organization Management (FR-001 / TC-001, FR-024 / TC-024)
     // =========================================================================
 
+    /**
+     * Creates a new organization under the authenticated actor's ownership.
+     * Implements controlled bootstrap: the authenticated creator is immediately provisioned
+     * as the organization-wide {@link Role#ROLE_ADMIN}.
+     */
     @Transactional
     public OrganizationResponse createOrganization(CreateOrganizationCommand command) {
         Objects.requireNonNull(command, "CreateOrganizationCommand must not be null");
+        UserAccount currentUser = securityContextFacade.getRequiredCurrentUser();
+
         Organization organization = new Organization(command.name());
         Organization saved = organizationRepository.save(organization);
+
+        // Bootstrap creator as organization-wide administrator
+        membershipRepository.save(new Membership(currentUser, saved, null, Role.ROLE_ADMIN));
+
+        return mapToResponse(saved);
+    }
+
+    /**
+     * Controlled administrative bootstrap provisioning outside public self-registration.
+     */
+    @Transactional
+    public OrganizationResponse bootstrapOrganization(CreateOrganizationCommand command, UserAccount adminAccount) {
+        Objects.requireNonNull(command, "CreateOrganizationCommand must not be null");
+        Objects.requireNonNull(adminAccount, "Admin account must not be null");
+
+        Organization organization = new Organization(command.name());
+        Organization saved = organizationRepository.save(organization);
+
+        membershipRepository.save(new Membership(adminAccount, saved, null, Role.ROLE_ADMIN));
         return mapToResponse(saved);
     }
 
     @Transactional
     public OrganizationResponse updateOrganization(UUID organizationId, String newName) {
         Objects.requireNonNull(organizationId, "Organization ID must not be null");
+        accessPolicy.enforceAdminOrganizationAccess(organizationId, securityContextFacade.getRequiredCurrentUser());
+
         if (newName == null || newName.isBlank()) {
             throw new IllegalArgumentException("New organization name must not be blank");
         }
@@ -75,29 +119,39 @@ public class OrganizationAdminService {
 
     @Transactional
     public void activateOrganization(UUID organizationId) {
+        Objects.requireNonNull(organizationId, "Organization ID must not be null");
+        accessPolicy.enforceAdminOrganizationAccess(organizationId, securityContextFacade.getRequiredCurrentUser());
+
         Organization organization = findOrganizationOrThrow(organizationId);
         organization.activate();
     }
 
     @Transactional
     public void deactivateOrganization(UUID organizationId) {
+        Objects.requireNonNull(organizationId, "Organization ID must not be null");
+        accessPolicy.enforceAdminOrganizationAccess(organizationId, securityContextFacade.getRequiredCurrentUser());
+
         Organization organization = findOrganizationOrThrow(organizationId);
         organization.deactivate();
     }
 
     public OrganizationResponse getOrganization(UUID organizationId) {
+        Objects.requireNonNull(organizationId, "Organization ID must not be null");
+        accessPolicy.enforceAdminOrganizationAccess(organizationId, securityContextFacade.getRequiredCurrentUser());
+
         Organization organization = findOrganizationOrThrow(organizationId);
         return mapToResponse(organization);
     }
 
     // =========================================================================
-    // 2. Branch Management (FR-002 / TC-002)
+    // 2. Branch Management (FR-002 / TC-002, FR-026 / TC-026)
     // =========================================================================
 
     @Transactional
     public BranchResponse createBranch(UUID organizationId, CreateBranchCommand command) {
         Objects.requireNonNull(organizationId, "Organization ID must not be null");
         Objects.requireNonNull(command, "CreateBranchCommand must not be null");
+        accessPolicy.enforceAdminOrganizationAccess(organizationId, securityContextFacade.getRequiredCurrentUser());
 
         Organization organization = findOrganizationOrThrow(organizationId);
         if (!organization.isActive()) {
@@ -125,11 +179,16 @@ public class OrganizationAdminService {
     }
 
     public BranchResponse getBranch(UUID branchId) {
+        Objects.requireNonNull(branchId, "Branch ID must not be null");
         Branch branch = findBranchOrThrow(branchId);
+        accessPolicy.enforceAdminBranchAccess(branchId, securityContextFacade.getRequiredCurrentUser());
         return mapToResponse(branch);
     }
 
     public List<BranchResponse> getBranchesByOrganization(UUID organizationId) {
+        Objects.requireNonNull(organizationId, "Organization ID must not be null");
+        accessPolicy.enforceAdminOrganizationAccess(organizationId, securityContextFacade.getRequiredCurrentUser());
+
         findOrganizationOrThrow(organizationId);
         return branchRepository.findByOrganizationId(organizationId).stream()
                 .map(this::mapToResponse)
@@ -138,13 +197,17 @@ public class OrganizationAdminService {
 
     @Transactional
     public void activateBranch(UUID branchId) {
+        Objects.requireNonNull(branchId, "Branch ID must not be null");
         Branch branch = findBranchOrThrow(branchId);
+        accessPolicy.enforceAdminBranchAccess(branchId, securityContextFacade.getRequiredCurrentUser());
         branch.setActive(true);
     }
 
     @Transactional
     public void deactivateBranch(UUID branchId) {
+        Objects.requireNonNull(branchId, "Branch ID must not be null");
         Branch branch = findBranchOrThrow(branchId);
+        accessPolicy.enforceAdminBranchAccess(branchId, securityContextFacade.getRequiredCurrentUser());
         branch.setActive(false);
     }
 
@@ -155,10 +218,12 @@ public class OrganizationAdminService {
     @Transactional
     public DepartmentResponse createDepartment(UUID branchId, String name) {
         Objects.requireNonNull(branchId, "Branch ID must not be null");
+        Branch branch = findBranchOrThrow(branchId);
+        accessPolicy.enforceAdminBranchAccess(branchId, securityContextFacade.getRequiredCurrentUser());
+
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("Department name must not be blank");
         }
-        Branch branch = findBranchOrThrow(branchId);
         if (!branch.isActive()) {
             throw new IllegalStateException("Cannot create department under inactive branch: " + branchId);
         }
@@ -180,7 +245,10 @@ public class OrganizationAdminService {
     }
 
     public List<DepartmentResponse> getDepartmentsByBranch(UUID branchId) {
-        findBranchOrThrow(branchId);
+        Objects.requireNonNull(branchId, "Branch ID must not be null");
+        Branch branch = findBranchOrThrow(branchId);
+        accessPolicy.enforceAdminBranchAccess(branchId, securityContextFacade.getRequiredCurrentUser());
+
         return departmentRepository.findByBranchId(branchId).stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -192,13 +260,14 @@ public class OrganizationAdminService {
 
     /**
      * Atomically configures weekly opening hours for a branch, replacing any prior schedule.
-     * All validation rules (weekday bounds, start < end, zero-length, overlapping intervals)
-     * are evaluated before any persistent modifications occur.
+     * Enforces administrator branch authorization before modifying persistent state.
      */
     @Transactional
     public List<OpeningHoursDto> configureOpeningHours(UUID branchId, List<OpeningHoursDto> hours) {
         Objects.requireNonNull(branchId, "Branch ID must not be null");
         Branch branch = findBranchOrThrow(branchId);
+        accessPolicy.enforceAdminBranchAccess(branchId, securityContextFacade.getRequiredCurrentUser());
+
         if (!branch.isActive()) {
             throw new IllegalStateException("Cannot configure opening hours for inactive branch: " + branchId);
         }
@@ -233,7 +302,6 @@ public class OrganizationAdminService {
                 OpeningHoursDto current = daySchedule.get(i);
                 OpeningHoursDto next = daySchedule.get(i + 1);
 
-                // Strictly overlapping if current end time is after next start time
                 if (current.endTime().isAfter(next.startTime())) {
                     throw new IllegalArgumentException(
                             "Overlapping opening hours on weekday " + entry.getKey() + ": [" +
@@ -257,7 +325,10 @@ public class OrganizationAdminService {
     }
 
     public List<OpeningHoursDto> getOpeningHoursByBranch(UUID branchId) {
-        findBranchOrThrow(branchId);
+        Objects.requireNonNull(branchId, "Branch ID must not be null");
+        Branch branch = findBranchOrThrow(branchId);
+        accessPolicy.enforceAdminBranchAccess(branchId, securityContextFacade.getRequiredCurrentUser());
+
         return branchOpeningHoursRepository.findByBranchIdOrderByWeekdayAscStartTimeAsc(branchId).stream()
                 .map(entity -> new OpeningHoursDto(entity.getWeekday(), entity.getStartTime(), entity.getEndTime()))
                 .toList();

@@ -1,6 +1,9 @@
 package com.example.clinic.organization.application;
 
 import com.example.clinic.AbstractIntegrationTest;
+import com.example.clinic.common.security.ClinicPrincipal;
+import com.example.clinic.identity.domain.UserAccount;
+import com.example.clinic.identity.infrastructure.UserAccountRepository;
 import com.example.clinic.organization.application.dto.BranchResponse;
 import com.example.clinic.organization.application.dto.CreateBranchCommand;
 import com.example.clinic.organization.application.dto.CreateDepartmentCommand;
@@ -8,9 +11,14 @@ import com.example.clinic.organization.application.dto.CreateOrganizationCommand
 import com.example.clinic.organization.application.dto.DepartmentResponse;
 import com.example.clinic.organization.application.dto.OpeningHoursDto;
 import com.example.clinic.organization.application.dto.OrganizationResponse;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
@@ -24,6 +32,33 @@ class OrganizationAdminServiceIT extends AbstractIntegrationTest {
 
     @Autowired
     private OrganizationAdminService organizationAdminService;
+
+    @Autowired
+    private UserAccountRepository userAccountRepository;
+
+    private UserAccount testAdmin;
+
+    @BeforeEach
+    void setUpSecurityActor() {
+        testAdmin = userAccountRepository.saveAndFlush(
+                new UserAccount("admin_it_" + java.util.UUID.randomUUID() + "@clinic.test", "hash123")
+        );
+        ClinicPrincipal principal = new ClinicPrincipal(
+                testAdmin.getId(),
+                testAdmin.getEmail(),
+                testAdmin.getPasswordHash(),
+                testAdmin.isEnabled(),
+                List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
+        );
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities())
+        );
+    }
+
+    @AfterEach
+    void clearSecurityContext() {
+        SecurityContextHolder.clearContext();
+    }
 
     @Test
     @DisplayName("TC-001 / FR-001: Admin creates and updates organization, persists and reads back correctly")

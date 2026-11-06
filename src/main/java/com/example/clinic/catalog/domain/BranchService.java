@@ -13,9 +13,12 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotNull;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Currency;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -62,7 +65,8 @@ public class BranchService extends BaseEntity {
     private BigDecimal feeAmount;
 
     @NotNull
-    @Column(name = "currency", nullable = false, length = 3, columnDefinition = "CHAR(3)")
+    @JdbcTypeCode(SqlTypes.CHAR)
+    @Column(name = "currency", nullable = false, length = 3)
     private String currency = DEFAULT_CURRENCY;
 
     @Column(name = "active", nullable = false)
@@ -108,7 +112,7 @@ public class BranchService extends BaseEntity {
         if (code == null || code.isBlank() || code.strip().length() != 3) {
             throw new IllegalArgumentException("Currency code must be a 3-character ISO code: " + code);
         }
-        return code.strip().toUpperCase();
+        return code.strip().toUpperCase(Locale.ROOT);
     }
 
     private static void validateDuration(int minutes) {

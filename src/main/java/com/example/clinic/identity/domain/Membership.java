@@ -5,11 +5,12 @@ import com.example.clinic.organization.domain.Branch;
 import com.example.clinic.organization.domain.Organization;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.Objects;
@@ -33,24 +34,33 @@ public class Membership extends BaseEntity {
     @JoinColumn(name = "branch_id")
     private Branch branch;
 
-    @NotBlank
+    @NotNull
+    @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false, length = 50)
-    private String role;
+    private Role role;
 
     protected Membership() {
         super();
     }
 
-    public Membership(UserAccount userAccount, Organization organization, Branch branch, String role) {
+    public Membership(UserAccount userAccount, Organization organization, Branch branch, Role role) {
         this(UUID.randomUUID(), userAccount, organization, branch, role, Instant.now());
     }
 
-    public Membership(UUID id, UserAccount userAccount, Organization organization, Branch branch, String role, Instant createdAt) {
+    public Membership(UserAccount userAccount, Organization organization, Branch branch, String role) {
+        this(UUID.randomUUID(), userAccount, organization, branch, Role.from(role), Instant.now());
+    }
+
+    public Membership(UUID id, UserAccount userAccount, Organization organization, Branch branch, Role role, Instant createdAt) {
         super(id, createdAt);
         this.userAccount = Objects.requireNonNull(userAccount, "UserAccount must not be null");
         this.organization = Objects.requireNonNull(organization, "Organization must not be null");
         this.branch = branch;
         this.role = Objects.requireNonNull(role, "role must not be null");
+    }
+
+    public Membership(UUID id, UserAccount userAccount, Organization organization, Branch branch, String role, Instant createdAt) {
+        this(id, userAccount, organization, branch, Role.from(role), createdAt);
     }
 
     public UserAccount getUserAccount() {
@@ -77,19 +87,23 @@ public class Membership extends BaseEntity {
         this.branch = branch;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = Objects.requireNonNull(role, "role must not be null");
+    }
+
+    public void setRole(String role) {
+        this.role = Role.from(role);
     }
 
     @Override
     public String toString() {
         return "Membership{" +
                 "id=" + getId() +
-                ", role='" + role + '\'' +
+                ", role=" + role +
                 ", createdAt=" + getCreatedAt() +
                 '}';
     }

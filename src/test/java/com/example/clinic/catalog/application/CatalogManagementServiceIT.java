@@ -6,14 +6,22 @@ import com.example.clinic.catalog.application.dto.BranchServiceResponse;
 import com.example.clinic.catalog.application.dto.CreateServiceCommand;
 import com.example.clinic.catalog.application.dto.ServiceDefinitionResponse;
 import com.example.clinic.catalog.application.dto.UpdateServicePricingCommand;
+import com.example.clinic.common.security.ClinicPrincipal;
+import com.example.clinic.identity.domain.UserAccount;
+import com.example.clinic.identity.infrastructure.UserAccountRepository;
 import com.example.clinic.organization.application.OrganizationAdminService;
 import com.example.clinic.organization.application.dto.BranchResponse;
 import com.example.clinic.organization.application.dto.CreateBranchCommand;
 import com.example.clinic.organization.application.dto.CreateOrganizationCommand;
 import com.example.clinic.organization.application.dto.OrganizationResponse;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -30,6 +38,33 @@ class CatalogManagementServiceIT extends AbstractIntegrationTest {
 
     @Autowired
     private CatalogManagementService catalogManagementService;
+
+    @Autowired
+    private UserAccountRepository userAccountRepository;
+
+    private UserAccount testAdmin;
+
+    @BeforeEach
+    void setUpSecurityActor() {
+        testAdmin = userAccountRepository.saveAndFlush(
+                new UserAccount("cat_admin_" + java.util.UUID.randomUUID() + "@clinic.test", "hash123")
+        );
+        ClinicPrincipal principal = new ClinicPrincipal(
+                testAdmin.getId(),
+                testAdmin.getEmail(),
+                testAdmin.getPasswordHash(),
+                testAdmin.isEnabled(),
+                List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
+        );
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities())
+        );
+    }
+
+    @AfterEach
+    void clearSecurityContext() {
+        SecurityContextHolder.clearContext();
+    }
 
     @Test
     @DisplayName("TC-005 / FR-005: Define medical service in catalog at organization level and retrieve")

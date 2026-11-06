@@ -135,8 +135,8 @@ class CatalogDatabaseConstraintIT extends AbstractIntegrationTest {
     }
 
     @Test
-    @DisplayName("DB Constraint: should reject cross-tenant mismatch via composite foreign keys at database level")
-    void shouldRejectCrossTenantMismatchAtDatabaseLevel() {
+    @DisplayName("DB Constraint: should reject cross-tenant mismatch when service definition belongs to different org")
+    void shouldRejectCrossTenantMismatchWhenServiceDefinitionBelongsToDifferentOrg() {
         Organization orgA = organizationRepository.saveAndFlush(new Organization("Org A Tenant"));
         Organization orgB = organizationRepository.saveAndFlush(new Organization("Org B Tenant"));
 
@@ -147,13 +147,26 @@ class CatalogDatabaseConstraintIT extends AbstractIntegrationTest {
                 new ServiceDefinition(orgB, "Service B", "Tanım B")
         );
 
-        // Attempting to insert a branch_service associating branchOfOrgA with defOfOrgB:
         // If organization_id is set to orgA.getId(), fk_branch_service_def_org (defOfOrgB, orgA) fails!
         assertThatThrownBy(() -> jdbcTemplate.update(
                 "INSERT INTO branch_service (id, organization_id, branch_id, service_definition_id, duration_minutes, fee_amount, currency, active, created_at) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)",
                 UUID.randomUUID(), orgA.getId(), branchOfOrgA.getId(), defOfOrgB.getId(), 30, new BigDecimal("1000.00"), "TRY", true
         )).isInstanceOf(DataIntegrityViolationException.class);
+    }
+
+    @Test
+    @DisplayName("DB Constraint: should reject cross-tenant mismatch when branch belongs to different org")
+    void shouldRejectCrossTenantMismatchWhenBranchBelongsToDifferentOrg() {
+        Organization orgA = organizationRepository.saveAndFlush(new Organization("Org A Tenant 2"));
+        Organization orgB = organizationRepository.saveAndFlush(new Organization("Org B Tenant 2"));
+
+        Branch branchOfOrgA = branchRepository.saveAndFlush(
+                new Branch(orgA, "Branch A 2", "Europe/Istanbul", "Adres A 2")
+        );
+        ServiceDefinition defOfOrgB = serviceDefinitionRepository.saveAndFlush(
+                new ServiceDefinition(orgB, "Service B 2", "Tanım B 2")
+        );
 
         // If organization_id is set to orgB.getId(), fk_branch_service_branch_org (branchOfOrgA, orgB) fails!
         assertThatThrownBy(() -> jdbcTemplate.update(

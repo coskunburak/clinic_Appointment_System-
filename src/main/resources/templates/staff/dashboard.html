@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Sağlık Personeli Paneli — Klinik Randevu Sistemi</title>
+</head>
+<body>
+    <h2>Personel / Doktor Paneli</h2>
+    <p>Hoş geldiniz. Şube çalışma takviminiz ve atanmış randevularınız bu alandan yürütülür.</p>
+    <form th:action="@{/logout}" method="post">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        <button type="submit">Güvenli Çıkış</button>
+    </form>
+</body>
+</html>

@@ -1,5 +1,9 @@
 package com.example.clinic.organization.application;
 
+import com.example.clinic.common.security.SecurityContextFacade;
+import com.example.clinic.identity.application.AccessPolicy;
+import com.example.clinic.identity.domain.UserAccount;
+import com.example.clinic.identity.infrastructure.MembershipRepository;
 import com.example.clinic.organization.application.dto.BranchResponse;
 import com.example.clinic.organization.application.dto.CreateBranchCommand;
 import com.example.clinic.organization.application.dto.CreateDepartmentCommand;
@@ -49,16 +53,28 @@ class OrganizationAdminServiceTest {
     @Mock
     private BranchOpeningHoursRepository branchOpeningHoursRepository;
 
+    @Mock
+    private MembershipRepository membershipRepository;
+
+    @Mock
+    private AccessPolicy accessPolicy;
+
+    @Mock
+    private SecurityContextFacade securityContextFacade;
+
     @InjectMocks
     private OrganizationAdminService organizationAdminService;
 
     private Organization activeOrg;
     private Branch activeBranch;
+    private UserAccount adminUser;
 
     @BeforeEach
     void setUp() {
+        adminUser = new UserAccount("admin@clinic.test", "hash123");
         activeOrg = new Organization("Şehir Sağlık Grubu");
         activeBranch = new Branch(activeOrg, "Kadıköy Şubesi", "Europe/Istanbul", "Bağdat Cad.");
+        org.mockito.Mockito.lenient().when(securityContextFacade.getRequiredCurrentUser()).thenReturn(adminUser);
     }
 
     // =========================================================================

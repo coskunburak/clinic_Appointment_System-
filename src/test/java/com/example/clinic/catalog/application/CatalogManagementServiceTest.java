@@ -11,6 +11,9 @@ import com.example.clinic.catalog.domain.ServiceDefinition;
 import com.example.clinic.catalog.infrastructure.BranchServiceRepository;
 import com.example.clinic.catalog.infrastructure.ServiceDefinitionRepository;
 import com.example.clinic.common.domain.Money;
+import com.example.clinic.common.security.SecurityContextFacade;
+import com.example.clinic.identity.application.AccessPolicy;
+import com.example.clinic.identity.domain.UserAccount;
 import com.example.clinic.organization.domain.Branch;
 import com.example.clinic.organization.domain.Organization;
 import com.example.clinic.organization.infrastructure.BranchRepository;
@@ -50,18 +53,27 @@ class CatalogManagementServiceTest {
     @Mock
     private BranchServiceRepository branchServiceRepository;
 
+    @Mock
+    private AccessPolicy accessPolicy;
+
+    @Mock
+    private SecurityContextFacade securityContextFacade;
+
     @InjectMocks
     private CatalogManagementService catalogManagementService;
 
     private Organization activeOrg;
     private Branch activeBranch;
     private ServiceDefinition activeServiceDef;
+    private UserAccount adminUser;
 
     @BeforeEach
     void setUp() {
+        adminUser = new UserAccount("admin@clinic.test", "hash123");
         activeOrg = new Organization("Şehir Tıp Grubu");
         activeBranch = new Branch(activeOrg, "Kadıköy Şubesi", "Europe/Istanbul", "Bağdat Cad.");
         activeServiceDef = new ServiceDefinition(activeOrg, "Genel Muayene", "Rutin poliklinik kontrolü");
+        org.mockito.Mockito.lenient().when(securityContextFacade.getRequiredCurrentUser()).thenReturn(adminUser);
     }
 
     // =========================================================================

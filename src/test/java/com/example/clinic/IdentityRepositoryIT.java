@@ -2,6 +2,7 @@ package com.example.clinic;
 
 import com.example.clinic.identity.domain.Membership;
 import com.example.clinic.identity.domain.PatientProfile;
+import com.example.clinic.identity.domain.Role;
 import com.example.clinic.identity.domain.StaffProfile;
 import com.example.clinic.identity.domain.UserAccount;
 import com.example.clinic.identity.infrastructure.MembershipRepository;
@@ -74,7 +75,8 @@ class IdentityRepositoryIT extends AbstractIntegrationTest {
         Membership savedMembership = membershipRepository.saveAndFlush(membership);
 
         assertThat(savedMembership.getId()).isNotNull();
-        assertThat(savedMembership.getRole()).isEqualTo("ROLE_ADMIN");
+        assertThat(savedMembership.getRole()).isEqualTo(Role.ROLE_ADMIN);
+        assertThat(savedMembership.getRole().name()).isEqualTo("ROLE_ADMIN");
         assertThat(savedMembership.getUserAccount().getId()).isEqualTo(user.getId());
         assertThat(savedMembership.getOrganization().getId()).isEqualTo(org.getId());
         assertThat(savedMembership.getBranch().getId()).isEqualTo(branch.getId());

@@ -11,6 +11,8 @@ import com.example.clinic.catalog.domain.ServiceDefinition;
 import com.example.clinic.catalog.infrastructure.BranchServiceRepository;
 import com.example.clinic.catalog.infrastructure.ServiceDefinitionRepository;
 import com.example.clinic.common.domain.Money;
+import com.example.clinic.common.security.SecurityContextFacade;
+import com.example.clinic.identity.application.AccessPolicy;
 import com.example.clinic.organization.domain.Branch;
 import com.example.clinic.organization.domain.Organization;
 import com.example.clinic.organization.infrastructure.BranchRepository;
@@ -21,12 +23,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 
 /**
  * Application service managing organization-level service definitions and branch-specific service offerings.
- * Satisfies FR-005 and FR-006.
+ * Satisfies FR-005, FR-006, WP-S04-09, FR-024, and FR-026.
+ * Enforces administrator authorization and tenant boundaries at the service layer.
  */
 @Service
 @Transactional(readOnly = true)
@@ -36,15 +40,21 @@ public class CatalogManagementService {
     private final BranchRepository branchRepository;
     private final ServiceDefinitionRepository serviceDefinitionRepository;
     private final BranchServiceRepository branchServiceRepository;
+    private final AccessPolicy accessPolicy;
+    private final SecurityContextFacade securityContextFacade;
 
     public CatalogManagementService(OrganizationRepository organizationRepository,
                                   BranchRepository branchRepository,
                                   ServiceDefinitionRepository serviceDefinitionRepository,
-                                  BranchServiceRepository branchServiceRepository) {
+                                  BranchServiceRepository branchServiceRepository,
+                                  AccessPolicy accessPolicy,
+                                  SecurityContextFacade securityContextFacade) {
         this.organizationRepository = organizationRepository;
         this.branchRepository = branchRepository;
         this.serviceDefinitionRepository = serviceDefinitionRepository;
         this.branchServiceRepository = branchServiceRepository;
+        this.accessPolicy = accessPolicy;
+        this.securityContextFacade = securityContextFacade;
     }
 
     // =========================================================================
@@ -55,6 +65,7 @@ public class CatalogManagementService {
     public ServiceDefinitionResponse defineService(UUID organizationId, CreateServiceCommand command) {
         Objects.requireNonNull(organizationId, "Organization ID must not be null");
         Objects.requireNonNull(command, "CreateServiceCommand must not be null");
+        accessPolicy.enforceAdminOrganizationAccess(organizationId, securityContextFacade.getRequiredCurrentUser());
 
         Organization organization = organizationRepository.findById(organizationId)
                 .orElseThrow(() -> new IllegalArgumentException("Organization not found: " + organizationId));
@@ -77,11 +88,14 @@ public class CatalogManagementService {
 
     public ServiceDefinitionResponse getServiceDefinition(UUID serviceDefinitionId) {
         ServiceDefinition def = findServiceDefinitionOrThrow(serviceDefinitionId);
+        accessPolicy.enforceAdminOrganizationAccess(def.getOrganization().getId(), securityContextFacade.getRequiredCurrentUser());
         return mapToResponse(def);
     }
 
     public List<ServiceDefinitionResponse> getServiceDefinitionsByOrganization(UUID organizationId) {
         Objects.requireNonNull(organizationId, "Organization ID must not be null");
+        accessPolicy.enforceAdminOrganizationAccess(organizationId, securityContextFacade.getRequiredCurrentUser());
+
         return serviceDefinitionRepository.findByOrganizationId(organizationId).stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -90,12 +104,14 @@ public class CatalogManagementService {
     @Transactional
     public void activateServiceDefinition(UUID serviceDefinitionId) {
         ServiceDefinition def = findServiceDefinitionOrThrow(serviceDefinitionId);
+        accessPolicy.enforceAdminOrganizationAccess(def.getOrganization().getId(), securityContextFacade.getRequiredCurrentUser());
         def.activate();
     }
 
     @Transactional
     public void deactivateServiceDefinition(UUID serviceDefinitionId) {
         ServiceDefinition def = findServiceDefinitionOrThrow(serviceDefinitionId);
+        accessPolicy.enforceAdminOrganizationAccess(def.getOrganization().getId(), securityContextFacade.getRequiredCurrentUser());
         def.deactivate();
     }
 
@@ -111,6 +127,7 @@ public class CatalogManagementService {
                                                       String currency) {
         Objects.requireNonNull(branchId, "Branch ID must not be null");
         Objects.requireNonNull(serviceDefinitionId, "ServiceDefinition ID must not be null");
+        accessPolicy.enforceAdminBranchAccess(branchId, securityContextFacade.getRequiredCurrentUser());
 
         Branch branch = branchRepository.findById(branchId)
                 .orElseThrow(() -> new IllegalArgumentException("Branch not found: " + branchId));
@@ -168,6 +185,8 @@ public class CatalogManagementService {
     public BranchServiceResponse updateServicePricing(UUID branchServiceId, BigDecimal newFee) {
         Objects.requireNonNull(branchServiceId, "BranchService ID must not be null");
         BranchService branchService = findBranchServiceOrThrow(branchServiceId);
+        accessPolicy.enforceAdminBranchAccess(branchService.getBranch().getId(), securityContextFacade.getRequiredCurrentUser());
+
         branchService.changePrice(newFee);
         return mapToResponse(branchService);
     }
@@ -177,6 +196,8 @@ public class CatalogManagementService {
         Objects.requireNonNull(branchServiceId, "BranchService ID must not be null");
         Objects.requireNonNull(command, "UpdateServicePricingCommand must not be null");
         BranchService branchService = findBranchServiceOrThrow(branchServiceId);
+        accessPolicy.enforceAdminBranchAccess(branchService.getBranch().getId(), securityContextFacade.getRequiredCurrentUser());
+
         if (command.currency() != null && !command.currency().isBlank()) {
             branchService.changePrice(command.newFee(), command.currency());
         } else {
@@ -189,6 +210,8 @@ public class CatalogManagementService {
     public BranchServiceResponse updateServiceDuration(UUID branchServiceId, int newDurationMinutes) {
         Objects.requireNonNull(branchServiceId, "BranchService ID must not be null");
         BranchService branchService = findBranchServiceOrThrow(branchServiceId);
+        accessPolicy.enforceAdminBranchAccess(branchService.getBranch().getId(), securityContextFacade.getRequiredCurrentUser());
+
         branchService.changeDuration(newDurationMinutes);
         return mapToResponse(branchService);
     }
@@ -201,11 +224,14 @@ public class CatalogManagementService {
 
     public BranchServiceResponse getBranchService(UUID branchServiceId) {
         BranchService branchService = findBranchServiceOrThrow(branchServiceId);
+        accessPolicy.enforceAdminBranchAccess(branchService.getBranch().getId(), securityContextFacade.getRequiredCurrentUser());
         return mapToResponse(branchService);
     }
 
     public List<BranchServiceResponse> getBranchServicesByBranch(UUID branchId) {
         Objects.requireNonNull(branchId, "Branch ID must not be null");
+        accessPolicy.enforceAdminBranchAccess(branchId, securityContextFacade.getRequiredCurrentUser());
+
         return branchServiceRepository.findByBranchId(branchId).stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -214,12 +240,14 @@ public class CatalogManagementService {
     @Transactional
     public void activateBranchService(UUID branchServiceId) {
         BranchService branchService = findBranchServiceOrThrow(branchServiceId);
+        accessPolicy.enforceAdminBranchAccess(branchService.getBranch().getId(), securityContextFacade.getRequiredCurrentUser());
         branchService.activate();
     }
 
     @Transactional
     public void deactivateBranchService(UUID branchServiceId) {
         BranchService branchService = findBranchServiceOrThrow(branchServiceId);
+        accessPolicy.enforceAdminBranchAccess(branchService.getBranch().getId(), securityContextFacade.getRequiredCurrentUser());
         branchService.deactivate();
     }
 
@@ -243,7 +271,7 @@ public class CatalogManagementService {
         if (code == null || code.isBlank() || code.strip().length() != 3) {
             throw new IllegalArgumentException("Currency code must be a 3-character ISO code: " + code);
         }
-        return code.strip().toUpperCase();
+        return code.strip().toUpperCase(Locale.ROOT);
     }
 
     private ServiceDefinitionResponse mapToResponse(ServiceDefinition def) {
