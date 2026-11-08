@@ -11,6 +11,7 @@ import java.util.UUID;
 /**
  * Concrete medical/clinic staff profile entity extending the shared {@link PersonProfile} abstraction.
  * Encapsulates staff-specific attributes such as staff type, medical specialty, and active status.
+ * Fulfills FR-007, FR-008, STA-01, and TC-007..TC-008.
  */
 @Entity
 @Table(name = "staff_profile")
@@ -46,10 +47,17 @@ public class StaffProfile extends PersonProfile {
         if (staffType == null || staffType.isBlank()) {
             throw new IllegalArgumentException("staffType must not be null or blank");
         }
-        return staffType.strip();
+        return StaffType.fromString(staffType).name();
     }
 
     public static String validateSpecialty(String staffType, String specialty) {
+        StaffType type = StaffType.fromString(staffType);
+        if (type.isSpecialtyRequired()) {
+            if (specialty == null || specialty.isBlank()) {
+                throw new IllegalArgumentException("Specialty is required for staff type DOCTOR");
+            }
+            return specialty.strip();
+        }
         if (specialty == null || specialty.isBlank()) {
             return null;
         }
@@ -60,8 +68,17 @@ public class StaffProfile extends PersonProfile {
         return staffType;
     }
 
+    public StaffType getStaffTypeEnum() {
+        return StaffType.fromString(staffType);
+    }
+
+    public boolean isDoctor() {
+        return getStaffTypeEnum().isDoctor();
+    }
+
     public void setStaffType(String staffType) {
         this.staffType = validateStaffType(staffType);
+        this.specialty = validateSpecialty(this.staffType, this.specialty);
     }
 
     public String getSpecialty() {
