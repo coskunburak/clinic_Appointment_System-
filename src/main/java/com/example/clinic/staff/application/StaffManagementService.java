@@ -122,7 +122,7 @@ public class StaffManagementService {
         accessPolicy.enforceAdminBranchAccess(branch.getId(), actor);
 
         UserAccount userAccount = userAccountRepository.findByEmail(command.email().trim().toLowerCase(java.util.Locale.ROOT))
-                .orElseGet(() -> accountCredentialService.createUserAccount(command.email(), command.password()));
+                .orElseGet(() -> accountCredentialService.createAccount(command.email(), command.password()));
 
         StaffProfile profile = new StaffProfile(
                 userAccount,
@@ -433,7 +433,7 @@ public class StaffManagementService {
                 service.getId(),
                 service.getServiceDefinition().getName(),
                 service.getDurationMinutes(),
-                service.getFeeAmount().getAmount(),
+                service.getFeeAmount(),
                 service.getCurrency()
         );
     }

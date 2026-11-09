@@ -23,12 +23,12 @@ class FlywayMigrationIT extends AbstractIntegrationTest {
     private DataSource dataSource;
 
     @Test
-    @DisplayName("TC-039 / NFR-003: Flyway V1, V2, and V3 migrations execute cleanly and create expected tables")
+    @DisplayName("TC-039 / NFR-003: Flyway V1, V2, V3, and V4 migrations execute cleanly and create expected tables")
     void migrations_createExpectedTables() {
         MigrationInfo current = flyway.info().current();
         assertThat(current).isNotNull();
-        assertThat(current.getVersion().getVersion()).isEqualTo("3");
-        assertThat(current.getDescription()).isEqualTo("create staff and availability");
+        assertThat(current.getVersion().getVersion()).isEqualTo("4");
+        assertThat(current.getDescription()).isEqualTo("create appointments");
 
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
         List<String> tableNames = jdbcTemplate.queryForList(
@@ -51,7 +51,9 @@ class FlywayMigrationIT extends AbstractIntegrationTest {
                 "staff_assignment",
                 "staff_service_eligibility",
                 "weekly_availability",
-                "availability_exception"
+                "availability_exception",
+                "appointment",
+                "appointment_status_history"
         );
     }
 
@@ -63,7 +65,7 @@ class FlywayMigrationIT extends AbstractIntegrationTest {
 
         MigrationInfo current = flyway.info().current();
         assertThat(current).isNotNull();
-        assertThat(current.getVersion().getVersion()).isEqualTo("3");
+        assertThat(current.getVersion().getVersion()).isEqualTo("4");
     }
 
     @Test

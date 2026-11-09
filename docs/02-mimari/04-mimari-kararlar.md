@@ -79,3 +79,21 @@
 3. **Müsaitlik ve Slot Hesaplama Motoru (`AvailabilityCalculator`):** `com.example.clinic.scheduling.application` katmanında konumlandırılmış, şube mesai saatleri (SCH-01), personel haftalık aralığı (SCH-02), izin istisnaları (SCH-03), hizmet yetkinliği (STA-02) ve randevu çakışmalarını (ADR-003) saf bir aralık cebiriyle (interval algebra) çözerek boş slotları üretecek şekilde inşa edilmiştir.
 4. **Randevu Çizelgeleme Portu (`AppointmentSchedulePort`):** S06'da veritabanına bağlanacak olan `Appointment` kalıcılığını S05'ten yalıtmak adına ikincil bir port tanımlanmış, `DefaultAppointmentSchedulePort` ile bellek-içi test ve genişletilebilirlik sağlanmıştır.
 5. **Uzmanlık Zorunluluğu (STA-01 / TC-008):** `StaffProfile` üzerinde `DOCTOR` çalışan tipi için `specialty` alanı zorunlu kılınmış, boş/null değerler doğrudan `IllegalArgumentException` ile engellenmiştir. `NURSE` ve `TECHNICIAN` tipleri için uzmanlık opsiyonel bırakılmıştır.
+
+## ADR-012 — S06 Randevu Kalıcılığı, Pesimist Kilit ve Eşzamanlılık Mimarisi
+**Durum:** Kabul Edildi (Sprint S06 kararı).
+**Bağlam:** Sprint S06 randevu rezervasyon mekanizmasını, veritabanı kalıcılığını (`V4__create_appointments.sql`), eşzamanlı çift rezervasyon engellemesini (`PESSIMISTIC_WRITE`), S05 slot motoru entegrasyonunu ve snapshot desenini inşa eder. S02'de kabul edilen ADR-009 ve `DomainArchitectureTest` uyarınca `Appointment` aggregate root'u saf POJO kalmalıdır. Ayrıca eşzamanlı iki HTTP isteğinde aynı hekime veya aynı hastaya çakışan randevu verilmesi fiziksel olarak engellenmelidir.
+**Karar:**
+1. **Sıralı Pesimist Satır Kilitleme (Ordered Row Locking):**
+   - Boş takvimlerde henüz randevu satırı bulunmadığından randevu satırını kilitlemek yarış durumunu önlemez. Bu nedenle kilitler var olan profil satırları üzerinden alınır (`SELECT ... FOR UPDATE`).
+   - Deadlock (ölümcül kilitlenme) riskini kesin olarak engellemek adına sistem genelinde katı bir kilit sırası (`Global Lock Ordering`) belirlenmiştir: Her rezervasyon işleminde **önce `PatientProfile` satırı**, **ardından `StaffProfile` satırı** kilitlenir. Hiçbir akışta bu sıralama tersine işletilmez.
+2. **Kilit Altında Yetkili Yeniden Okuma (Read-After-Lock):**
+   - `READ_COMMITTED` transaction izolasyonunda, bekleyen transaction kilidi devraldığında kazanan transaction'ın commit ettiği satırları görebilmelidir. Bu nedenle hekim ve hasta çakışma sorguları kilit alındıktan sonra ve transaction içinde yürütülür; arayüzde önceden görüntülenen slot listesine asla güvenilmez.
+3. **Saf Domain ve JPA Kalıcılık Ayrımı:**
+   - `com.example.clinic.booking.domain.Appointment` sınıfı saf POJO olarak kalmış; `@Entity`, `@Table`, `@Version` gibi altyapı bağımlılıkları `com.example.clinic.booking.infrastructure.persistence.AppointmentJpaEntity` sınıfında kapsüllenmiştir. İki temsil arasında tam çift yönlü ve kayıpsız eşleme sağlanmıştır.
+4. **S05 Müsaitlik Entegrasyonu (`DatabaseAppointmentSchedulePort`):**
+   - S05'te tanımlanan `AppointmentSchedulePort` için veritabanı destekli `@Primary` adaptör yazılmıştır. Bu adaptör, hekimin tüm şubelerdeki `PENDING`, `CONFIRMED` ve `COMPLETED` randevularını yarı açık `[start, end)` aralığı ile sorgulayarak slot motorundan düşer; `CANCELLED` ve `REJECTED` randevuları ise slotu serbest bırakır (ADR-003).
+5. **Olay Geçmişi ve S07 Sınırı:**
+   - TC-017 gereğince ilk rezervasyon anında `appointment_status_history` tablosuna `from_status = NULL, to_status = 'PENDING'` denetim kaydı randevu ile aynı transaction'da yazılır. S07 onay/red durum geçiş servisleri ise S07 kapsamına bırakılmıştır.
+6. **Hata Sınıflandırması:**
+   - Hekim çakışmasında `AppointmentConflictException` (409), hasta çakışmasında `PatientOverlapException` (409), iş kuralı/mesai/DST ihlallerinde ise `BookingValidationException` (400/422) fırlatılır; veritabanı kilit hataları ve iç sorgular istemciye sızdırılmaz.

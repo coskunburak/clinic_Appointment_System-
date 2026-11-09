@@ -43,13 +43,28 @@ public final class Money implements Comparable<Money> {
         return new Money(amount, currency);
     }
 
+    public static Money of(BigDecimal amount, String currencyCode) {
+        Objects.requireNonNull(currencyCode, "Currency code must not be null");
+        return new Money(amount, Currency.getInstance(currencyCode.trim().toUpperCase(java.util.Locale.ROOT)));
+    }
+
     public static Money of(String amountStr, Currency currency) {
         Objects.requireNonNull(amountStr, "Amount string must not be null");
         return new Money(new BigDecimal(amountStr), currency);
     }
 
+    public static Money of(String amountStr, String currencyCode) {
+        Objects.requireNonNull(currencyCode, "Currency code must not be null");
+        return of(new BigDecimal(amountStr), Currency.getInstance(currencyCode.trim().toUpperCase(java.util.Locale.ROOT)));
+    }
+
     public static Money zero(Currency currency) {
         return new Money(BigDecimal.ZERO, currency);
+    }
+
+    public static Money zero(String currencyCode) {
+        Objects.requireNonNull(currencyCode, "Currency code must not be null");
+        return zero(Currency.getInstance(currencyCode.trim().toUpperCase(java.util.Locale.ROOT)));
     }
 
     public BigDecimal amount() {

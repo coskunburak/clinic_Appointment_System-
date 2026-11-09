@@ -53,6 +53,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Collections;
+import java.util.Currency;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -143,7 +144,7 @@ class StaffManagementServiceTest {
 
         when(branchRepository.findById(branch.getId())).thenReturn(Optional.of(branch));
         when(userAccountRepository.findByEmail("doc@clinic.test")).thenReturn(Optional.empty());
-        when(accountCredentialService.createUserAccount("doc@clinic.test", "StrongPass123")).thenReturn(staffUser);
+        when(accountCredentialService.createAccount("doc@clinic.test", "StrongPass123")).thenReturn(staffUser);
         when(staffProfileRepository.save(any(StaffProfile.class))).thenAnswer(inv -> inv.getArgument(0));
         when(membershipRepository.findByUserAccountIdAndRole(staffUser.getId(), Role.ROLE_STAFF))
                 .thenReturn(Collections.emptyList());
@@ -214,7 +215,7 @@ class StaffManagementServiceTest {
     @DisplayName("configureEligibility: Successfully binds branch services to assignment")
     void shouldConfigureEligibility() {
         ServiceDefinition def = new ServiceDefinition(UUID.randomUUID(), organization, "Eko", "Eko Cekimi", true, Instant.now());
-        BranchService bs = new BranchService(UUID.randomUUID(), organization, branch, def, 30, Money.of(new BigDecimal("1000.00"), "TRY"), true, Instant.now());
+        BranchService bs = new BranchService(UUID.randomUUID(), organization, branch, def, 30, Money.of(new BigDecimal("1000.00"), Currency.getInstance("TRY")), true, Instant.now());
 
         ConfigureEligibilityCommand cmd = new ConfigureEligibilityCommand(assignment.getId(), List.of(bs.getId()));
 

@@ -80,6 +80,10 @@ public class BranchService extends BaseEntity {
         this(UUID.randomUUID(), branch, serviceDefinition, durationMinutes, price, true, Instant.now());
     }
 
+    public BranchService(Organization organization, Branch branch, ServiceDefinition serviceDefinition, int durationMinutes, Money price) {
+        this(branch, serviceDefinition, durationMinutes, price);
+    }
+
     public BranchService(Branch branch, ServiceDefinition serviceDefinition, int durationMinutes, BigDecimal feeAmount, String currencyCode) {
         this(branch, serviceDefinition, durationMinutes,
                 Money.of(feeAmount, Currency.getInstance(validateCurrencyCode(currencyCode))));
@@ -106,6 +110,10 @@ public class BranchService extends BaseEntity {
         this.feeAmount = price.amount();
         this.currency = price.currency().getCurrencyCode();
         this.active = active;
+    }
+
+    public BranchService(UUID id, Organization organization, Branch branch, ServiceDefinition serviceDefinition, int durationMinutes, Money price, boolean active, Instant createdAt) {
+        this(id, branch, serviceDefinition, durationMinutes, price, active, createdAt);
     }
 
     private static String validateCurrencyCode(String code) {

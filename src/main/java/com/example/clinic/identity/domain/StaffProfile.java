@@ -35,12 +35,21 @@ public class StaffProfile extends PersonProfile {
         this(UUID.randomUUID(), userAccount, fullName, phone, staffType, specialty, true, Instant.now());
     }
 
+    public StaffProfile(UserAccount userAccount, String fullName, String phone, StaffType staffType, String specialty) {
+        this(userAccount, fullName, phone, staffType != null ? staffType.name() : null, specialty);
+    }
+
     public StaffProfile(UUID id, UserAccount userAccount, String fullName, String phone,
                         String staffType, String specialty, boolean active, Instant createdAt) {
         super(id, userAccount, fullName, phone, createdAt);
         this.staffType = validateStaffType(staffType);
         this.specialty = validateSpecialty(this.staffType, specialty);
         this.active = active;
+    }
+
+    public StaffProfile(UUID id, UserAccount userAccount, String fullName, String phone,
+                        StaffType staffType, String specialty, boolean active, Instant createdAt) {
+        this(id, userAccount, fullName, phone, staffType != null ? staffType.name() : null, specialty, active, createdAt);
     }
 
     public static String validateStaffType(String staffType) {

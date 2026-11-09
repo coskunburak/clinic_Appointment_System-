@@ -4,13 +4,13 @@
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.2-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![Build Tool](https://img.shields.io/badge/Maven%20Wrapper-3.9.9-blue.svg)](https://maven.apache.org/)
 [![Database](https://img.shields.io/badge/PostgreSQL-17-blue.svg)](https://www.postgresql.org/)
-[![Migration](https://img.shields.io/badge/Flyway-V1-red.svg)](https://flywaydb.org/)
-[![Sprint](https://img.shields.io/badge/Sprint-S01%20(Java%20Altyapı%20ve%20Veritabanı)-green.svg)](docs/07-sprintler/S01.md)
+[![Migration](https://img.shields.io/badge/Flyway-V4-red.svg)](https://flywaydb.org/)
+[![Sprint](https://img.shields.io/badge/Sprint-S06%20(Randevu%20ve%20Eşzamanlılık%20Kilidi)-yellow.svg)](docs/07-sprintler/S06.md)
 [![Academic Status](https://img.shields.io/badge/Academic%20Project-OOP%20Seçenek%20A-informational.svg)](docs/00-baslangic/02-proje-kunyesi-ve-basari.md)
 
 Bu proje, üniversite **Nesneye Dayalı Programlama (OOP)** dersi kapsamında geliştirilen, tek ve çok şubeli sağlık kuruluşlarının randevu süreçlerini uçtan uca yönetmeyi amaçlayan web tabanlı bir hastane/klinik randevu yönetim sistemidir.
 
-> **Mevcut Proje Durumu:** **Sprint S01 — Java Bootstrapping ve Veritabanı Temeli** uygulanmıştır. PostgreSQL 17 Docker ortamı, sürüm kontrollü Flyway V1 temel migrasyonu, Jakarta JPA/Hibernate `ddl-auto=validate` kalıcılık eşlemeleri, Testcontainers tabanlı entegrasyon testleri ve GitHub Actions CI iş akışı devreye alınmıştır.
+> **Mevcut Proje Durumu:** **Sprint S06 — Randevu Rezervasyonu, Çakışma Önleme ve Eşzamanlılık Kilidi** kaynak kodları, Flyway V4 migrasyonu, PostgreSQL `PESSIMISTIC_WRITE` kilidi ve çok iş parçacıklı entegrasyon testleri hazırlanmıştır (Statü: `AWAITING_OWNER_TEST`). S01–S05 altyapısı, saf OOP domain çekirdeği ve Spring Security çok kiracılı yetkilendirmesi devralınmıştır. Detaylar için [S06 Uygulama Raporu](docs/07-sprintler/S06-implementation-report.md) incelenebilir.
 
 ---
 

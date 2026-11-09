@@ -15,6 +15,8 @@ public interface BranchOpeningHoursRepository extends JpaRepository<BranchOpenin
 
     List<BranchOpeningHours> findByBranchId(UUID branchId);
 
+    List<BranchOpeningHours> findByBranchIdAndWeekday(UUID branchId, short weekday);
+
     List<BranchOpeningHours> findByBranchIdOrderByWeekdayAscStartTimeAsc(UUID branchId);
 
     @Modifying

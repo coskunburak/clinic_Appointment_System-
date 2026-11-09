@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Currency;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -54,10 +55,10 @@ class StaffEntitiesDomainTest {
 
         ServiceDefinition serviceDef = new ServiceDefinition(UUID.randomUUID(), org, "Eko Cekimi", "Ekokardiyografi", true, java.time.Instant.now());
         BranchService serviceInBranchA = new BranchService(
-                UUID.randomUUID(), org, branchA, serviceDef, 30, Money.of(new BigDecimal("1000.00"), "TRY"), true, java.time.Instant.now()
+                UUID.randomUUID(), org, branchA, serviceDef, 30, Money.of(new BigDecimal("1000.00"), Currency.getInstance("TRY")), true, java.time.Instant.now()
         );
         BranchService serviceInBranchB = new BranchService(
-                UUID.randomUUID(), org, branchB, serviceDef, 30, Money.of(new BigDecimal("1200.00"), "TRY"), true, java.time.Instant.now()
+                UUID.randomUUID(), org, branchB, serviceDef, 30, Money.of(new BigDecimal("1200.00"), Currency.getInstance("TRY")), true, java.time.Instant.now()
         );
 
         StaffServiceEligibility validEligibility = new StaffServiceEligibility(assignmentA, serviceInBranchA);

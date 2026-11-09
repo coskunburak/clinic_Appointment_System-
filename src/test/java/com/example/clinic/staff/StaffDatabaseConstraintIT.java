@@ -35,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Currency;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -90,7 +91,7 @@ class StaffDatabaseConstraintIT extends AbstractIntegrationTest {
                 new ServiceDefinition(org, "Muayene", "Genel Muayene")
         );
         branchService = branchServiceRepository.saveAndFlush(
-                new BranchService(org, branch, def, 30, Money.of(new BigDecimal("500.00"), "TRY"))
+                new BranchService(org, branch, def, 30, Money.of(new BigDecimal("500.00"), Currency.getInstance("TRY")))
         );
 
         assignment = staffAssignmentRepository.saveAndFlush(new StaffAssignment(staff, branch, dept));

@@ -33,6 +33,7 @@ public class Appointment {
     private final ServiceSnapshot serviceSnapshot;
     private AppointmentStatus status;
     private final Instant createdAt;
+    private Long version;
 
     public Appointment(UUID id, UUID patientId, UUID staffId, UUID branchId, UUID branchServiceId,
                        TimeInterval interval, ServiceSnapshot serviceSnapshot, Instant createdAt) {
@@ -66,6 +67,18 @@ public class Appointment {
                                     TimeInterval interval, ServiceSnapshot serviceSnapshot) {
         return new Appointment(UUID.randomUUID(), patientId, staffId, branchId, branchServiceId,
                 interval, serviceSnapshot, Instant.now());
+    }
+
+    /**
+     * Reconstitutes an existing appointment aggregate from persistence representation.
+     */
+    public static Appointment reconstitute(UUID id, UUID patientId, UUID staffId, UUID branchId, UUID branchServiceId,
+                                           TimeInterval interval, ServiceSnapshot serviceSnapshot,
+                                           AppointmentStatus status, Instant createdAt, Long version) {
+        Appointment appointment = new Appointment(id, patientId, staffId, branchId, branchServiceId, interval, serviceSnapshot, createdAt);
+        appointment.status = Objects.requireNonNull(status, "AppointmentStatus must not be null");
+        appointment.version = version;
+        return appointment;
     }
 
     /**
@@ -255,6 +268,14 @@ public class Appointment {
 
     public Instant createdAt() {
         return createdAt;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public Long version() {
+        return version;
     }
 
     @Override

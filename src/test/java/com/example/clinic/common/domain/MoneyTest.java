@@ -47,7 +47,7 @@ class MoneyTest {
     @Test
     @DisplayName("Negative: Null currency is rejected with NullPointerException")
     void shouldRejectNullCurrency() {
-        assertThatThrownBy(() -> Money.of(BigDecimal.TEN, null))
+        assertThatThrownBy(() -> Money.of(BigDecimal.TEN, (Currency) null))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessageContaining("Currency must not be null");
     }

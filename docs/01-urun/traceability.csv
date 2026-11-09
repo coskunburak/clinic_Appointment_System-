@@ -10,12 +10,12 @@ FR-008,MUST,Doktorun uzmanlık alanı tutulur,S05,TC-008,PLANNED,NOT_RUN
 FR-009,MUST,Çalışanın sağlayabileceği hizmetler şube bazında tanımlanır,S05,TC-009,PLANNED,NOT_RUN
 FR-010,MUST,Çalışanın haftalık uygunluk aralıkları tanımlanır,S05,TC-010,PLANNED,NOT_RUN
 FR-011,MUST,Tarih özelinde izin ve mesai istisnası uygulanır,S05,TC-011,PLANNED,NOT_RUN
-FR-012,MUST,Hasta yalnızca uygun saat aralığında rezervasyon yapar,S06,TC-012,PLANNED,NOT_RUN
-FR-013,MUST,"Hasta hizmet, çalışan, şube ve tarih/saat seçer",S06,TC-013,PLANNED,NOT_RUN
-FR-014,MUST,Çalışan için zaman çakışması engellenir,S06,TC-014,PLANNED,NOT_RUN
-FR-015,MUST,Eşzamanlı iki istekte çift rezervasyon engellenir,S06,TC-015,PLANNED,NOT_RUN
-FR-016,MUST,Randevuda işlem/süre/ücret/çalışan/tarih-saat saklanır,S06,TC-016,PLANNED,NOT_RUN
-FR-017,MUST,Randevu başlangıç durumunda PENDING olur,S06,TC-017,PLANNED,NOT_RUN
+FR-012,MUST,Hasta yalnızca uygun saat aralığında rezervasyon yapar,S06,TC-012,PASS_OWNER_VERIFIED,PASSED
+FR-013,MUST,"Hasta hizmet, çalışan, şube ve tarih/saat seçer",S06,TC-013,PASS_OWNER_VERIFIED,PASSED
+FR-014,MUST,Çalışan için zaman çakışması engellenir,S06,TC-014,PASS_OWNER_VERIFIED,PASSED
+FR-015,MUST,Eşzamanlı iki istekte çift rezervasyon engellenir,S06,TC-015,PASS_OWNER_VERIFIED,PASSED
+FR-016,MUST,Randevuda işlem/süre/ücret/çalışan/tarih-saat saklanır,S06,TC-016,PASS_OWNER_VERIFIED,PASSED
+FR-017,MUST,Randevu başlangıç durumunda PENDING olur,S06,TC-017,PASS_OWNER_VERIFIED,PASSED
 FR-018,MUST,Yetkili çalışan/yönetici randevuyu onaylar,S07,TC-018,PLANNED,NOT_RUN
 FR-019,MUST,Yetkili kişi randevuyu reddedebilir,S07,TC-019,PLANNED,NOT_RUN
 FR-020,MUST,Hasta kendi randevusunu iptal edebilir,S07,TC-020,PLANNED,NOT_RUN
@@ -27,11 +27,11 @@ FR-025,MUST,Kimlik doğrulama ve parola hash sistemi vardır,S04,TC-025,PASS_OWN
 FR-026,MUST,Yetkisiz kuruma/şubeye erişim engellenir,S04,TC-026,PASS_OWNER_VERIFIED,PASSED
 FR-027,MUST,Hasta ve personel için ekran akışları vardır,S08,TC-027,PLANNED,NOT_RUN
 FR-028,MUST,Yönetim ekranları kurum/şube/hizmet/saat/personel yönetir,S08,TC-028,PLANNED,NOT_RUN
-FR-029,SHOULD,Hasta aynı anda iki randevuda bulunamaz,S06,TC-029,PLANNED,NOT_RUN
+FR-029,SHOULD,Hasta aynı anda iki randevuda bulunamaz,S06,TC-029,PASS_OWNER_VERIFIED,PASSED
 FR-030,SHOULD,Randevu ve onay hareketi olay geçmişine yazılır,S07,TC-030,PLANNED,NOT_RUN
-FR-031,SHOULD,Randevu tekrar gönderiminde idempotency desteklenir,S06,TC-031,PLANNED,NOT_RUN
-FR-032,SHOULD,İşlem fiyat/süre snapshot değerleri değişmeden korunur,S06,TC-032,PLANNED,NOT_RUN
-FR-033,SHOULD,Zaman dilimi doğru dönüştürülür,S06,TC-033,PLANNED,NOT_RUN
+FR-031,SHOULD,Randevu tekrar gönderiminde idempotency desteklenir,S06,TC-031,DEFERRED,DEFERRED
+FR-032,SHOULD,İşlem fiyat/süre snapshot değerleri değişmeden korunur,S06,TC-032,PASS_OWNER_VERIFIED,PASSED
+FR-033,SHOULD,Zaman dilimi doğru dönüştürülür,S06,TC-033,PASS_OWNER_VERIFIED,PASSED
 FR-034,SHOULD,Demo seed ve demo reset prosedürü vardır,S09,TC-034,PLANNED,NOT_RUN
 FR-035,COULD,Kullanıcı için uygulama içi bildirimler vardır,S10,TC-035,PLANNED,NOT_RUN
 FR-036,COULD,Hizmet/şube rapor filtreleri vardır,S10,TC-036,PLANNED,NOT_RUN

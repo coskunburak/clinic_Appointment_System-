@@ -17,8 +17,8 @@
 | `staff_service_eligibility` | id, assignment_id, branch_service_id | unique(assignment_id, branch_service_id) (S05 / V2) |
 | `weekly_availability` | id, assignment_id, weekday, start_time, end_time | start<end (S05 / V2) |
 | `availability_exception` | id, assignment_id, local_date, kind, start_time nullable, end_time nullable | leave full day or bounded interval (S05 / V2) |
-| `appointment` | id, patient_id, staff_id, branch_id, branch_service_id, start_at_utc TIMESTAMPTZ, end_at_utc TIMESTAMPTZ, status, service_name_snapshot, duration_minutes_snapshot, fee_amount_snapshot, currency_snapshot, version, created_at | end>start; status enum check; FK (S06 / V3) |
-| `appointment_status_history` | id, appointment_id, from_status, to_status, actor_user_id, reason, occurred_at | append-only (S07 / V3) |
+| `appointment` | id, patient_id, staff_id, branch_id, branch_service_id, start_at_utc TIMESTAMPTZ, end_at_utc TIMESTAMPTZ, status, service_name_snapshot, duration_minutes_snapshot, fee_amount_snapshot, currency_snapshot, version, created_at | end>start; status enum check; composite FK branch_service (S06 / V4) |
+| `appointment_status_history` | id, appointment_id, from_status, to_status, actor_user_id, reason, occurred_at | append-only; initial creation & lifecycle transitions (S06/S07 / V4) |
 | `booking_request` | id, patient_id, request_key, body_hash, appointment_id | optional SHOULD; unique(patient_id,request_key) (S06 / V4) |
 
 ## Gerçekleşen ve Önerilen Migration Sırası
@@ -40,3 +40,4 @@
 ## Çok Kiracılı Veri Bütünlüğü Kuralı
 Yalnızca bağımsız tekil yabancı anahtarlar (`branch_id` ve `organization_id`) kiracı izolasyonunu garanti etmez. V1 migrasyonunda `branch` tablosuna `uq_branch_id_org_id (id, organization_id)` tanımlanmış ve `membership` tablosuna `fk_membership_branch_org FOREIGN KEY (branch_id, organization_id) REFERENCES branch(id, organization_id)` kompozit kısıtı eklenmiştir.
 S03'te bu kural katalog katmanına genişletilmiştir: `service_definition` tablosuna `uq_service_definition_id_org_id (id, organization_id)` kısıtı eklenmiş; `branch_service` tablosuna hem `fk_branch_service_branch_org FOREIGN KEY (branch_id, organization_id) REFERENCES branch(id, organization_id)` hem de `fk_branch_service_def_org FOREIGN KEY (service_definition_id, organization_id) REFERENCES service_definition(id, organization_id)` kompozit yabancı anahtarları bağlanmıştır. Böylece A Kurumunun şubesine B Kurumunun hizmetinin atanması veritabanı motoru seviyesinde fiziksel olarak engellenmiştir.
+S06'da bu bütünlük randevu katmanına genişletilmiştir: `branch_service` tablosuna `uq_branch_service_id_branch_id (id, branch_id)` eklenmiş; `appointment` tablosuna `fk_appointment_branch_service_branch FOREIGN KEY (branch_service_id, branch_id) REFERENCES branch_service(id, branch_id)` kompozit yabancı anahtarı tanımlanmıştır. Böylece bağımsız UUID'ler gönderilerek A şubesinin randevusuna B şubesinin hizmetinin atanması fiziksel olarak engellenmiştir.

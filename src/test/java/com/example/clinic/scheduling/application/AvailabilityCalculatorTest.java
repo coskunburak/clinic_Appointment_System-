@@ -36,6 +36,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.Collections;
+import java.util.Currency;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -106,7 +107,7 @@ class AvailabilityCalculatorTest {
 
         serviceDef = new ServiceDefinition(UUID.randomUUID(), org, "Genel Muayene", "Rutin Muayene", true, Instant.now());
         branchService = new BranchService(
-                UUID.randomUUID(), org, branch, serviceDef, 30, Money.of(new BigDecimal("800.00"), "TRY"), true, Instant.now()
+                UUID.randomUUID(), org, branch, serviceDef, 30, Money.of(new BigDecimal("800.00"), Currency.getInstance("TRY")), true, Instant.now()
         );
     }
 
