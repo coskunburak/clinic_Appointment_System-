@@ -17,6 +17,8 @@ import com.example.clinic.catalog.infrastructure.BranchServiceRepository;
 import com.example.clinic.catalog.infrastructure.ServiceDefinitionRepository;
 import com.example.clinic.common.domain.Money;
 import com.example.clinic.common.domain.TimeInterval;
+import com.example.clinic.common.security.SecurityContextFacade;
+import com.example.clinic.identity.application.AccessPolicy;
 import com.example.clinic.identity.domain.Membership;
 import com.example.clinic.identity.domain.PatientProfile;
 import com.example.clinic.identity.domain.Role;
@@ -142,6 +144,12 @@ class AppointmentApprovalServiceIT extends AbstractIntegrationTest {
 
     @Autowired
     private Clock clock;
+
+    @Autowired
+    private AccessPolicy accessPolicy;
+
+    @Autowired
+    private SecurityContextFacade securityContextFacade;
 
     private Organization org1;
     private Organization org2;

@@ -136,13 +136,13 @@ class AppointmentApprovalServiceTest {
         staffUserId = UUID.randomUUID();
         staffProfileId = UUID.randomUUID();
         staffUser = new UserAccount(staffUserId, "doctor@example.com", "hash", true, fixedNow);
-        staffProfile = new StaffProfile(staffProfileId, staffUser, "Dr. Ahmet", "+905552223344", StaffType.DOCTOR, "Kardiyoloji");
+        staffProfile = new StaffProfile(staffProfileId, staffUser, "Dr. Ahmet", "+905552223344", StaffType.DOCTOR, "Kardiyoloji", true, fixedNow);
 
         // Other Doctor
         otherStaffUserId = UUID.randomUUID();
         otherStaffProfileId = UUID.randomUUID();
         otherStaffUser = new UserAccount(otherStaffUserId, "other.doctor@example.com", "hash", true, fixedNow);
-        otherStaffProfile = new StaffProfile(otherStaffProfileId, otherStaffUser, "Dr. Zeynep", "+905553334455", StaffType.DOCTOR, "Nöroloji");
+        otherStaffProfile = new StaffProfile(otherStaffProfileId, otherStaffUser, "Dr. Zeynep", "+905553334455", StaffType.DOCTOR, "Nöroloji", true, fixedNow);
 
         // Authorized Manager
         managerUserId = UUID.randomUUID();
@@ -151,7 +151,6 @@ class AppointmentApprovalServiceTest {
         // Outside-scope Manager
         otherManagerUserId = UUID.randomUUID();
         otherManagerUser = new UserAccount(otherManagerUserId, "other.manager@example.com", "hash", true, fixedNow);
-        setId(otherManagerUser, otherManagerUserId);
 
         // Appointment: scheduled for 2026-11-10T10:00 to 10:30 UTC (future relative to fixedNow 09:00)
         appointmentStart = Instant.parse("2026-11-10T10:00:00Z");
