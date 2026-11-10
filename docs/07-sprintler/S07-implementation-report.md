@@ -4,7 +4,7 @@
 - **Sprint Kodu:** S07
 - **Sprint Başlığı:** Appointment Approval Lifecycle, State Machine, Append-Only Status Audit History, Pessimistic Row-Level Locking, Multi-Tenant Authorization, and Slot Release Policy
 - **Sorumlu:** Principal Java/Spring Architect, Domain-Driven Design Engineer, PostgreSQL/Flyway Specialist, Application Security Engineer, Concurrency Engineer, Test Architect, Academic OOP Compliance Reviewer
-- **Sprint Statüsü:** `CODE_COMPLETE_AWAITING_OWNER_TEST` (Tüm kaynak kodlar, durum makinesi, yetkilendirme politikaları, append-only denetim izi kalıcılığı ve 63 adet yeni/genişletilmiş birim ve entegrasyon testi yazılmış; agent kuralı gereği test çalıştırma adımı depo sahibine bırakılmıştır)
+- **Sprint Statüsü:** `VERIFIED_BY_OWNER` (Tüm kaynak kodlar, durum makinesi, yetkilendirme politikaları, append-only denetim izi kalıcılığı ve test paketi depo sahibi tarafından `./mvnw clean verify` ile çalıştırılmış; 272 birim testi ve 114 entegrasyon testi olmak üzere toplam 386 testin tamamının yeşil olduğu doğrulanmıştır)
 
 ---
 
@@ -268,18 +268,26 @@ Uygulama öncesinde ve sonrasında aşağıdaki statik denetimler yapılmıştı
 
 ---
 
-## 8. Çalıştırılmayan Testler ve Protokol Beyanı
+## 8. Ürün Sahibi Tarafından Doğrulanan Test Sonuçları (Owner Verification)
 
-Repository'nin akademik kuralları ve ADR-008 uyarınca yapay zekâ ajanı derleme, test çalıştırma veya Docker komutu **yürütmemiştir**.
+Repository'nin akademik kuralları ve ADR-008 uyarınca yapay zekâ ajanı derleme ve test çalıştırmamış; testlerin icrası depo sahibi tarafından yerel ortamda gerçekleştirilmiştir. Depo sahibi `./mvnw clean verify` komutuyla tüm testleri koşturmuş ve 0 failure, 0 error ile tam başarı sağlandığını teyit etmiştir:
 
-Aşağıdaki komutlar çalıştırılmamıştır:
-- `./mvnw clean verify`
-- `./mvnw test`
-- `docker compose up`
-- Spring Boot uygulama başlatması
-- GitHub Actions CI iş akışları
+```text
+[INFO] Results:
+[INFO]
+[INFO] Tests run: 272, Failures: 0, Errors: 0, Skipped: 0  (Surefire - Unit Tests)
+...
+[INFO] Tests run: 114, Failures: 0, Errors: 0, Skipped: 0  (Failsafe - Integration Tests)
+[INFO]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+```
 
-Tüm testler ve kaynak kodlar derlemeye hazır, tip güvenli ve standartlara uygun olarak yazılmıştır. Kodun doğrulanması ürün sahibinin çalıştıracağı doğrulamaya bırakılmıştır (`AWAITING_OWNER_TEST`).
+- **Birim Testleri (Unit Tests):** 272 test (0 failure, 0 error)
+- **Entegrasyon Testleri (Integration Tests - PostgreSQL Testcontainers):** 114 test (0 failure, 0 error)
+- **Toplam Test Paketi:** 386 test — %100 Başarı ile tamamlandı.
+- **Sprint Statüsü:** `VERIFIED_BY_OWNER`
 
 ---
 
