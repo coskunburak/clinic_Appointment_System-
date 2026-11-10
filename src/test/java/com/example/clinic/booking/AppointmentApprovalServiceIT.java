@@ -49,11 +49,14 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.annotation.AnnotationTransactionAttributeSource;
+import org.springframework.transaction.interceptor.TransactionInterceptor;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.math.BigDecimal;
@@ -282,7 +285,7 @@ class AppointmentApprovalServiceIT extends AbstractIntegrationTest {
     }
 
     private AppointmentApprovalService createServiceWithClock(Instant instant) {
-        return new AppointmentApprovalService(
+        AppointmentApprovalService target = new AppointmentApprovalService(
                 appointmentJpaRepository,
                 appointmentStatusHistoryJpaRepository,
                 userAccountRepository,
@@ -292,6 +295,10 @@ class AppointmentApprovalServiceIT extends AbstractIntegrationTest {
                 securityContextFacade,
                 Clock.fixed(instant, ZoneOffset.UTC)
         );
+        ProxyFactory proxyFactory = new ProxyFactory(target);
+        proxyFactory.setProxyTargetClass(true);
+        proxyFactory.addAdvice(new TransactionInterceptor(transactionManager, new AnnotationTransactionAttributeSource()));
+        return (AppointmentApprovalService) proxyFactory.getProxy();
     }
 
     @Test

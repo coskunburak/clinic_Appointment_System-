@@ -17,6 +17,8 @@ import com.example.clinic.catalog.infrastructure.BranchServiceRepository;
 import com.example.clinic.catalog.infrastructure.ServiceDefinitionRepository;
 import com.example.clinic.common.domain.Money;
 import com.example.clinic.common.security.ClinicPrincipal;
+import com.example.clinic.common.security.SecurityContextFacade;
+import com.example.clinic.identity.application.AccessPolicy;
 import com.example.clinic.identity.domain.Membership;
 import com.example.clinic.identity.domain.PatientProfile;
 import com.example.clinic.identity.domain.Role;
@@ -45,10 +47,14 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.AnnotationTransactionAttributeSource;
+import org.springframework.transaction.interceptor.TransactionInterceptor;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -127,6 +133,15 @@ class AppointmentLifecycleConcurrencyIT extends AbstractIntegrationTest {
 
     @Autowired
     private MembershipRepository membershipRepository;
+
+    @Autowired
+    private PlatformTransactionManager transactionManager;
+
+    @Autowired
+    private AccessPolicy accessPolicy;
+
+    @Autowired
+    private SecurityContextFacade securityContextFacade;
 
     private Organization org;
     private Branch branch;
@@ -230,6 +245,23 @@ class AppointmentLifecycleConcurrencyIT extends AbstractIntegrationTest {
         );
         appointmentStatusHistoryJpaRepository.saveAndFlush(initial);
         return saved;
+    }
+
+    private AppointmentApprovalService createServiceWithClock(java.time.Clock customClock) {
+        AppointmentApprovalService target = new AppointmentApprovalService(
+                appointmentJpaRepository,
+                appointmentStatusHistoryJpaRepository,
+                userAccountRepository,
+                staffProfileRepository,
+                patientProfileRepository,
+                accessPolicy,
+                securityContextFacade,
+                customClock
+        );
+        ProxyFactory proxyFactory = new ProxyFactory(target);
+        proxyFactory.setProxyTargetClass(true);
+        proxyFactory.addAdvice(new TransactionInterceptor(transactionManager, new AnnotationTransactionAttributeSource()));
+        return (AppointmentApprovalService) proxyFactory.getProxy();
     }
 
     private void authenticate(UserAccount user, Role role) {
@@ -505,22 +537,7 @@ class AppointmentLifecycleConcurrencyIT extends AbstractIntegrationTest {
 
         // Use custom clock service where time is after appointment end
         java.time.Clock clockAfterEnd = java.time.Clock.fixed(appointmentEndUtc.plus(Duration.ofMinutes(15)), ZoneId.of("Europe/Istanbul"));
-        AppointmentApprovalService serviceAfterEnd = new AppointmentApprovalService(
-                appointmentJpaRepository,
-                appointmentStatusHistoryJpaRepository,
-                userAccountRepository,
-                staffProfileRepository,
-                patientProfileRepository,
-                new com.example.clinic.identity.application.AccessPolicy(
-                        userAccountRepository,
-                        membershipRepository,
-                        patientProfileRepository,
-                        staffProfileRepository,
-                        branchRepository
-                ),
-                new com.example.clinic.common.security.SecurityContextFacade(userAccountRepository),
-                clockAfterEnd
-        );
+        AppointmentApprovalService serviceAfterEnd = createServiceWithClock(clockAfterEnd);
 
         ExecutorService executor = Executors.newFixedThreadPool(2);
         CyclicBarrier barrier = new CyclicBarrier(2);
