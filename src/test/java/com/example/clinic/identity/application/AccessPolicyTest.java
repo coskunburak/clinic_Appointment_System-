@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
@@ -235,5 +236,36 @@ class AccessPolicyTest {
         assertThatThrownBy(() -> accessPolicy.enforceAdminBranchAccess(branchOtherOrg.getId(), admin1))
                 .isInstanceOf(AccessDeniedException.class)
                 .hasMessageContaining("administrator is not authorized for branch");
+    }
+
+    @Test
+    @DisplayName("S07 / FR-018: hasAdminBranchAccess returns true for authorized admin and false for unauthorized/disabled/missing branch")
+    void testHasAdminBranchAccessScenarios() {
+        UserAccount branchAdmin = new UserAccount("branch_admin@clinic.test", "hash");
+        Membership membership = new Membership(branchAdmin, org1, branch1, Role.ROLE_ADMIN);
+
+        when(branchRepository.findById(branch1.getId())).thenReturn(Optional.of(branch1));
+        when(branchRepository.findById(branch2.getId())).thenReturn(Optional.of(branch2));
+        when(membershipRepository.findByUserAccountIdAndRole(branchAdmin.getId(), Role.ROLE_ADMIN))
+                .thenReturn(List.of(membership));
+        when(userAccountRepository.findById(branchAdmin.getId())).thenReturn(Optional.of(branchAdmin));
+
+        // Authorized branch
+        assertThat(accessPolicy.hasAdminBranchAccess(branch1.getId(), branchAdmin)).isTrue();
+        assertThat(accessPolicy.hasAdminBranchAccess(branch1.getId(), branchAdmin.getId())).isTrue();
+
+        // Unauthorized sibling branch
+        assertThat(accessPolicy.hasAdminBranchAccess(branch2.getId(), branchAdmin)).isFalse();
+        assertThat(accessPolicy.hasAdminBranchAccess(branch2.getId(), branchAdmin.getId())).isFalse();
+
+        // Unknown branch
+        UUID unknownBranchId = UUID.randomUUID();
+        when(branchRepository.findById(unknownBranchId)).thenReturn(Optional.empty());
+        assertThat(accessPolicy.hasAdminBranchAccess(unknownBranchId, branchAdmin)).isFalse();
+
+        // Null / disabled checks
+        assertThat(accessPolicy.hasAdminBranchAccess(null, branchAdmin)).isFalse();
+        assertThat(accessPolicy.hasAdminBranchAccess(branch1.getId(), (UserAccount) null)).isFalse();
+        assertThat(accessPolicy.hasAdminBranchAccess(branch1.getId(), (UUID) null)).isFalse();
     }
 }

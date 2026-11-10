@@ -180,11 +180,18 @@ public class AccessPolicy {
 
         validateUserEnabled(currentAdmin);
 
-        if (!branchRepository.existsById(branchId)) {
-            throw new AccessDeniedException("Access denied: branch not found: " + branchId);
-        }
+        Branch branch = branchRepository.findById(branchId)
+                .orElseThrow(() -> new AccessDeniedException("Access denied: branch not found: " + branchId));
 
-        if (!hasAdminBranchAccess(branchId, currentAdmin)) {
+        UUID orgId = branch.getOrganization().getId();
+
+        List<Membership> adminMemberships = membershipRepository.findByUserAccountIdAndRole(currentAdmin.getId(), Role.ROLE_ADMIN);
+
+        boolean authorized = adminMemberships.stream()
+                .anyMatch(m -> m.getOrganization().getId().equals(orgId) &&
+                        (m.getBranch() == null || m.getBranch().getId().equals(branchId)));
+
+        if (!authorized) {
             throw new AccessDeniedException("Access denied: administrator is not authorized for branch " + branchId);
         }
     }
