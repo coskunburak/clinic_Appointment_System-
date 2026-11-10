@@ -258,10 +258,10 @@ class AppointmentApprovalServiceIT extends AbstractIntegrationTest {
                 start,
                 end,
                 AppointmentStatus.PENDING,
-                branchService1.getServiceDefinition().getName(),
-                branchService1.getDurationMinutes(),
-                branchService1.getPrice().amount(),
-                branchService1.getPrice().currency().getCurrencyCode(),
+                "Cardiology Exam",
+                30,
+                new BigDecimal("750.00"),
+                "TRY",
                 0L,
                 Instant.now()
         );

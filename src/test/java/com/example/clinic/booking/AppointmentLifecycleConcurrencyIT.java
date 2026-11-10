@@ -210,10 +210,10 @@ class AppointmentLifecycleConcurrencyIT extends AbstractIntegrationTest {
                 appointmentStartUtc,
                 appointmentEndUtc,
                 AppointmentStatus.PENDING,
-                branchService.getServiceDefinition().getName(),
-                branchService.getDurationMinutes(),
-                branchService.getPrice().amount(),
-                branchService.getPrice().currency().getCurrencyCode(),
+                "Check-Up",
+                30,
+                new BigDecimal("800.00"),
+                "TRY",
                 0L,
                 Instant.now()
         );
