@@ -21,10 +21,10 @@
 | TC-015 | FR-015 | iki ayrı DB transaction aynı staff/intervale barrier ile gönder | DB üzerinde en fazla 1 aktif kayıt; diğer kontrollü conflict |
 | TC-016 | FR-016 | 30dk/800 TRY randevu oluştur ve yeniden oku | işlem/şube/çalışan/süre/ücret/start/end kalıcıdır |
 | TC-017 | FR-017 | hasta yeni randevu oluştur | PENDING ve başlangıç audit kaydı |
-| TC-018 | FR-018 | atanmış doktor PENDING randevuyu onaylar | CONFIRMED ve actor history kaydı |
-| TC-019 | FR-019 | atanmış doktor PENDING randevuyu reddeder | REJECTED ve slot açılmıştır |
-| TC-020 | FR-020 | sahibi başlangıç öncesi pending/confirmed randevuyu iptal eder | CANCELLED, sonraki aynı interval rezervasyonu olabilir |
-| TC-021 | FR-021 | bitişi geçen onaylı randevuyu personel tamamlar | COMPLETED; gelecekteki randevu için reddedilir |
+| TC-018 | FR-018 | atanmış doktor PENDING randevuyu onaylar | CONFIRMED ve actor history kaydı (`AppointmentApprovalServiceIT.authorizedDoctorCanApprovePendingAppointment` — Otomatize / OWNER_TEST_PENDING) |
+| TC-019 | FR-019 | atanmış doktor PENDING randevuyu reddeder | REJECTED ve slot açılmıştır (`AppointmentApprovalServiceIT.doctorRejectsAppointmentWithReason` — Otomatize / OWNER_TEST_PENDING) |
+| TC-020 | FR-020 | sahibi başlangıç öncesi pending/confirmed randevuyu iptal eder | CANCELLED, sonraki aynı interval rezervasyonu olabilir (`AppointmentApprovalServiceIT.patientCancelsOwnPendingAppointment` — Otomatize / OWNER_TEST_PENDING) |
+| TC-021 | FR-021 | bitişi geçen onaylı randevuyu personel tamamlar | COMPLETED; gelecekteki randevu için reddedilir (`AppointmentApprovalServiceIT.doctorCompletesAfterAppointmentEnd` — Otomatize / OWNER_TEST_PENDING) |
 | TC-022 | FR-022 | Hasta A, Hasta B appointment UUIDsini GET yapar | 403/404; başka hastanın içeriği sızmaz |
 | TC-023 | FR-023 | Dr A, Dr B randevularını görmeye/onaylamaya çalışır | kendi listeye erişir, diğerini değiştiremez |
 | TC-024 | FR-024 | yetkili şube yöneticisi hizmet ve mesai günceller | scope içinde başarılı, dışında 403/404 |
@@ -33,7 +33,7 @@
 | TC-027 | FR-027 | hasta booking ve staff approval ekranlarını gezin | navigasyon, durum ve hata mesajları doğru |
 | TC-028 | FR-028 | admin ekranından şube/hizmet/staff/availability yönet | temel CRUD değişiklikleri kalıcıdır |
 | TC-029 | FR-029 | aynı hasta iki farklı staff ile çakışan slot talep eder | SHOULD uygulandıysa ikinci istek reddedilir |
-| TC-030 | FR-030 | onay, iptal/ret ve tamamla geçişi tetikle | actor/from/to/time bilgisi append-only |
+| TC-030 | FR-030 | onay, iptal/ret ve tamamla geçişi tetikle | actor/from/to/time bilgisi append-only (`AppointmentApprovalServiceIT.statusHistoryRecordsAllTransitionsInOrder` — Otomatize / OWNER_TEST_PENDING) |
 | TC-031 | FR-031 | aynı requestKey ile formu iki kez gönder; gövde değiştir | aynı içerik aynı sonuç; farklı içerik 409 |
 | TC-032 | FR-032 | fiyatı 800den 900e değiştir; eski appointment getir | eski 800, yeni 900 snapshot |
 | TC-033 | FR-033 | IANA zone local->UTC dönüşümünü; DST gap/overlap test et | belirsiz/olmayan saat açık hataya dönüşür |

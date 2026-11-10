@@ -139,6 +139,38 @@ public class AccessPolicy {
     }
 
     /**
+     * Checks whether an administrator has authority over a specific branch (either through organization-wide
+     * admin membership or branch-specific admin membership).
+     * Returns true if authorized, false otherwise.
+     */
+    public boolean hasAdminBranchAccess(UUID branchId, UserAccount currentAdmin) {
+        if (branchId == null || currentAdmin == null || !currentAdmin.isEnabled()) {
+            return false;
+        }
+
+        Branch branch = branchRepository.findById(branchId).orElse(null);
+        if (branch == null) {
+            return false;
+        }
+
+        UUID orgId = branch.getOrganization().getId();
+        List<Membership> adminMemberships = membershipRepository.findByUserAccountIdAndRole(currentAdmin.getId(), Role.ROLE_ADMIN);
+
+        return adminMemberships.stream()
+                .anyMatch(m -> m.getOrganization().getId().equals(orgId) &&
+                        (m.getBranch() == null || m.getBranch().getId().equals(branchId)));
+    }
+
+    public boolean hasAdminBranchAccess(UUID branchId, UUID userId) {
+        if (userId == null) {
+            return false;
+        }
+        return userAccountRepository.findById(userId)
+                .map(u -> hasAdminBranchAccess(branchId, u))
+                .orElse(false);
+    }
+
+    /**
      * Enforces that the administrator has authority over a specific branch (either through organization-wide
      * admin membership or branch-specific admin membership) (FR-024, TC-024, TC-026).
      */
@@ -148,18 +180,11 @@ public class AccessPolicy {
 
         validateUserEnabled(currentAdmin);
 
-        Branch branch = branchRepository.findById(branchId)
-                .orElseThrow(() -> new AccessDeniedException("Access denied: branch not found: " + branchId));
+        if (!branchRepository.existsById(branchId)) {
+            throw new AccessDeniedException("Access denied: branch not found: " + branchId);
+        }
 
-        UUID orgId = branch.getOrganization().getId();
-
-        List<Membership> adminMemberships = membershipRepository.findByUserAccountIdAndRole(currentAdmin.getId(), Role.ROLE_ADMIN);
-
-        boolean authorized = adminMemberships.stream()
-                .anyMatch(m -> m.getOrganization().getId().equals(orgId) &&
-                        (m.getBranch() == null || m.getBranch().getId().equals(branchId)));
-
-        if (!authorized) {
+        if (!hasAdminBranchAccess(branchId, currentAdmin)) {
             throw new AccessDeniedException("Access denied: administrator is not authorized for branch " + branchId);
         }
     }

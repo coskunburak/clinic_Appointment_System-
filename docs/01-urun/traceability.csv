@@ -16,10 +16,10 @@ FR-014,MUST,Çalışan için zaman çakışması engellenir,S06,TC-014,PASS_OWNE
 FR-015,MUST,Eşzamanlı iki istekte çift rezervasyon engellenir,S06,TC-015,PASS_OWNER_VERIFIED,PASSED
 FR-016,MUST,Randevuda işlem/süre/ücret/çalışan/tarih-saat saklanır,S06,TC-016,PASS_OWNER_VERIFIED,PASSED
 FR-017,MUST,Randevu başlangıç durumunda PENDING olur,S06,TC-017,PASS_OWNER_VERIFIED,PASSED
-FR-018,MUST,Yetkili çalışan/yönetici randevuyu onaylar,S07,TC-018,PLANNED,NOT_RUN
-FR-019,MUST,Yetkili kişi randevuyu reddedebilir,S07,TC-019,PLANNED,NOT_RUN
-FR-020,MUST,Hasta kendi randevusunu iptal edebilir,S07,TC-020,PLANNED,NOT_RUN
-FR-021,MUST,Personel geçmiş randevuyu tamamlandı işaretleyebilir,S07,TC-021,PLANNED,NOT_RUN
+FR-018,MUST,Yetkili çalışan/yönetici randevuyu onaylar,S07,TC-018,APPLICATION_SERVICE_IMPLEMENTED,OWNER_TEST_PENDING
+FR-019,MUST,Yetkili kişi randevuyu reddedebilir,S07,TC-019,APPLICATION_SERVICE_IMPLEMENTED,OWNER_TEST_PENDING
+FR-020,MUST,Hasta kendi randevusunu iptal edebilir,S07,TC-020,APPLICATION_SERVICE_IMPLEMENTED,OWNER_TEST_PENDING
+FR-021,MUST,Personel geçmiş randevuyu tamamlandı işaretleyebilir,S07,TC-021,APPLICATION_SERVICE_IMPLEMENTED,OWNER_TEST_PENDING
 FR-022,MUST,Hasta rolü yalnız kendi randevularını görür,S04,TC-022,PASS_OWNER_VERIFIED,PASSED
 FR-023,MUST,Personel rolü yalnız yetkili şube/kendi programını görür,S04,TC-023,PASS_OWNER_VERIFIED,PASSED
 FR-024,MUST,Yönetici rolü şube/kurum yönetimini yapar,S04,TC-024,PASS_OWNER_VERIFIED,PASSED
@@ -28,7 +28,7 @@ FR-026,MUST,Yetkisiz kuruma/şubeye erişim engellenir,S04,TC-026,PASS_OWNER_VER
 FR-027,MUST,Hasta ve personel için ekran akışları vardır,S08,TC-027,PLANNED,NOT_RUN
 FR-028,MUST,Yönetim ekranları kurum/şube/hizmet/saat/personel yönetir,S08,TC-028,PLANNED,NOT_RUN
 FR-029,SHOULD,Hasta aynı anda iki randevuda bulunamaz,S06,TC-029,PASS_OWNER_VERIFIED,PASSED
-FR-030,SHOULD,Randevu ve onay hareketi olay geçmişine yazılır,S07,TC-030,PLANNED,NOT_RUN
+FR-030,SHOULD,Randevu ve onay hareketi olay geçmişine yazılır,S07,TC-030,APPLICATION_SERVICE_IMPLEMENTED,OWNER_TEST_PENDING
 FR-031,SHOULD,Randevu tekrar gönderiminde idempotency desteklenir,S06,TC-031,DEFERRED,DEFERRED
 FR-032,SHOULD,İşlem fiyat/süre snapshot değerleri değişmeden korunur,S06,TC-032,PASS_OWNER_VERIFIED,PASSED
 FR-033,SHOULD,Zaman dilimi doğru dönüştürülür,S06,TC-033,PASS_OWNER_VERIFIED,PASSED

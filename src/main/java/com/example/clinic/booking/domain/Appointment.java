@@ -115,13 +115,21 @@ public class Appointment {
      * Rejects a PENDING appointment, transitioning it to REJECTED.
      *
      * @param actorId the UUID of the rejecting staff/manager
-     * @param reason  optional reason for rejection
+     * @param reason  mandatory explanation for the rejection (max 500 characters)
      * @param clock   the system or test clock
      * @throws AppointmentDomainException if status is not PENDING
+     * @throws IllegalArgumentException   if reason is null, blank, or exceeds 500 characters
      */
     public void reject(UUID actorId, String reason, Clock clock) {
         Objects.requireNonNull(actorId, "actorId must not be null");
         Objects.requireNonNull(clock, "Clock must not be null");
+
+        if (reason == null || reason.isBlank()) {
+            throw new IllegalArgumentException("Rejection reason must not be null or blank");
+        }
+        if (reason.strip().length() > 500) {
+            throw new IllegalArgumentException("Rejection reason must not exceed 500 characters");
+        }
 
         if (this.status != AppointmentStatus.PENDING) {
             throw new AppointmentDomainException(
@@ -136,10 +144,11 @@ public class Appointment {
     /**
      * Cancels an appointment from either PENDING or CONFIRMED status.
      *
-     * @param actorId the UUID of the patient or staff cancelling
-     * @param reason  mandatory explanation for the cancellation
+     * @param actorId the UUID of the patient, staff, or manager cancelling
+     * @param reason  mandatory explanation for the cancellation (max 500 characters)
      * @param clock   the system or test clock
      * @throws AppointmentDomainException if status is not cancellable or appointment has already started
+     * @throws IllegalArgumentException   if reason is null, blank, or exceeds 500 characters
      */
     public void cancel(UUID actorId, String reason, Clock clock) {
         Objects.requireNonNull(actorId, "actorId must not be null");
@@ -147,6 +156,9 @@ public class Appointment {
 
         if (reason == null || reason.isBlank()) {
             throw new IllegalArgumentException("Cancellation reason must not be null or blank");
+        }
+        if (reason.strip().length() > 500) {
+            throw new IllegalArgumentException("Cancellation reason must not exceed 500 characters");
         }
 
         if (this.status != AppointmentStatus.PENDING && this.status != AppointmentStatus.CONFIRMED) {

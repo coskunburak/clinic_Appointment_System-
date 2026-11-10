@@ -210,6 +210,88 @@ class AppointmentStatusTransitionTest {
     }
 
     @Test
+    @DisplayName("Negative: Blank, null, or whitespace-only rejection reason fails")
+    void rejectWithoutReasonShouldFail() {
+        Clock clock = fixedClock(appointmentStart.minus(Duration.ofMinutes(30)));
+
+        assertThatThrownBy(() -> appointment.reject(actorStaff, null, clock))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Rejection reason must not be null or blank");
+
+        assertThatThrownBy(() -> appointment.reject(actorStaff, "", clock))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Rejection reason must not be null or blank");
+
+        assertThatThrownBy(() -> appointment.reject(actorStaff, "   \t\n  ", clock))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Rejection reason must not be null or blank");
+
+        // Status remains PENDING
+        assertThat(appointment.status()).isEqualTo(AppointmentStatus.PENDING);
+    }
+
+    @Test
+    @DisplayName("Negative: Excessively long reasons (>500 chars) fail for both rejection and cancellation")
+    void excessivelyLongReasonsFail() {
+        Clock clock = fixedClock(appointmentStart.minus(Duration.ofMinutes(30)));
+        String longReason = "A".repeat(501);
+
+        assertThatThrownBy(() -> appointment.reject(actorStaff, longReason, clock))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("must not exceed 500 characters");
+
+        assertThatThrownBy(() -> appointment.cancel(actorPatient, longReason, clock))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("must not exceed 500 characters");
+
+        assertThat(appointment.status()).isEqualTo(AppointmentStatus.PENDING);
+    }
+
+    @Test
+    @DisplayName("Temporal: Cancellation immediately before start succeeds, at exact start is rejected")
+    void cancellationTimingBoundaries() {
+        // 1 millisecond before start succeeds
+        Clock clockBefore = fixedClock(appointmentStart.minusMillis(1));
+        appointment.cancel(actorPatient, "Son dakika acil durum", clockBefore);
+        assertThat(appointment.status()).isEqualTo(AppointmentStatus.CANCELLED);
+
+        // At exact start boundary fails
+        Appointment app2 = Appointment.create(actorPatient, actorStaff, UUID.randomUUID(), UUID.randomUUID(), interval, snapshot);
+        Clock clockAtStart = fixedClock(appointmentStart);
+        assertThatThrownBy(() -> app2.cancel(actorPatient, "Tam vaktinde iptal", clockAtStart))
+                .isInstanceOf(AppointmentDomainException.class)
+                .hasMessageContaining("already started");
+        assertThat(app2.status()).isEqualTo(AppointmentStatus.PENDING);
+    }
+
+    @Test
+    @DisplayName("Temporal: Completion at the exact end boundary succeeds")
+    void completionAtTheExactEndBoundarySucceeds() {
+        Clock clockBefore = fixedClock(appointmentStart.minus(Duration.ofHours(1)));
+        appointment.approve(actorStaff, clockBefore);
+
+        // Exact end time
+        Clock clockAtEnd = fixedClock(appointmentEnd);
+        appointment.complete(actorStaff, clockAtEnd);
+
+        assertThat(appointment.status()).isEqualTo(AppointmentStatus.COMPLETED);
+    }
+
+    @Test
+    @DisplayName("Negative: Cannot approve already cancelled appointment")
+    void cannotApproveAlreadyCancelledAppointment() {
+        Clock clock = fixedClock(appointmentStart.minus(Duration.ofHours(1)));
+        appointment.cancel(actorPatient, "Hasta vazgeçti", clock);
+        assertThat(appointment.status()).isEqualTo(AppointmentStatus.CANCELLED);
+
+        assertThatThrownBy(() -> appointment.approve(actorStaff, clock))
+                .isInstanceOf(AppointmentDomainException.class)
+                .hasMessageContaining("INVALID_STATUS_TRANSITION");
+
+        assertThat(appointment.status()).isEqualTo(AppointmentStatus.CANCELLED);
+    }
+
+    @Test
     @DisplayName("Positive: Service snapshot and fee remain unchanged across transitions")
     void shouldPreserveSnapshotAcrossTransitions() {
         Clock clock = fixedClock(appointmentStart.minus(Duration.ofMinutes(30)));

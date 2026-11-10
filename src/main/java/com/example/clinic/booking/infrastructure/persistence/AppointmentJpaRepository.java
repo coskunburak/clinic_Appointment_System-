@@ -1,7 +1,9 @@
 package com.example.clinic.booking.infrastructure.persistence;
 
 import com.example.clinic.booking.domain.AppointmentStatus;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -9,14 +11,24 @@ import org.springframework.stereotype.Repository;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
  * Spring Data JPA repository for {@link AppointmentJpaEntity}.
- * Supplies authoritative conflict queries using half-open {@code [start, end)} interval intersection.
+ * Supplies authoritative conflict queries using half-open {@code [start, end)} interval intersection,
+ * and pessimistic write locking for lifecycle state transitions.
  */
 @Repository
 public interface AppointmentJpaRepository extends JpaRepository<AppointmentJpaEntity, UUID> {
+
+    /**
+     * Acquires a row-level pessimistic write lock (SELECT ... FOR UPDATE) on the appointment row.
+     * Guarantees deterministic serialization for concurrent lifecycle operations.
+     */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT a FROM AppointmentJpaEntity a WHERE a.id = :id")
+    Optional<AppointmentJpaEntity> findByIdForUpdate(@Param("id") UUID id);
 
     /**
      * Finds appointments for a given staff member that overlap with the target interval {@code [startAtUtc, endAtUtc)}

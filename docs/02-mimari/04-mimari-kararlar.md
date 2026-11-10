@@ -97,3 +97,25 @@
    - TC-017 gereğince ilk rezervasyon anında `appointment_status_history` tablosuna `from_status = NULL, to_status = 'PENDING'` denetim kaydı randevu ile aynı transaction'da yazılır. S07 onay/red durum geçiş servisleri ise S07 kapsamına bırakılmıştır.
 6. **Hata Sınıflandırması:**
    - Hekim çakışmasında `AppointmentConflictException` (409), hasta çakışmasında `PatientOverlapException` (409), iş kuralı/mesai/DST ihlallerinde ise `BookingValidationException` (400/422) fırlatılır; veritabanı kilit hataları ve iç sorgular istemciye sızdırılmaz.
+
+## ADR-013 — S07 Randevu Yaşam Döngüsü, Durum Makinesi, Satır Kilidi ve Denetim İzi Mimarisi
+**Durum:** Kabul Edildi (Sprint S07 kararı).
+**Bağlam:** Sprint S07 randevu onay (`CONFIRMED`), red (`REJECTED`), iptal (`CANCELLED`) ve tamamlama (`COMPLETED`) durum geçişlerini kurala bağlar. Her durum değişikliği `appointment_status_history` tablosuna append-only olarak loglanmalıdır. Eşzamanlı iki işlemde (ör. aynı anda iki onay veya onay ile iptal yarışı) durum makinesinin tutarsız duruma düşmesi ve mükerrer denetim izi üretilmesi engellenmelidir.
+**Karar:**
+1. **Saf Domain Kapsüllemesi:** `Appointment` aggregate root'u saf POJO olarak korunmuş; tüm durum geçişleri niyet belirten domain metotları (`approve`, `reject`, `cancel`, `complete`) ile kapsüllenmiştir. Durum değiştiren kontrolsüz public setter'lar engellenmiştir. Geçersiz durum geçişleri `AppointmentDomainException` (kod: `INVALID_STATUS_TRANSITION`) fırlatır.
+2. **Zaman Kısıtları ve Deterministik Saat:** Zaman kıyaslamaları UTC `Instant` üzerinden yapılır. İptal işlemi randevu başlangıcından önce gerçekleştirilmelidir (`now < startAt`). Tamamlama işlemi ise randevu bitiş saatine ulaşıldığında veya sonrasında yapılabilir (`now >= endAt`). Zaman kararları dışarıdan enjekte edilen `Clock` nesnesi ile yönetilir.
+3. **Yetkilendirme ve Çok Kiracılı Güvence:**
+   - **Onay (`approve`) & Red (`reject`):** Yalnızca ilgili randevuya atanmış hekim veya şube/kurum yetkisi bulunan yönetici (`AccessPolicy.hasAdminBranchAccess`) tarafından yürütülebilir. Hastalar ve yabancı personeller kesin olarak engellenir (`AccessDeniedException`).
+   - **İptal (`cancel`):** Randevunun sahibi olan hasta, atanmış hekim veya şube yöneticisi tarafından başlatılabilir.
+   - **Tamamlama (`complete`):** Yalnızca randevuya atanmış hekim tarafından gerçekleştirilebilir; şube yöneticileri veya başka çalışanlar tamamlayamaz.
+4. **Eşzamanlılık ve Randevu Satır Kilidi (`PESSIMISTIC_WRITE`):**
+   - Randevu durum geçişleri `appointmentJpaRepository.findByIdForUpdate(appointmentId)` ile veritabanı seviyesinde satır kilidi (`SELECT ... FOR UPDATE`) altına alınır.
+   - Bu kilit mekanizması, iki eşzamanlı onay veya onay-iptal yarışını deterministik olarak serileştirir; kazanan işlem commit olduktan sonra kaybeden işlem güncel durumu okur ve kural dışı geçiş hatası alır.
+   - S06 rezervasyon kilitleri (`PatientProfile` -> `StaffProfile`) ile S07 randevu satır kilidi arasında döngüsel kilit bağımlılığı oluşmaz (deadlock-free).
+5. **Atomik Durum ve Denetim İzi Geçmişi:**
+   - Her başarılı geçişte `appointment_status_history` tablosuna `(id, appointment_id, from_status, to_status, actor_user_id, reason, occurred_at)` atomik olarak yazılır.
+   - İki işlem aynı `@Transactional(isolation = Isolation.READ_COMMITTED)` sınırında birleştirilmiştir. Tarihçe yazımı başarısız olursa randevu durumu da geri alınır (rollback); durum değişmeden tarihçe commit edilemez.
+   - Tarihçe tablosu kronolojik sıralama için `occurred_at ASC, id ASC` deterministik ikincil anahtarıyla sorgulanır.
+6. **Slot Serbest Bırakma Politikası (ADR-003):**
+   - Yalnızca `CANCELLED` ve `REJECTED` durumları slotu serbest bırakır. `PENDING`, `CONFIRMED` ve geçmiş `COMPLETED` randevuları `DatabaseAppointmentSchedulePort` ve `AvailabilityCalculator` motorunda dolu kabul edilir.
+7. **Gerekçe Politikası:** Red ve iptal işlemlerinde gerekçe zorunlu (`@NotBlank`), boşlukları normalize edilir (`strip()`) ve veritabanı sınırı olan 500 karakter ile sınırlandırılır. Onay ve tamamlama gerekçe içermez (`null`).

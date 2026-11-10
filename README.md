@@ -5,12 +5,12 @@
 [![Build Tool](https://img.shields.io/badge/Maven%20Wrapper-3.9.9-blue.svg)](https://maven.apache.org/)
 [![Database](https://img.shields.io/badge/PostgreSQL-17-blue.svg)](https://www.postgresql.org/)
 [![Migration](https://img.shields.io/badge/Flyway-V4-red.svg)](https://flywaydb.org/)
-[![Sprint](https://img.shields.io/badge/Sprint-S06%20(Randevu%20ve%20Eşzamanlılık%20Kilidi)-yellow.svg)](docs/07-sprintler/S06.md)
+[![Sprint](https://img.shields.io/badge/Sprint-S07%20(Randevu%20Onay%20Yaşam%20Döngüsü%20ve%20Durum%20Makinesi)-yellow.svg)](docs/07-sprintler/S07.md)
 [![Academic Status](https://img.shields.io/badge/Academic%20Project-OOP%20Seçenek%20A-informational.svg)](docs/00-baslangic/02-proje-kunyesi-ve-basari.md)
 
 Bu proje, üniversite **Nesneye Dayalı Programlama (OOP)** dersi kapsamında geliştirilen, tek ve çok şubeli sağlık kuruluşlarının randevu süreçlerini uçtan uca yönetmeyi amaçlayan web tabanlı bir hastane/klinik randevu yönetim sistemidir.
 
-> **Mevcut Proje Durumu:** **Sprint S06 — Randevu Rezervasyonu, Çakışma Önleme ve Eşzamanlılık Kilidi** kaynak kodları, Flyway V4 migrasyonu, PostgreSQL `PESSIMISTIC_WRITE` kilidi ve çok iş parçacıklı entegrasyon testleri hazırlanmıştır (Statü: `AWAITING_OWNER_TEST`). S01–S05 altyapısı, saf OOP domain çekirdeği ve Spring Security çok kiracılı yetkilendirmesi devralınmıştır. Detaylar için [S06 Uygulama Raporu](docs/07-sprintler/S06-implementation-report.md) incelenebilir.
+> **Mevcut Proje Durumu:** **Sprint S07 — Randevu Onay Yaşam Döngüsü, Durum Makinesi ve Denetim İzi** kaynak kodları, durum makinesi servis katmanı (`AppointmentApprovalService`), PostgreSQL satır kilidi (`findByIdForUpdate`), append-only denetim geçmişi ve Testcontainers entegrasyon testleri tamamlanmıştır (Statü: `CODE_COMPLETE_AWAITING_OWNER_TEST`). S00–S06 altyapısı, saf OOP domain çekirdeği ve Spring Security çok kiracılı yetkilendirmesi korunmuştur. Detaylar için [S07 Uygulama Raporu](docs/07-sprintler/S07-implementation-report.md) incelenebilir.
 
 ---
 
@@ -79,7 +79,7 @@ Sistemin tam teslimatta destekleyeceği ana modüller ve mevcut durumları:
 5. **Uygunluk ve Çalışma Takvimi:** Haftalık mesai şablonları, özel izinler ve müsaitlik aralıkları *(Planlandı — S05)*.
 6. **Randevu Rezervasyonu:** Şube, hizmet, doktor ve geçerli zaman aralığı seçerek randevu alma *(Planlandı — S06)*.
 7. **Çakışma ve Çift Rezervasyon Önleme:** Eşzamanlı isteklerde satır kilitleme ve çakışma kontrolü *(Planlandı — S06)*.
-8. **Randevu Yaşam Döngüsü:** `PENDING` -> `CONFIRMED` / `REJECTED` / `CANCELLED` / `COMPLETED` geçişleri ve işlem geçmişi *(Planlandı — S07)*.
+8. **Randevu Yaşam Döngüsü:** `PENDING` -> `CONFIRMED` / `REJECTED` / `CANCELLED` / `COMPLETED` geçişleri ve append-only denetim geçmişi *(Uygulandı — S07)*.
 9. **Rol ve Erişim Yönetimi:** Hasta, Doktor/Sağlık Personeli ve Yönetici rolleri *(Planlandı — S04 ve S08)*.
 
 ---
@@ -201,7 +201,7 @@ clinic-appointment/
 | **S04** | Kimlik Doğrulama, Roller ve Yetkilendirme | *Planlandı* | Spring Security, 3 rol (Hasta, Personel, Yönetici), oturum güvenliği |
 | **S05** | Personel Yönetimi ve Çalışma Saatleri | *Planlandı* | Doktor/personel uygunluk aralıkları, izinler, haftalık mesai |
 | **S06** | Randevu Rezervasyonu ve Çakışma Önleme | *Planlandı* | Slot arama, satır kilitleme (pessimistic lock), çakışmasız PENDING randevu |
-| **S07** | Randevu Onay Yaşam Döngüsü ve Geçmiş | *Planlandı* | Onay/ret/iptal akışı, durum makinesi, snapshot veri saklama |
+| **S07** | Randevu Onay Yaşam Döngüsü ve Geçmiş | **Uygulandı (Test Bekliyor)** | Onay/ret/iptal akışı, durum makinesi, append-only denetim geçmişi |
 | **S08** | Spring MVC ve Thymeleaf Kullanıcı Ekranları | *Planlandı* | Hasta, personel ve yönetici arayüzleri, form doğrulama, hata sayfaları |
 | **S09** | Test Regresyonu, Eşzamanlılık ve Demo Seed | *Planlandı* | Entegrasyon testleri, eşzamanlı rezervasyon testi, kurmaca seed verisi |
 | **S10** | Nihai Kalite Kapısı, Sunum ve Akademik Teslim | *Planlandı* | 10 farklı gün commit kontrolü, sunum hazırlığı, akademik rapor |
