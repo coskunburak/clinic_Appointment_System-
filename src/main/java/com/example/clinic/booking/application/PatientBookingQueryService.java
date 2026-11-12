@@ -98,7 +98,7 @@ public class PatientBookingQueryService {
                         s.getId(),
                         s.getFullName(),
                         s.getSpecialty() != null ? s.getSpecialty() : "Genel",
-                        s.getStaffType().name()
+                        s.getStaffType()
                 ))
                 .sorted(Comparator.comparing(StaffSummaryDto::fullName))
                 .toList();

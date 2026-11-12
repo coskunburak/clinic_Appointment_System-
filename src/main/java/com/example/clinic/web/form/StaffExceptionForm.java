@@ -22,7 +22,7 @@ public class StaffExceptionForm {
     private LocalDate localDate;
 
     @NotNull(message = "İstisna türü zorunludur.")
-    private AvailabilityExceptionKind kind = AvailabilityExceptionKind.ANNUAL_LEAVE;
+    private AvailabilityExceptionKind kind = AvailabilityExceptionKind.FULL_DAY_LEAVE;
 
     @DateTimeFormat(pattern = "HH:mm")
     private LocalTime startTime;

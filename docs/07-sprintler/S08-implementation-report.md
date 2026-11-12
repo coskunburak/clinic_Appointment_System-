@@ -281,6 +281,7 @@ Master prompt gereğince hiçbir test veya build aracı çalıştırılmadan kay
 3. **Repository Bağımsızlığı:** Hiçbir web kontrolöründe Spring Data JPA Repository enjeksiyonu bırakılmamış; tüm sorgular uygulama servislerine taşınmıştır.
 4. **Şablon Bütünlüğü:** Tüm formlarda CSRF token gizli alanları bulunmakta; form aksiyonları gerçek endpoint'lere bağlanmaktadır. Hiçbir boş veya dekoratif buton bırakılmamıştır.
 5. **Git Hijyeni:** `git diff --check` komutuyla hiçbir satır sonu boşluğu veya uyumsuzluk kalmadığı doğrulanmıştır.
+6. **Statik Tip ve Sözdizimi Düzeltmeleri:** `PatientBookingQueryService` (`getStaffType()`), `AdminManagementController` (`CreateStaffCommand` parametre uyumu) ve `StaffExceptionForm` (`AvailabilityExceptionKind.FULL_DAY_LEAVE`) tip eşleşmeleri doğrulanmıştır.
 
 ---
 

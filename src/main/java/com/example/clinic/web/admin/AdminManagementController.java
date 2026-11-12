@@ -492,13 +492,20 @@ public class AdminManagementController {
         }
 
         try {
+            UUID organizationId = organizationAdminService.getAuthorizedBranches().stream()
+                    .filter(b -> b.id().equals(form.getBranchId()))
+                    .map(BranchResponse::organizationId)
+                    .findFirst()
+                    .orElse(null);
+
             CreateStaffCommand command = new CreateStaffCommand(
+                    organizationId,
                     form.getBranchId(),
                     form.getEmail(),
                     form.getPassword(),
                     form.getFullName(),
                     form.getPhone(),
-                    form.getStaffType(),
+                    form.getStaffType() != null ? form.getStaffType().name() : "DOCTOR",
                     form.getSpecialty()
             );
             staffManagementService.registerStaff(command);

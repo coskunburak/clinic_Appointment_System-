@@ -132,7 +132,7 @@
                                 <tr th:each="ex : ${exceptions}">
                                     <td class="fw-bold" th:text="${ex.localDate}">2026-11-25</td>
                                     <td>
-                                        <span class="badge bg-warning text-dark" th:text="${ex.kind}">ANNUAL_LEAVE</span>
+                                        <span class="badge bg-warning text-dark" th:text="${ex.kind}">FULL_DAY_LEAVE</span>
                                     </td>
                                     <td>
                                         <span th:if="${ex.startTime != null}" th:text="${ex.startTime + ' - ' + ex.endTime}">09:00 - 12:00</span>
@@ -162,9 +162,8 @@
                         <div class="mb-3">
                             <label for="kind" class="form-label small">İstisna Türü <span class="text-danger">*</span></label>
                             <select id="kind" th:field="*{kind}" class="form-select form-select-sm" required>
-                                <option value="ANNUAL_LEAVE">Yıllık İzin (Slotları Kapatır)</option>
-                                <option value="SICK_LEAVE">Rapor / Hastalık İzni (Slotları Kapatır)</option>
-                                <option value="EMERGENCY">Acil Görev / Nöbet</option>
+                                <option value="FULL_DAY_LEAVE">Tam Gün İzin (Slotları Kapatır)</option>
+                                <option value="PARTIAL_LEAVE">Kısmi İzin (Saat Aralığını Kapatır)</option>
                                 <option value="OVERTIME">Fazla Mesai (Ek Slot Açar)</option>
                             </select>
                         </div>
