@@ -10,7 +10,7 @@
 
 Bu proje, üniversite **Nesneye Dayalı Programlama (OOP)** dersi kapsamında geliştirilen, tek ve çok şubeli sağlık kuruluşlarının randevu süreçlerini uçtan uca yönetmeyi amaçlayan web tabanlı bir hastane/klinik randevu yönetim sistemidir.
 
-> **Mevcut Proje Durumu:** **Sprint S08 — Spring MVC ve Thymeleaf Kullanıcı Ekranları (3 Rol)** sunucu taraflı render edilen (SSR) dinamik HTML arayüzleri, Spring MVC denetleyicileri (`PatientBookingController`, `StaffScheduleController`, `AdminManagementController`), form doğrulama modelleri (`@Valid` Jakarta Bean Validation), çevrimdışı yerel Bootstrap 5 varlıkları, özel hata sayfaları (403, 404, 500) ve 51 yeni otomatik test ile tamamlanmıştır (Mevcut Statü: `CODE_COMPLETE_AWAITING_OWNER_TEST` — S07'deki 386 doğrulanmış teste ek olarak toplam 437 test kurgulanmıştır). Detaylar için [S08 Uygulama Raporu](docs/07-sprintler/S08-implementation-report.md) incelenebilir.
+> **Mevcut Proje Durumu:** **Sprint S08 — Spring MVC ve Thymeleaf Kullanıcı Ekranları (3 Rol)** sunucu taraflı render edilen (SSR) dinamik HTML arayüzleri, Spring MVC denetleyicileri (`PatientBookingController`, `StaffScheduleController`, `AdminManagementController`), form doğrulama modelleri (`@Valid` Jakarta Bean Validation), çevrimdışı yerel Bootstrap 5 varlıkları, özel hata sayfaları (403, 404, 500) ve 51 yeni otomatik test ile tamamlanmıştır (Mevcut Statü: `VERIFIED_BY_OWNER` — 437/437 test: 320 birim/MVC testi + 117 Testcontainers PostgreSQL entegrasyon testi başarıyla geçmiştir). Detaylar için [S08 Uygulama Raporu](docs/07-sprintler/S08-implementation-report.md) incelenebilir.
 
 ---
 

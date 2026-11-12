@@ -4,7 +4,7 @@
 - **Sprint Kodu:** S08
 - **Sprint Başlığı:** Production-Level Spring MVC, Server-Side Rendered Thymeleaf User Interfaces for Three Roles (Patient, Staff, Admin), Offline Local Bootstrap 5 Assets, Form Validation, and Secure Error Handling
 - **Sorumlu:** Principal Java/Spring Boot Architect, Senior Spring MVC Engineer, Thymeleaf UI Architect, Application Security Engineer, Accessibility Engineer, Quality Assurance Architect, Academic OOP Compliance Reviewer
-- **Sprint Statüsü:** `CODE_COMPLETE_AWAITING_OWNER_TEST` (Tüm Spring MVC controller sınıfları, sunum katmanı sorgu servisleri, Thymeleaf şablonları, form DTO'ları, yerel Bootstrap 5 varlıkları, özel hata sayfaları ve 51 adet otomatik test kaynak kodu tamamlanmış; akademik kural gereği `./mvnw clean verify` çalıştırması depo sahibine devredilmiştir)
+- **Sprint Statüsü:** `VERIFIED_BY_OWNER` (Tüm Spring MVC controller sınıfları, sunum katmanı sorgu servisleri, Thymeleaf şablonları, form DTO'ları, yerel Bootstrap 5 varlıkları, özel hata sayfaları ve 51 adet yeni otomatik test ile toplam 437 testin tamamı [320 birim/MVC + 117 Testcontainers PostgreSQL entegrasyon] depo sahibi tarafından `./mvnw clean verify` ile başarıyla doğrulanmıştır)
 
 ---
 
@@ -269,7 +269,7 @@ Sınıf içi canlı sunumda internet kesilse bile ekranların kırılmaması iç
 
 - **S07 Tarihsel Tabanı:** 386 test (`VERIFIED_BY_OWNER`)
 - **Yeni Eklenen S08 Testleri:** 51 test
-- **Toplam Depo Test Sayısı:** 437 test (Kaynak kodda hazır ve çalıştırılmayı bekliyor)
+- **Toplam Depo Test Sayısı:** 437 test (320 birim/MVC testi + 117 entegrasyon testi — `VERIFIED_BY_OWNER` ile başarıyla doğrulanmıştır)
 
 ---
 
