@@ -104,7 +104,7 @@ class PatientBookingQueryServiceTest {
     void getEligibleStaffForService() {
         UUID branchServiceId = UUID.randomUUID();
         UserAccount user = new UserAccount("doc@clinic.test", "hash");
-        StaffProfile staff = new StaffProfile(user, "Dr. Mehmet Kaya", "555123", StaffType.DOCTOR, "Göz");
+        StaffProfile staff = new StaffProfile(user, "Dr. Mehmet Kaya", "+905551234567", StaffType.DOCTOR, "Göz");
         Department dept = new Department(branch, "Göz");
         StaffAssignment asg = new StaffAssignment(staff, branch, dept);
 
