@@ -2,36 +2,53 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Giriş Yap — Klinik Randevu Sistemi</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giriş Yap — Klinik Randevu Sistemi</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/clinic.css}">
 </head>
-<body>
-    <div class="login-container">
-        <h2>Klinik Randevu Sistemi</h2>
-        <h3>Giriş Yap</h3>
+<body class="d-flex flex-column min-vh-100 justify-content-center align-items-center bg-light">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-4">
+                <div class="clinic-card shadow">
+                    <div class="text-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="#176b86" class="bi bi-hospital mb-2" viewBox="0 0 16 16">
+                            <path d="M8.5 5.034v1.1l.953-.55.5.867L9 7l.953.55-.5.866-.953-.55v1.1h-1v-1.1l-.953.55-.5-.866L7 7l-.953-.55.5-.866.953.55v-1.1h1ZM13.25 9a.75.75 0 0 0-.75.75v.5a.75.75 0 0 0 1.5 0v-.5a.75.75 0 0 0-.75-.75ZM2.75 9a.75.75 0 0 0-.75.75v.5a.75.75 0 0 0 1.5 0v-.5A.75.75 0 0 0 2.75 9Zm10.5-3a.75.75 0 0 0-.75.75v.5a.75.75 0 0 0 1.5 0v-.5a.75.75 0 0 0-.75-.75ZM2.75 6a.75.75 0 0 0-.75.75v.5a.75.75 0 0 0 1.5 0v-.5A.75.75 0 0 0 2.75 6Z"/>
+                            <path d="M5 1a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1a1 1 0 0 1 1 1v4h3a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h3V3a1 1 0 0 1 1-1V1Zm6 2V2H5v1h6ZM1 8v6h14V8h-3v2H4V8H1Zm4 2v4h6v-4H5Z"/>
+                        </svg>
+                        <h1 class="h4 fw-bold text-dark">Klinik Randevu Sistemi</h1>
+                        <p class="text-muted small">Lütfen kurumsal veya hasta hesabınızla giriş yapınız.</p>
+                    </div>
 
-        <div th:if="${errorMessage}" class="alert alert-danger" style="color: red;">
-            <p th:text="${errorMessage}"></p>
+                    <div th:if="${errorMessage}" class="alert alert-danger py-2 small" role="alert">
+                        <span th:text="${errorMessage}">Geçersiz e-posta veya şifre.</span>
+                    </div>
+
+                    <div th:if="${logoutMessage}" class="alert alert-success py-2 small" role="alert">
+                        <span th:text="${logoutMessage}">Oturumunuz başarıyla kapatıldı.</span>
+                    </div>
+
+                    <form th:action="@{/login}" method="post">
+                        <input type="hidden" th:name="${_csrf != null ? _csrf.parameterName : '_csrf'}" th:value="${_csrf != null ? _csrf.token : ''}" />
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label small">E-posta Adresi</label>
+                            <input type="email" id="email" name="email" class="form-control" required autocomplete="username" placeholder="ornek@clinic.test" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label small">Şifre</label>
+                            <input type="password" id="password" name="password" class="form-control" required autocomplete="current-password" placeholder="••••••••" />
+                        </div>
+
+                        <div class="d-grid mt-4">
+                            <button type="submit" id="login-button" class="btn btn-clinic-primary py-2">Giriş Yap</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-
-        <div th:if="${logoutMessage}" class="alert alert-success" style="color: green;">
-            <p th:text="${logoutMessage}"></p>
-        </div>
-
-        <form th:action="@{/login}" method="post">
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-            <div>
-                <label for="email">E-posta Adresi:</label>
-                <input type="email" id="email" name="email" required autocomplete="username" />
-            </div>
-            <div style="margin-top: 10px;">
-                <label for="password">Şifre:</label>
-                <input type="password" id="password" name="password" required autocomplete="current-password" />
-            </div>
-            <div style="margin-top: 15px;">
-                <button type="submit" id="login-button">Giriş Yap</button>
-            </div>
-        </form>
     </div>
 </body>
 </html>

@@ -76,5 +76,14 @@ public interface AppointmentJpaRepository extends JpaRepository<AppointmentJpaEn
 
     List<AppointmentJpaEntity> findByStaffIdOrderByStartAtUtcAsc(UUID staffId);
 
+    @Query("SELECT a FROM AppointmentJpaEntity a WHERE a.staffId = :staffId " +
+            "AND a.startAtUtc >= :windowStart AND a.startAtUtc < :windowEnd " +
+            "ORDER BY a.startAtUtc ASC")
+    List<AppointmentJpaEntity> findByStaffIdAndWindow(
+            @Param("staffId") UUID staffId,
+            @Param("windowStart") Instant windowStart,
+            @Param("windowEnd") Instant windowEnd
+    );
+
     List<AppointmentJpaEntity> findByBranchId(UUID branchId);
 }

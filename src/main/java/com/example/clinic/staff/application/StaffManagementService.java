@@ -346,6 +346,18 @@ public class StaffManagementService {
         return mapToProfileResponse(profile);
     }
 
+    public List<StaffProfileResponse> getAllStaffProfiles() {
+        return staffProfileRepository.findAll().stream()
+                .map(this::mapToProfileResponse)
+                .toList();
+    }
+
+    public List<StaffAssignmentResponse> getAllStaffAssignments() {
+        return staffAssignmentRepository.findAll().stream()
+                .map(this::mapToAssignmentResponse)
+                .toList();
+    }
+
     public List<StaffAssignmentResponse> getStaffAssignmentsByBranch(UUID branchId) {
         return staffAssignmentRepository.findByBranchId(branchId).stream()
                 .map(this::mapToAssignmentResponse)

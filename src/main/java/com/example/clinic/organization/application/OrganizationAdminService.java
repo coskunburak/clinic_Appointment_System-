@@ -143,6 +143,43 @@ public class OrganizationAdminService {
         return mapToResponse(organization);
     }
 
+    /**
+     * Lists organizations authorized for the currently authenticated administrator.
+     */
+    public List<OrganizationResponse> getAuthorizedOrganizations() {
+        UserAccount currentUser = securityContextFacade.getRequiredCurrentUser();
+        List<Membership> adminMemberships = membershipRepository.findByUserAccountIdAndRole(currentUser.getId(), Role.ROLE_ADMIN);
+
+        return adminMemberships.stream()
+                .map(Membership::getOrganization)
+                .filter(Objects::nonNull)
+                .distinct()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+    /**
+     * Lists branches authorized for the currently authenticated administrator.
+     */
+    public List<BranchResponse> getAuthorizedBranches() {
+        UserAccount currentUser = securityContextFacade.getRequiredCurrentUser();
+        List<Membership> adminMemberships = membershipRepository.findByUserAccountIdAndRole(currentUser.getId(), Role.ROLE_ADMIN);
+
+        List<Branch> branches = new ArrayList<>();
+        for (Membership m : adminMemberships) {
+            if (m.getBranch() == null && m.getOrganization() != null) {
+                branches.addAll(branchRepository.findByOrganizationId(m.getOrganization().getId()));
+            } else if (m.getBranch() != null) {
+                branches.add(m.getBranch());
+            }
+        }
+
+        return branches.stream()
+                .distinct()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
     // =========================================================================
     // 2. Branch Management (FR-002 / TC-002, FR-026 / TC-026)
     // =========================================================================

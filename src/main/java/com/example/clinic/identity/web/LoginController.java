@@ -29,21 +29,6 @@ public class LoginController {
         return "auth/login";
     }
 
-    @GetMapping("/admin/dashboard")
-    public String adminDashboard() {
-        return "admin/dashboard";
-    }
-
-    @GetMapping("/staff/dashboard")
-    public String staffDashboard() {
-        return "staff/dashboard";
-    }
-
-    @GetMapping("/patient/dashboard")
-    public String patientDashboard() {
-        return "patient/dashboard";
-    }
-
     @GetMapping("/")
     public String index() {
         return "redirect:/login";

@@ -5,12 +5,12 @@
 [![Build Tool](https://img.shields.io/badge/Maven%20Wrapper-3.9.9-blue.svg)](https://maven.apache.org/)
 [![Database](https://img.shields.io/badge/PostgreSQL-17-blue.svg)](https://www.postgresql.org/)
 [![Migration](https://img.shields.io/badge/Flyway-V4-red.svg)](https://flywaydb.org/)
-[![Sprint](https://img.shields.io/badge/Sprint-S07%20(Randevu%20Onay%20Yaşam%20Döngüsü%20ve%20Durum%20Makinesi)-brightgreen.svg)](docs/07-sprintler/S07.md)
+[![Sprint](https://img.shields.io/badge/Sprint-S08%20(Spring%20MVC%20ve%20Thymeleaf%20Ekranları)-yellowgreen.svg)](docs/07-sprintler/S08.md)
 [![Academic Status](https://img.shields.io/badge/Academic%20Project-OOP%20Seçenek%20A-informational.svg)](docs/00-baslangic/02-proje-kunyesi-ve-basari.md)
 
 Bu proje, üniversite **Nesneye Dayalı Programlama (OOP)** dersi kapsamında geliştirilen, tek ve çok şubeli sağlık kuruluşlarının randevu süreçlerini uçtan uca yönetmeyi amaçlayan web tabanlı bir hastane/klinik randevu yönetim sistemidir.
 
-> **Mevcut Proje Durumu:** **Sprint S07 — Randevu Onay Yaşam Döngüsü, Durum Makinesi ve Denetim İzi** kaynak kodları, durum makinesi servis katmanı (`AppointmentApprovalService`), PostgreSQL satır kilidi (`findByIdForUpdate`), append-only denetim geçmişi ve Testcontainers entegrasyon testleri başarıyla tamamlanmış ve depo sahibi tarafından `./mvnw clean verify` ile doğrulanmıştır (Statü: `VERIFIED_BY_OWNER` — 272 birim ve 114 entegrasyon testi olmak üzere 386 testin tamamı başarılı). S00–S06 altyapısı, saf OOP domain çekirdeği ve Spring Security çok kiracılı yetkilendirmesi korunmuştur. Detaylar için [S07 Uygulama Raporu](docs/07-sprintler/S07-implementation-report.md) incelenebilir.
+> **Mevcut Proje Durumu:** **Sprint S08 — Spring MVC ve Thymeleaf Kullanıcı Ekranları (3 Rol)** sunucu taraflı render edilen (SSR) dinamik HTML arayüzleri, Spring MVC denetleyicileri (`PatientBookingController`, `StaffScheduleController`, `AdminManagementController`), form doğrulama modelleri (`@Valid` Jakarta Bean Validation), çevrimdışı yerel Bootstrap 5 varlıkları, özel hata sayfaları (403, 404, 500) ve 51 yeni otomatik test ile tamamlanmıştır (Mevcut Statü: `CODE_COMPLETE_AWAITING_OWNER_TEST` — S07'deki 386 doğrulanmış teste ek olarak toplam 437 test kurgulanmıştır). Detaylar için [S08 Uygulama Raporu](docs/07-sprintler/S08-implementation-report.md) incelenebilir.
 
 ---
 
@@ -80,7 +80,7 @@ Sistemin tam teslimatta destekleyeceği ana modüller ve mevcut durumları:
 6. **Randevu Rezervasyonu:** Şube, hizmet, doktor ve geçerli zaman aralığı seçerek randevu alma *(Planlandı — S06)*.
 7. **Çakışma ve Çift Rezervasyon Önleme:** Eşzamanlı isteklerde satır kilitleme ve çakışma kontrolü *(Planlandı — S06)*.
 8. **Randevu Yaşam Döngüsü:** `PENDING` -> `CONFIRMED` / `REJECTED` / `CANCELLED` / `COMPLETED` geçişleri ve append-only denetim geçmişi *(Uygulandı — S07)*.
-9. **Rol ve Erişim Yönetimi:** Hasta, Doktor/Sağlık Personeli ve Yönetici rolleri *(Planlandı — S04 ve S08)*.
+9. **Rol ve Erişim Yönetimi & Kullanıcı Ekranları:** Hasta, Doktor/Sağlık Personeli ve Yönetici rolleri için sunucu taraflı dinamik Thymeleaf kullanıcı arayüzleri *(Uygulandı — S08)*.
 
 ---
 

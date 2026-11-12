@@ -1,15 +1,88 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="tr">
+<html xmlns:th="http://www.thymeleaf.org" lang="tr"
+      th:replace="~{fragments/layout :: mainLayout(~{::title}, ~{::section})}">
 <head>
-    <meta charset="UTF-8">
     <title>Yönetici Paneli — Klinik Randevu Sistemi</title>
 </head>
 <body>
-    <h2>Yönetici Paneli</h2>
-    <p>Hoş geldiniz. Kurum, şube, personel ve hizmet kataloğu yönetimi bu alandan yürütülür.</p>
-    <form th:action="@{/logout}" method="post">
-        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-        <button type="submit">Güvenli Çıkış</button>
-    </form>
+<section>
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 fw-bold text-dark mb-1">Klinik ve Kurum Yönetim Paneli</h1>
+            <p class="text-muted mb-0">Kurum, şube, tıbbi bölüm, hizmet kataloğu ve personel operasyonlarını buradan yönetebilirsiniz.</p>
+        </div>
+    </div>
+
+    <!-- Metrik Kartları -->
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-lg-3">
+            <div class="clinic-card py-3 px-4 mb-0 border-start border-primary border-4">
+                <div class="text-muted small">Aktif Kurumlar</div>
+                <div class="h3 fw-bold text-primary mb-0" th:text="${organizationCount}">0</div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="clinic-card py-3 px-4 mb-0 border-start border-info border-4">
+                <div class="text-muted small">Tanımlı Şubeler</div>
+                <div class="h3 fw-bold text-info mb-0" th:text="${branchCount}">0</div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="clinic-card py-3 px-4 mb-0 border-start border-success border-4">
+                <div class="text-muted small">Tıbbi Bölümler</div>
+                <div class="h3 fw-bold text-success mb-0" th:text="${departmentCount}">0</div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="clinic-card py-3 px-4 mb-0 border-start border-warning border-4">
+                <div class="text-muted small">Kayıtlı Personel</div>
+                <div class="h3 fw-bold text-warning mb-0" th:text="${staffCount}">0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Yönetim Modülleri Hızlı Erişim Kartları -->
+    <div class="row g-4">
+        <div class="col-md-6 col-lg-3">
+            <div class="clinic-card h-100 d-flex flex-column justify-content-between p-4">
+                <div>
+                    <h2 class="h5 fw-bold text-dark mb-2">Şube Yönetimi</h2>
+                    <p class="text-muted small">Yeni şube oluşturma, adres/zaman dilimi yapılandırması ve mesai saatleri yönetimi.</p>
+                </div>
+                <a th:href="@{/admin/branches}" class="btn btn-outline-primary btn-sm mt-3">Şubeleri Yönet &rarr;</a>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="clinic-card h-100 d-flex flex-column justify-content-between p-4">
+                <div>
+                    <h2 class="h5 fw-bold text-dark mb-2">Tıbbi Bölümler</h2>
+                    <p class="text-muted small">Şube bazında poliklinik ve tıbbi bölüm tanımları (Kardiyoloji, Radyoloji vb.).</p>
+                </div>
+                <a th:href="@{/admin/departments}" class="btn btn-outline-primary btn-sm mt-3">Bölümleri Yönet &rarr;</a>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="clinic-card h-100 d-flex flex-column justify-content-between p-4">
+                <div>
+                    <h2 class="h5 fw-bold text-dark mb-2">Hizmet Kataloğu</h2>
+                    <p class="text-muted small">Katalog hizmet tanımları, şube fiyatlandırma ve süre (dakika) politikaları.</p>
+                </div>
+                <a th:href="@{/admin/services}" class="btn btn-outline-primary btn-sm mt-3">Hizmetleri Yönet &rarr;</a>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="clinic-card h-100 d-flex flex-column justify-content-between p-4">
+                <div>
+                    <h2 class="h5 fw-bold text-dark mb-2">Personel &amp; Mesai</h2>
+                    <p class="text-muted small">Doktor ve teknisyen kaydı, uzmanlık tanımlama, haftalık uygunluk ve izin istisnaları.</p>
+                </div>
+                <a th:href="@{/admin/staff}" class="btn btn-outline-primary btn-sm mt-3">Personeli Yönet &rarr;</a>
+            </div>
+        </div>
+    </div>
+</section>
 </body>
 </html>

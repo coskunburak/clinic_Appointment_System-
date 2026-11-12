@@ -30,8 +30,8 @@
 | TC-024 | FR-024 | yetkili şube yöneticisi hizmet ve mesai günceller | scope içinde başarılı, dışında 403/404 |
 | TC-025 | FR-025 | kayıt/giriş yap; DB parola kolonunu incele; hatalı şifre dene | plaintext yok, yanlış şifre giriş yapamaz |
 | TC-026 | FR-026 | başka organization branchId ile admin formu gönder | işlem reddedilir ve başka tenant değişmez |
-| TC-027 | FR-027 | hasta booking ve staff approval ekranlarını gezin | navigasyon, durum ve hata mesajları doğru |
-| TC-028 | FR-028 | admin ekranından şube/hizmet/staff/availability yönet | temel CRUD değişiklikleri kalıcıdır |
+| TC-027 | FR-027 | hasta booking ve staff approval ekranlarını gezin | navigasyon, durum ve hata mesajları doğru (`Sprint08AcceptanceSpecificationTest.patientCanViewBookingPage`, `PatientBookingControllerMvcTest`, `StaffScheduleControllerMvcTest`, `RoleBasedWebMvcIT` — Otomatize / OWNER_TEST_PENDING) |
+| TC-028 | FR-028 | admin ekranından şube/hizmet/staff/availability yönet | temel CRUD değişiklikleri kalıcıdır (`AdminManagementControllerMvcTest`, `RoleBasedWebMvcIT.endToEndAdminBranchAndDepartmentCreation` — Otomatize / OWNER_TEST_PENDING) |
 | TC-029 | FR-029 | aynı hasta iki farklı staff ile çakışan slot talep eder | SHOULD uygulandıysa ikinci istek reddedilir |
 | TC-030 | FR-030 | onay, iptal/ret ve tamamla geçişi tetikle | actor/from/to/time bilgisi append-only (`AppointmentApprovalServiceIT.statusHistoryRecordsAllTransitionsInOrder` — Otomatize / OWNER_TEST_PENDING) |
 | TC-031 | FR-031 | aynı requestKey ile formu iki kez gönder; gövde değiştir | aynı içerik aynı sonuç; farklı içerik 409 |
@@ -48,7 +48,7 @@
 | TC-042 | NFR-006 | git log tarihlerini gün olarak grupla | en az 10 farklı gerçek gün, GitHub push/commit görülebilir |
 | TC-043 | NFR-007 | GitHub URL, SABİS yüklemesi, sunum katılımı doğrula | üç teslim kanıtı tamamlanmış |
 | TC-044 | NFR-008 | 1000 örnek randevu/50 çalışanla yerel ölçüm al | hedef p95<1sn; ortama göre ölçüm raporlanır |
-| TC-045 | NFR-009 | hatalı UUID, negatif fiyat, çakışma gönder | kullanıcıya anlamlı kod; stacktrace/SQL yok |
+| TC-045 | NFR-009 | hatalı UUID, negatif fiyat, çakışma gönder | kullanıcıya anlamlı kod; stacktrace/SQL yok (`Sprint08AcceptanceSpecificationTest.customErrorPageHandles403`, `CustomErrorControllerMvcTest` — Otomatize / OWNER_TEST_PENDING) |
 | TC-046 | NFR-010 | mimari bağımlılıkları denetle; controller taraması yap | controller iş mantığı ve direkt repo bağımlılığı içermez |
 
 ## Özellikle gözden geçirilecek sınırlar
