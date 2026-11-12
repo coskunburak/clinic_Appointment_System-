@@ -129,8 +129,8 @@ class PatientBookingQueryServiceTest {
         UUID branchServiceId = UUID.randomUUID();
         LocalDate date = LocalDate.now().plusDays(1);
 
-        TimeSlot slot1 = new TimeSlot(date, LocalTime.of(9, 0), LocalTime.of(9, 30));
-        TimeSlot slot2 = new TimeSlot(date, LocalTime.of(9, 30), LocalTime.of(10, 0));
+        TimeSlot slot1 = new TimeSlot(LocalTime.of(9, 0), LocalTime.of(9, 30));
+        TimeSlot slot2 = new TimeSlot(LocalTime.of(9, 30), LocalTime.of(10, 0));
 
         when(availabilityCalculator.calculateAvailableSlots(staffId, branchServiceId, date))
                 .thenReturn(List.of(slot1, slot2));
