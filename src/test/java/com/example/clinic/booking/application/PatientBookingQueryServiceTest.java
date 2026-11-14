@@ -188,7 +188,7 @@ class PatientBookingQueryServiceTest {
         );
         when(branchRepository.findById(branch.getId())).thenReturn(Optional.of(branch));
 
-        // 22:00 UTC on Nov 20 == 01:00 on Nov 21 in Europe/Istanbul -> +1 day = Nov 22
-        assertThat(tzAware.getDefaultBookingDate(branch.getId())).isEqualTo(LocalDate.of(2026, 11, 22));
+        // 22:00 UTC on Nov 20 == 01:00 on Nov 21 in Europe/Istanbul -> branch local date is Nov 21
+        assertThat(tzAware.getDefaultBookingDate(branch.getId())).isEqualTo(LocalDate.of(2026, 11, 21));
     }
 }

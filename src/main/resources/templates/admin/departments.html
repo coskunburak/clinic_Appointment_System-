@@ -1,5 +1,9 @@
 <!DOCTYPE html>
-<html lang="tr" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout('Bölüm Yönetimi', ~{::section})}">
+<html xmlns:th="http://www.thymeleaf.org" lang="tr"
+      th:replace="~{fragments/layout :: mainLayout(~{::title}, ~{::section})}">
+<head>
+    <title>Bölüm Yönetimi — Klinik Randevu Sistemi</title>
+</head>
 <body>
 <section>
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
