@@ -1,0 +1,97 @@
+classDiagram
+    direction TB
+    class BaseEntity {
+        <<abstract>>
+        -UUID id
+        -Instant createdAt
+        +getId() UUID
+        +getCreatedAt() Instant
+        +equals(Object) boolean
+        +hashCode() int
+    }
+    class PersonProfile {
+        <<abstract>>
+        -UserAccount userAccount
+        -String fullName
+        -String phone
+        +rename(String) void
+        +changePhone(String) void
+    }
+    class PatientProfile
+    class StaffProfile {
+        -String staffType
+        -String specialty
+        -boolean active
+        +isDoctor() boolean
+        +changeSpecialty(String) void
+    }
+    class Money {
+        <<final value object>>
+        -BigDecimal amount
+        -Currency currency
+        +of(BigDecimal, Currency) Money
+        +add(Money) Money
+        +subtract(Money) Money
+    }
+    class TimeInterval {
+        <<final value object>>
+        -Instant startAt
+        -Instant endAt
+        +overlapsWith(TimeInterval) boolean
+        +contains(Instant) boolean
+        +duration() Duration
+    }
+    class ServiceSnapshot {
+        <<final value object>>
+        -UUID serviceId
+        -String serviceName
+        -int durationMinutes
+        -Money fee
+    }
+    class AppointmentStatus {
+        <<enumeration>>
+        PENDING
+        CONFIRMED
+        REJECTED
+        CANCELLED
+        COMPLETED
+        +isTerminal() boolean
+        +isBlocking() boolean
+    }
+    class Appointment {
+        <<pure aggregate root>>
+        -UUID id
+        -TimeInterval interval
+        -ServiceSnapshot serviceSnapshot
+        -AppointmentStatus status
+        +create(...) Appointment
+        +approve(UUID, Clock) void
+        +reject(UUID, String, Clock) void
+        +cancel(UUID, String, Clock) void
+        +complete(UUID, Clock) void
+    }
+    class SchedulingConstraint {
+        <<interface>>
+        +validate(BookingValidationContext) void
+    }
+    class OpeningHoursConstraint
+    class StaffAvailabilityConstraint
+    class StaffServiceEligibilityConstraint
+    class NoOverlapConstraint
+    class SchedulingValidator {
+        -List~SchedulingConstraint~ constraints
+        +validate(BookingValidationContext) void
+    }
+
+    BaseEntity <|-- PersonProfile
+    PersonProfile <|-- PatientProfile
+    PersonProfile <|-- StaffProfile
+    Appointment *-- TimeInterval
+    Appointment *-- ServiceSnapshot
+    Appointment --> AppointmentStatus
+    ServiceSnapshot *-- Money
+    SchedulingConstraint <|.. OpeningHoursConstraint
+    SchedulingConstraint <|.. StaffAvailabilityConstraint
+    SchedulingConstraint <|.. StaffServiceEligibilityConstraint
+    SchedulingConstraint <|.. NoOverlapConstraint
+    SchedulingValidator o-- SchedulingConstraint

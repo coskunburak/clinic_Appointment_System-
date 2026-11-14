@@ -2,6 +2,8 @@
 
 Bu belge, **Sakarya Üniversitesi Nesneye Dayalı Programlama (OOP)** dersi Seçenek A dönem projesinin canlı sunum ve değerlendirme protokolünü ayrıntılandırır.
 
+> **S10 Üretilen Teslimat Bağlantıları:** Nihai 7 slaytlık sunum (`deliverables/Clinic_Appointment_System_Final_Presentation.pptx`), ayrıntılı zamanlı gösterim kılavuzu için [S10-live-demo-runbook.md](./S10-live-demo-runbook.md) ve 30 soruluk savunma rehberi için [S10-oral-defense.md](./S10-oral-defense.md) dosyalarına bakınız.
+
 ---
 
 ## 1. Resmî Akademik Sunum Kuralları

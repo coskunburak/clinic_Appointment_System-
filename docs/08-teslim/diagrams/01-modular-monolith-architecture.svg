@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 610" width="940" height="610" role="img" aria-label="Modüler Monolit Bileşen Mimarisi">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#334155"/>
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#0f5e78"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#b91c1c"/>
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#15803d"/>
+    </marker>
+    <marker id="inherit" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M 1 1 L 11 6 L 1 11 z" fill="#ffffff" stroke="#0f5e78" stroke-width="1.6"/>
+    </marker>
+    <marker id="diamond" viewBox="0 0 14 10" refX="1" refY="5" markerWidth="10" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 1 5 L 7 1 L 13 5 L 7 9 z" fill="#0f5e78"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="940" height="610" fill="#ffffff"/>
+
+<rect x="20" y="14" width="900" height="122" rx="10" fill="#f0f9ff" stroke="#0284c7" stroke-width="1.5" stroke-dasharray="5,3"/>
+<text x="34" y="34" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="12" font-weight="700" fill="#0369a1">1. Sunum ve Güvenlik Katmanı (Spring MVC + Thymeleaf SSR + Yerel Bootstrap 5.3.3 + Spring Security 6)</text>
+<rect x="34" y="44" width="200" height="78" rx="8" fill="#ffffff" stroke="#0284c7" stroke-width="1.5"/>
+  <path d="M 34 52 Q 34 44 42 44 L 226 44 Q 234 44 234 52 L 234 69 L 34 69 Z" fill="#0369a1"/>
+  <text x="134.0" y="60.5" text-anchor="middle" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="11" font-weight="700" fill="#ffffff">Kimlik &amp; Hata Web</text>
+  <text x="44" y="86" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.0" fill="#1e293b">LoginController (/login)</text>
+  <text x="44" y="101" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.0" fill="#1e293b">CustomErrorController (/error)</text>
+  <text x="44" y="116" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.0" fill="#1e293b">WebExceptionHandler (NFR-009)</text>
+<rect x="250" y="44" width="205" height="78" rx="8" fill="#ffffff" stroke="#0284c7" stroke-width="1.5"/>
+  <path d="M 250 52 Q 250 44 258 44 L 447 44 Q 455 44 455 52 L 455 69 L 250 69 Z" fill="#0369a1"/>
+  <text x="352.5" y="60.5" text-anchor="middle" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="11" font-weight="700" fill="#ffffff">Hasta &amp; Personel MVC</text>
+  <text x="260" y="86" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.0" fill="#1e293b">PatientBookingController</text>
+  <text x="260" y="101" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.0" fill="#1e293b">StaffScheduleController</text>
+  <text x="260" y="116" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.0" fill="#1e293b">BookingForm / RejectionForm</text>
+<rect x="471" y="44" width="212" height="78" rx="8" fill="#ffffff" stroke="#0284c7" stroke-width="1.5"/>
+  <path d="M 471 52 Q 471 44 479 44 L 675 44 Q 683 44 683 52 L 683 69 L 471 69 Z" fill="#0369a1"/>
+  <text x="577.0" y="60.5" text-anchor="middle" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="11" font-weight="700" fill="#ffffff">Yönetici MVC (5 Denetleyici)</text>
+  <text x="481" y="86" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.0" fill="#1e293b">AdminDashboard / AdminBranch</text>
+  <text x="481" y="101" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.0" fill="#1e293b">AdminDepartment / AdminService</text>
+  <text x="481" y="116" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.0" fill="#1e293b">AdminStaffController</text>
+<rect x="699" y="44" width="207" height="78" rx="8" fill="#ffffff" stroke="#0284c7" stroke-width="1.5"/>
+  <path d="M 699 52 Q 699 44 707 44 L 898 44 Q 906 44 906 52 L 906 69 L 699 69 Z" fill="#0369a1"/>
+  <text x="802.5" y="60.5" text-anchor="middle" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="11" font-weight="700" fill="#ffffff">Güvenlik Zinciri</text>
+  <text x="709" y="86" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.0" fill="#1e293b">SecurityConfig (BCrypt-12)</text>
+  <text x="709" y="101" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.0" fill="#1e293b">CSRF &amp; Session Fixation</text>
+  <text x="709" y="116" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.0" fill="#1e293b">/patient/**, /staff/**, /admin/**</text>
+<rect x="20" y="156" width="900" height="232" rx="10" fill="#f8fafc" stroke="#0f5e78" stroke-width="1.5"/>
+<text x="34" y="176" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="12" font-weight="700" fill="#0f5e78">2. Alan Odaklı Modüler Monolit Çekirdeği (Package-by-Feature: com.example.clinic.*)</text>
+<rect x="34" y="188" width="276" height="86" rx="8" fill="#ffffff" stroke="#0f5e78" stroke-width="1.5"/>
+  <path d="M 34 196 Q 34 188 42 188 L 302 188 Q 310 188 310 196 L 310 213 L 34 213 Z" fill="#0f5e78"/>
+  <text x="172.0" y="204.5" text-anchor="middle" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="11" font-weight="700" fill="#ffffff">organization</text>
+  <text x="44" y="230" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.0" fill="#1e293b">Organization, Branch, Department</text>
+  <text x="44" y="245" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.0" fill="#1e293b">BranchOpeningHours (IANA TZ)</text>
+  <text x="44" y="260" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.0" fill="#1e293b">OrganizationAdminService</text>
+<rect x="332" y="188" width="276" height="86" rx="8" fill="#ffffff" stroke="#0f5e78" stroke-width="1.5"/>
+  <path d="M 332 196 Q 332 188 340 188 L 600 188 Q 608 188 608 196 L 608 213 L 332 213 Z" fill="#0f5e78"/>
+  <text x="470.0" y="204.5" text-anchor="middle" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="11" font-weight="700" fill="#ffffff">identity</text>
+  <text x="342" y="230" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.0" fill="#1e293b">UserAccount, Membership (Role)</text>
+  <text x="342" y="245" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.0" fill="#1e293b">PersonProfile -&gt; Patient / StaffProfile</text>
+  <text x="342" y="260" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.0" fill="#1e293b">AccessPolicy (IDOR &amp; Tenant Kontrolü)</text>
+<rect x="630" y="188" width="276" height="86" rx="8" fill="#ffffff" stroke="#0f5e78" stroke-width="1.5"/>
+  <path d="M 630 196 Q 630 188 638 188 L 898 188 Q 906 188 906 196 L 906 213 L 630 213 Z" fill="#0f5e78"/>
+  <text x="768.0" y="204.5" text-anchor="middle" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="11" font-weight="700" fill="#ffffff">catalog</text>
+  <text x="640" y="230" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.0" fill="#1e293b">ServiceDefinition (Kurum Kapsamı)</text>
+  <text x="640" y="245" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.0" fill="#1e293b">BranchService (Süre dk + Money TRY)</text>
+  <text x="640" y="260" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.0" fill="#1e293b">CatalogManagementService</text>
+<rect x="34" y="286" width="276" height="86" rx="8" fill="#ffffff" stroke="#0f5e78" stroke-width="1.5"/>
+  <path d="M 34 294 Q 34 286 42 286 L 302 286 Q 310 286 310 294 L 310 311 L 34 311 Z" fill="#0f5e78"/>
+  <text x="172.0" y="302.5" text-anchor="middle" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="11" font-weight="700" fill="#ffffff">staff</text>
+  <text x="44" y="328" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.0" fill="#1e293b">StaffAssignment, StaffServiceEligibility</text>
+  <text x="44" y="343" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.0" fill="#1e293b">WeeklyAvailability (Haftalık Şablon)</text>
+  <text x="44" y="358" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.0" fill="#1e293b">AvailabilityException (İzin / Mesai)</text>
+<rect x="332" y="286" width="276" height="86" rx="8" fill="#ecfeff" stroke="#0e7490" stroke-width="1.5"/>
+  <path d="M 332 294 Q 332 286 340 286 L 600 286 Q 608 286 608 294 L 608 311 L 332 311 Z" fill="#0e7490"/>
+  <text x="470.0" y="302.5" text-anchor="middle" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="11" font-weight="700" fill="#ffffff">scheduling (Saf Java Çekirdek)</text>
+  <text x="342" y="328" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.0" fill="#1e293b">SchedulingConstraint (4 Polimorfik Kural)</text>
+  <text x="342" y="343" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.0" fill="#1e293b">SchedulingValidator, TimeSlot</text>
+  <text x="342" y="358" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.0" fill="#1e293b">AvailabilityCalculator + SchedulePort</text>
+<rect x="630" y="286" width="276" height="86" rx="8" fill="#ecfeff" stroke="#0e7490" stroke-width="1.5"/>
+  <path d="M 630 294 Q 630 286 638 286 L 898 286 Q 906 286 906 294 L 906 311 L 630 311 Z" fill="#0e7490"/>
+  <text x="768.0" y="302.5" text-anchor="middle" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="11" font-weight="700" fill="#ffffff">booking (Çekirdek İşlem Modülü)</text>
+  <text x="640" y="328" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.0" fill="#1e293b">Appointment (Saf Aggregate) &amp; Snapshot</text>
+  <text x="640" y="343" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.0" fill="#1e293b">BookingService (PESSIMISTIC_WRITE)</text>
+  <text x="640" y="358" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.0" fill="#1e293b">AppointmentApprovalService &amp; History</text>
+<rect x="20" y="408" width="900" height="86" rx="10" fill="#fffbeb" stroke="#b45309" stroke-width="1.5"/>
+<text x="34" y="427" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="11.5" font-weight="700" fill="#92400e">3. Ortak Çekirdek ve Altyapı (common)</text>
+<rect x="34" y="435" width="276" height="48" rx="8" fill="#ffffff" stroke="#d97706" stroke-width="1.5"/>
+  <text x="172.0" y="453" text-anchor="middle" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.5" font-weight="700" fill="#d97706">common.domain</text>
+  <text x="44" y="469" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.0" fill="#1e293b">BaseEntity, Money, TimeInterval</text>
+<rect x="332" y="435" width="276" height="48" rx="8" fill="#ffffff" stroke="#d97706" stroke-width="1.5"/>
+  <text x="470.0" y="453" text-anchor="middle" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.5" font-weight="700" fill="#d97706">common.clock &amp; common.security</text>
+  <text x="342" y="469" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.0" fill="#1e293b">ClockConfig, SecurityContextFacade</text>
+<rect x="630" y="435" width="276" height="48" rx="8" fill="#ffffff" stroke="#d97706" stroke-width="1.5"/>
+  <text x="768.0" y="453" text-anchor="middle" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.5" font-weight="700" fill="#d97706">common.infrastructure (@Profile dev)</text>
+  <text x="640" y="469" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.0" fill="#1e293b">DemoDataSeeder &amp; DemoEnvironmentGuard</text>
+<rect x="20" y="514" width="900" height="82" rx="10" fill="#f0fdf4" stroke="#15803d" stroke-width="1.5"/>
+<text x="34" y="533" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="11.5" font-weight="700" fill="#166534">4. Kalıcılık ve Veritabanı Katmanı (Spring Data JPA + Hibernate 6 + Flyway + PostgreSQL 17)</text>
+<rect x="34" y="541" width="424" height="44" rx="8" fill="#ffffff" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="246.0" y="559" text-anchor="middle" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.5" font-weight="700" fill="#16a34a">Spring Data JPA Repositories</text>
+  <text x="44" y="575" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.0" fill="#1e293b">findByIdForUpdate (PESSIMISTIC_WRITE), ddl-auto=validate</text>
+<rect x="482" y="541" width="424" height="44" rx="8" fill="#ffffff" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="694.0" y="559" text-anchor="middle" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.5" font-weight="700" fill="#16a34a">PostgreSQL 17 + Flyway V1–V4</text>
+  <text x="492" y="575" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.0" fill="#1e293b">16 Tablo, Kompozit FK Bütünlüğü, TIMESTAMPTZ (UTC)</text>
+<line x1="470" y1="136" x2="470" y2="156" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<line x1="470" y1="388" x2="470" y2="408" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<line x1="470" y1="494" x2="470" y2="514" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow)"/>
+<line x1="608" y1="329" x2="630" y2="329" stroke="#0e7490" stroke-width="1.8" marker-end="url(#arrow-blue)"/>
+</svg>

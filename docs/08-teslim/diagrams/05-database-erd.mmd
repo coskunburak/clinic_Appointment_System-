@@ -1,0 +1,23 @@
+erDiagram
+    ORGANIZATION ||--o{ BRANCH : contains
+    ORGANIZATION ||--o{ SERVICE_DEFINITION : owns
+    ORGANIZATION ||--o{ MEMBERSHIP : scopes
+    BRANCH ||--o{ BRANCH_OPENING_HOURS : defines
+    BRANCH ||--o{ DEPARTMENT : contains
+    BRANCH ||--o{ BRANCH_SERVICE : offers
+    BRANCH ||--o{ STAFF_ASSIGNMENT : hosts
+    BRANCH ||--o{ APPOINTMENT : location
+    SERVICE_DEFINITION ||--o{ BRANCH_SERVICE : priced_as
+    USER_ACCOUNT ||--o{ MEMBERSHIP : has
+    USER_ACCOUNT ||--o| PATIENT_PROFILE : patient
+    USER_ACCOUNT ||--o| STAFF_PROFILE : employee
+    DEPARTMENT ||--o{ STAFF_ASSIGNMENT : department
+    STAFF_PROFILE ||--o{ STAFF_ASSIGNMENT : assigned
+    STAFF_ASSIGNMENT ||--o{ STAFF_SERVICE_ELIGIBILITY : performs
+    BRANCH_SERVICE ||--o{ STAFF_SERVICE_ELIGIBILITY : eligible
+    STAFF_ASSIGNMENT ||--o{ WEEKLY_AVAILABILITY : weekly
+    STAFF_ASSIGNMENT ||--o{ AVAILABILITY_EXCEPTION : exception
+    PATIENT_PROFILE ||--o{ APPOINTMENT : books
+    STAFF_PROFILE ||--o{ APPOINTMENT : serves
+    BRANCH_SERVICE ||--o{ APPOINTMENT : snapshot_ref
+    APPOINTMENT ||--o{ APPOINTMENT_STATUS_HISTORY : audit_trail

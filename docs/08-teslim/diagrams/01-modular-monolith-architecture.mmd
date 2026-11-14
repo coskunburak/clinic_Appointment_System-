@@ -1,0 +1,45 @@
+flowchart TB
+    subgraph WEB["Sunum Katmanı (Spring MVC + Thymeleaf + Yerel Bootstrap 5.3.3)"]
+        LC["LoginController"]
+        PC["PatientBookingController"]
+        SC["StaffScheduleController"]
+        AC["Admin*Controllers (5 Adet)"]
+        EC["CustomErrorController & WebExceptionHandler"]
+        SEC["Spring Security 6 (BCrypt-12, CSRF, Role Guards)"]
+    end
+
+    subgraph MODULES["Modüler Monolit Alan Modülleri (Package-by-Feature)"]
+        ORG["organization\nOrganization, Branch, Department, BranchOpeningHours\nOrganizationAdminService"]
+        IDN["identity\nUserAccount, Membership, PersonProfile\nPatientProfile, StaffProfile, AccessPolicy"]
+        CAT["catalog\nServiceDefinition, BranchService\nCatalogManagementService"]
+        STF["staff\nStaffAssignment, StaffServiceEligibility\nWeeklyAvailability, AvailabilityException"]
+        SCH["scheduling (Saf Java Çekirdek)\nSchedulingConstraint (4 Strateji)\nSchedulingValidator, AvailabilityCalculator"]
+        BOK["booking (Saf Aggregate + Uygulama)\nAppointment, AppointmentStatus, ServiceSnapshot\nBookingService, AppointmentApprovalService"]
+    end
+
+    subgraph COMMON["common"]
+        DOM["BaseEntity, Money, TimeInterval"]
+        INF["ClockConfig, SecurityContextFacade\nDemoDataSeeder (@Profile dev) & DemoEnvironmentGuard"]
+    end
+
+    subgraph DB["Kalıcılık ve Veritabanı (PostgreSQL 17 + Flyway V1–V4)"]
+        JPA["Spring Data JPA Repositories (PESSIMISTIC_WRITE)"]
+        PG[("PostgreSQL 17\n16 Tablo, Kompozit FK, CHECK/UNIQUE Kısıtları")]
+    end
+
+    WEB --> SEC
+    PC --> BOK
+    PC --> SCH
+    SC --> BOK
+    AC --> ORG
+    AC --> CAT
+    AC --> STF
+    BOK --> SCH
+    BOK --> IDN
+    BOK --> CAT
+    BOK --> STF
+    BOK --> ORG
+    SCH -.->|Port: AppointmentSchedulePort| BOK
+    MODULES --> COMMON
+    MODULES --> JPA
+    JPA --> PG

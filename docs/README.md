@@ -1,8 +1,8 @@
 # Java Hastane / Klinik Randevu Sistemi — Dokümantasyon Merkezi
 
-**Belge sürümü:** 1.0 · **Planlama tarihi:** 2026-11-02 · **Proje:** OOP dersi / Seçenek A · **Durum:** Uygulama başlamadan önceki onaylanabilir tasarım taslağı
+**Belge sürümü:** 2.0 (S10 Final) · **Tarih:** 2026-11-14 · **Proje:** OOP dersi / Seçenek A · **Durum:** Sprint S00–S10 Uygulandı (`VERIFIED_BY_OWNER` — `501 PASS`, SABİS ve Canlı Savunma Paketleri Hazır)
 
-> Bu ZIP **uygulama kaynak kodu içermez**. Uygulamayı geliştirirken izlenecek kapsamı, mimariyi, veri modelini, testleri, günlük commit stratejisini, sprintleri, sunumu ve yapay zekâ ajanı talimatlarını içerir. Belge içindeki örnek yol ve sınıflar tasarım önerisidir; uygulanmış özellik iddiası değildir.
+> Bu `docs/` dizini; uygulanan mimariyi, veri modelini (Flyway V1–V4), gereksinim izlenebilirliğini (`traceability.csv`), S00–S10 sprint uygulama raporlarını, üretime hazır diyagramları ve SABİS/savunma teslimatlarını belgeler. Güncel S10 nihai test doğrulaması `2026-11-14 12:39–12:40+03:00` tarihinde ürün sahibi tarafından `./mvnw clean verify` ile tamamlanmıştır (`366` Surefire + `135` Failsafe = `501 PASS`).
 
 ## 1. Başlangıç sırası
 1. [Kararlar ve varsayımlar](00-baslangic/01-kararlar-ve-varsayimlar.md) — belirsizlikleri sabitle.

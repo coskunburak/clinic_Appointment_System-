@@ -1,0 +1,10 @@
+stateDiagram-v2
+    [*] --> PENDING : Appointment.create() [Bloke Eder]
+    PENDING --> CONFIRMED : approve(actorId, clock) [Bloke Eder]
+    PENDING --> REJECTED : reject(actorId, reason, clock) [Slot Serbest]
+    PENDING --> CANCELLED : cancel(actorId, reason, clock) [Slot Serbest]
+    CONFIRMED --> CANCELLED : cancel(actorId, reason, clock) [Slot Serbest]
+    CONFIRMED --> COMPLETED : complete(actorId, clock) [endAt Sonrası / Bloke Eder]
+    REJECTED --> [*]
+    CANCELLED --> [*]
+    COMPLETED --> [*]

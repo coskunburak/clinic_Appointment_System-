@@ -5,12 +5,12 @@
 [![Build Tool](https://img.shields.io/badge/Maven%20Wrapper-3.9.9-blue.svg)](https://maven.apache.org/)
 [![Database](https://img.shields.io/badge/PostgreSQL-17-blue.svg)](https://www.postgresql.org/)
 [![Migration](https://img.shields.io/badge/Flyway-V4-red.svg)](https://flywaydb.org/)
-[![Sprint](https://img.shields.io/badge/Sprint-S09%20(Verified%20by%20Owner)-brightgreen.svg)](docs/07-sprintler/S09.md)
+[![Sprint](https://img.shields.io/badge/Sprint-S10%20(Verified%20by%20Owner)-brightgreen.svg)](docs/07-sprintler/S10.md)
 [![Academic Status](https://img.shields.io/badge/Academic%20Project-OOP%20Seçenek%20A-informational.svg)](docs/00-baslangic/02-proje-kunyesi-ve-basari.md)
 
 Bu proje, üniversite **Nesneye Dayalı Programlama (OOP)** dersi kapsamında geliştirilen, tek ve çok şubeli sağlık kuruluşlarının randevu süreçlerini uçtan uca yönetmeyi amaçlayan web tabanlı bir hastane/klinik randevu yönetim sistemidir.
 
-> **Mevcut Proje Durumu:** **Sprint S09 — Regresyon, Eşzamanlılık, Demo Veri Tohumu ve Yerel Performans Doğrulaması (`VERIFIED_BY_OWNER`)** tamamlanmış ve ürün sahibi tarafından `./mvnw clean verify` ile doğrulanmıştır (`366/366` Surefire, `135/135` Failsafe PostgreSQL 17 Testcontainers IT, `0` hata/atlama). Paket; yalnızca `dev` profiline kısıtlı deterministik ve idempotent `DemoDataSeeder` (`DemoEnvironmentGuard`, `DemoDataSeedService`, `DemoDataResetService`), 5 iş parçacıklı `ConcurrentBookingIT` stres testi, 50 personel / 1.000 randevulu `PerformanceBenchmarkIT` kıyaslaması (`availability-slot-search p95=21.86 ms`, `booking-tx p95=14.74 ms`, `< 1000 ms` hedefi doğrulandı) ve genişletilmiş `WebArchitectureTest`/`DomainArchitectureTest` sınır kontrollerini içerir. Detaylar için [S08 Uygulama Raporu](docs/07-sprintler/S08-implementation-report.md) ve [S09 Uygulama Raporu](docs/07-sprintler/S09-implementation-report.md) incelenebilir.
+> **Mevcut Proje Durumu:** **Sprint S10 — Nihai Kalite Kapısı, SABİS & Savunma Hazırlığı (`VERIFIED_BY_OWNER`)** tamamlanmış ve ürün sahibi tarafından `2026-11-14 12:39–12:40+03:00` arasında `./mvnw clean verify` ile doğrulanmıştır (**46 sınıf / 366 Surefire + 20 sınıf / 135 Failsafe PostgreSQL 17 Testcontainers = 501 PASS**, `0` hata/atlama/flake; `ConcurrentBookingIT` 2/2 `0.177 s`; `PerformanceBenchmarkIT` `availability-slot-search p95=14.83 ms`, `booking-tx p95=14.40 ms`). 10 tekil takvim gününde 28 gerçek commit denetimi geçmiştir (`GIT_10_DAY_REQUIREMENT: PASS`), 6 üretilebilir diyagram, 16 sayfalık akademik PDF raporu, 7 slaytlık `.pptx` sunumu, 5 dakikalık demo runbook'u, 30 soruluk sözlü savunma rehberi ve temiz kaynak ZIP arşivi hazırdır. Detaylar için [S09 Uygulama Raporu](docs/07-sprintler/S09-implementation-report.md) ve [S10 Uygulama Raporu](docs/07-sprintler/S10-implementation-report.md) incelenebilir.
 
 ---
 
@@ -29,9 +29,9 @@ Projenin temel amacı yalnızca bir web uygulaması sunmak değil, nesneye yöne
 
 | OOP İlkesi | Planlanan Mimari ve Domain Uygulaması | Durum |
 |---|---|---|
-| **Kapsülleme (Encapsulation)** | Varlık durumlarının `private` alanlar, `final` değer nesneleri (Value Object: ör. `TimeSlot`, `Money`) ve değişmezlik (immutability) kurallarıyla korunması; kontrolsüz setter yerine doğrulanmış iş metotları. | Modelleniyor (S01/S02) |
-| **Kalıtım (Inheritance)** | Ortak varlık tabanları (`BaseEntity`, `AuditableEntity`) ve çalışan hiyerarşisi (`StaffMember` soyut sınıfından `Doctor`, `Nurse`, `Technician` özelleştirmeleri). | Tasarlandı (S02, S05) |
-| **Çok Biçimlilik (Polymorphism)** | Farklı randevu onaylama kuralları, uygunluk doğrulama stratejileri ve bildirim mekanizmalarının polimorfik arayüzler (`AppointmentRule`, `SlotValidator`) üzerinden yürütülmesi. | Tasarlandı (S03, S06) |
+| **Kapsülleme (Encapsulation)** | Varlık durumlarının `private` alanlar, `final` değer nesneleri (`TimeInterval`, `Money`, `ServiceSnapshot`) ve `Appointment` üzerinde public `setStatus` yerine davranışsal metotlarla (`approve`, `reject`, `cancel`, `complete`) korunması. | Uygulandı (S02/S07, Mimari Testli) |
+| **Kalıtım (Inheritance)** | Ortak varlık tabanı (`BaseEntity`) ve `PersonProfile` soyut sınıfından türeyen `PatientProfile` ile `StaffProfile` hiyerarşisi. | Uygulandı (S02/S05) |
+| **Çok Biçimlilik (Polymorphism)** | `SchedulingValidator` koordinasyonunda `instanceof` olmadan `SchedulingConstraint` arayüzünü uygulayan 4 strateji sınıfı (`OpeningHoursConstraint`, `StaffAvailabilityConstraint`, `StaffServiceEligibilityConstraint`, `NoOverlapConstraint`). | Uygulandı (S02/S05) |
 | **Soyutlama (Abstraction)** | Veri erişim (`Repository`), randevu çakışma çözümü (`BookingService`), zaman dilimi ve bildirim mekanizmalarının arayüz sözleşmeleri arkasına gizlenmesi. | Uygulandı (S01/S06) |
 | **Arayüz Tabanlı Tasarım (Interface-Based)** | Servisler arası doğrudan somut bağımlılık yerine arayüz (`interface`) tanımları üzerinden Bağımlılıkların Ters Çevrilmesi (DIP). | Uygulandı (S01/S04) |
 | **Bileşim (Composition)** | `Organization` -> `Branch` -> `Department` hiyerarşisi ve randevularda saklanan anlık fiyat/süre `Snapshot` bileşenleri. | Uygulandı (S01/S03) |
@@ -222,7 +222,7 @@ clinic-appointment/
 | **S07** | Randevu Onay Yaşam Döngüsü ve Geçmiş | **Uygulandı (Doğrulandı)** | Onay/ret/iptal akışı, durum makinesi, append-only denetim geçmişi |
 | **S08** | Spring MVC ve Thymeleaf Kullanıcı Ekranları | **Uygulandı (Doğrulandı)** | Hasta, personel ve yönetici arayüzleri, form doğrulama, hata sayfaları |
 | **S09** | Test Regresyonu, Eşzamanlılık ve Demo Seed | **Uygulandı (Doğrulandı — [Rapor](docs/07-sprintler/S09-implementation-report.md))** | `DemoDataSeeder`, güvenli reset, 5-thread stres testi (`ConcurrentBookingIT`), p95 kıyaslama (`PerformanceBenchmarkIT`) |
-| **S10** | Nihai Kalite Kapısı, Sunum ve Akademik Teslim | *Planlandı* | 10 farklı gün commit kontrolü, sunum hazırlığı, akademik rapor |
+| **S10** | Nihai Kalite Kapısı, Sunum ve Akademik Teslim | **Uygulandı ve Doğrulandı (`VERIFIED_BY_OWNER` — [Rapor](docs/07-sprintler/S10-implementation-report.md))** | 10 farklı gün Git PASS, 501/501 test PASS, akademik PDF, 7 slayt `.pptx`, demo/savunma rehberi, temiz kaynak ZIP |
 
 ---
 
@@ -238,6 +238,11 @@ clinic-appointment/
 - [Sprint S01 Görev ve Kabul Kriterleri](docs/07-sprintler/S01.md)
 - [Sprint S01 Uygulama Raporu](docs/07-sprintler/S01-implementation-report.md)
 - [GitHub 10 Farklı Gün Commit Takvimi](docs/08-teslim/01-github-commit-takvimi.md)
+- [Sprint S10 Uygulama Raporu](docs/07-sprintler/S10-implementation-report.md)
+- [S10 Teslimat Manifestosu ve Doğrulama Özeti](docs/08-teslim/S10-artifact-manifest.md)
+- [5 Dakikalık Canlı Demo ve Çevrimdışı Hazırlık Rehberi](docs/08-teslim/S10-live-demo-runbook.md)
+- [30 Soruluk Sözlü Savunma Rehberi](docs/08-teslim/S10-oral-defense.md)
+- [SABİS Teslim Kontrol Listesi](docs/08-teslim/S10-sabis-checklist.md)
 
 ---
 

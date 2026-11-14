@@ -37,11 +37,11 @@ FR-035,COULD,Kullanıcı için uygulama içi bildirimler vardır,S10,TC-035,PLAN
 FR-036,COULD,Hizmet/şube rapor filtreleri vardır,S10,TC-036,PLANNED,NOT_RUN
 NFR-001,MUST,"Şifre plaintext saklanmaz, oturum ve CSRF korunur",S04,TC-037,PASS_OWNER_VERIFIED,PASSED
 NFR-002,MUST,Müşteri/kurum düzeyinde erişim kontrolleri servis katmanında uygulanır,S04,TC-038,PASS_OWNER_VERIFIED,PASSED
-NFR-003,MUST,Flyway ile sıfırdan şema kurulabilir ve migration tekrarlanabilir,S01,TC-039,PLANNED,NOT_RUN
+NFR-003,MUST,Flyway ile sıfırdan şema kurulabilir ve migration tekrarlanabilir,S01,TC-039,PASS_OWNER_VERIFIED,PASSED
 NFR-004,MUST,Kritik iş kuralı unit ve PostgreSQL integration testleri bulunur,S09,TC-040,PASS_OWNER_VERIFIED,PASSED
 NFR-005,MUST,Sistem baştan demo verisi ile ayağa kaldırılabilir,S09,TC-041,PASS_OWNER_VERIFIED,PASSED
-NFR-006,MUST,En az 10 farklı gerçek günde commit kanıtı vardır,S10,TC-042,PLANNED,NOT_RUN
-NFR-007,MUST,GitHub + SABİS + canlı sunum teslimleri yapılır,S10,TC-043,PLANNED,NOT_RUN
+NFR-006,MUST,En az 10 farklı gerçek günde commit kanıtı vardır,S10,TC-042,GIT_10_DAY_PASS_28_COMMITS,PASSED
+NFR-007,MUST,GitHub + SABİS + canlı sunum teslimleri yapılır,S10,TC-043,GITHUB_AND_PACKAGES_VERIFIED_AWAITING_SABIS_DEFENSE,READY_FOR_SABIS_SUBMISSION
 NFR-008,SHOULD,Randevu p95 yanıt süresi yerel örnek yükte 1sn altı hedeflenir,S09,TC-044,PASS_OWNER_VERIFIED,PASSED
 NFR-009,SHOULD,Hata yanıtları güvenli ve kullanıcıya açıklayıcıdır,S08,TC-045,PASS_OWNER_VERIFIED,PASSED
 NFR-010,SHOULD,Kod test edilebilir ve katman sınırları doğrulanır,S09,TC-046,PASS_OWNER_VERIFIED,PASSED

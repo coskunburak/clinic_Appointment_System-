@@ -32,6 +32,9 @@ build/
 ### VS Code ###
 .vscode/
 
+### Deliverables (outside tracked source) ###
+deliverables/
+
 ### macOS ###
 .DS_Store
 .DS_Store?

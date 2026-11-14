@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 420" width="900" height="420" role="img" aria-label="Randevu Durum Makinesi">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#334155"/>
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#0f5e78"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#b91c1c"/>
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#15803d"/>
+    </marker>
+    <marker id="inherit" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M 1 1 L 11 6 L 1 11 z" fill="#ffffff" stroke="#0f5e78" stroke-width="1.6"/>
+    </marker>
+    <marker id="diamond" viewBox="0 0 14 10" refX="1" refY="5" markerWidth="10" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 1 5 L 7 1 L 13 5 L 7 9 z" fill="#0f5e78"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="900" height="420" fill="#ffffff"/>
+
+<circle cx="55" cy="195" r="12" fill="#0f5e78"/>
+<line x1="67" y1="195" x2="135" y2="195" stroke="#0f5e78" stroke-width="2" marker-end="url(#arrow-blue)"/>
+<text x="100" y="183" text-anchor="middle" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10" font-weight="700" fill="#0f5e78">create()</text>
+<rect x="137" y="162" width="165" height="66" rx="12" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+<text x="219.5" y="188" text-anchor="middle" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="13" font-weight="700" fill="#92400e">PENDING</text>
+<text x="219.5" y="206" text-anchor="middle" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10" fill="#92400e">isBlocking = true</text>
+<rect x="415" y="162" width="175" height="66" rx="12" fill="#dbeafe" stroke="#1d4ed8" stroke-width="2"/>
+<text x="502.5" y="188" text-anchor="middle" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="13" font-weight="700" fill="#1e3a8a">CONFIRMED</text>
+<text x="502.5" y="206" text-anchor="middle" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10" fill="#1e3a8a">isBlocking = true</text>
+<rect x="415" y="36" width="175" height="62" rx="12" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+<text x="502.5" y="62" text-anchor="middle" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="13" font-weight="700" fill="#991b1b">REJECTED</text>
+<text x="502.5" y="80" text-anchor="middle" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10" fill="#991b1b">Terminal / Slot Serbest</text>
+<rect x="415" y="315" width="175" height="62" rx="12" fill="#f1f5f9" stroke="#475569" stroke-width="2"/>
+<text x="502.5" y="341" text-anchor="middle" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="13" font-weight="700" fill="#334155">CANCELLED</text>
+<text x="502.5" y="359" text-anchor="middle" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10" fill="#334155">Terminal / Slot Serbest</text>
+<rect x="690" y="162" width="175" height="66" rx="12" fill="#dcfce7" stroke="#15803d" stroke-width="2"/>
+<text x="777.5" y="188" text-anchor="middle" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="13" font-weight="700" fill="#14532d">COMPLETED</text>
+<text x="777.5" y="206" text-anchor="middle" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10" fill="#14532d">Terminal / isBlocking = true</text>
+<line x1="302" y1="195" x2="413" y2="195" stroke="#1d4ed8" stroke-width="2" marker-end="url(#arrow-blue)"/>
+<text x="357" y="182" text-anchor="middle" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10" font-weight="700" fill="#1e40af">approve()</text>
+<text x="357" y="212" text-anchor="middle" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="9" fill="#475569">[now &lt; startAt]</text>
+<polyline points="220,162 220,67 413,67" fill="none" stroke="#dc2626" stroke-width="1.9" marker-end="url(#arrow-red)"/>
+<text x="315" y="57" text-anchor="middle" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10" font-weight="700" fill="#b91c1c">reject(actorId, reason, clock)</text>
+<polyline points="220,228 220,346 413,346" fill="none" stroke="#475569" stroke-width="1.9" marker-end="url(#arrow)"/>
+<text x="310" y="336" text-anchor="middle" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10" font-weight="700" fill="#334155">cancel() [now &lt; startAt]</text>
+<line x1="502" y1="228" x2="502" y2="313" stroke="#475569" stroke-width="1.9" marker-end="url(#arrow)"/>
+<text x="580" y="274" text-anchor="middle" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10" font-weight="700" fill="#334155">cancel() [now &lt; startAt]</text>
+<line x1="590" y1="195" x2="688" y2="195" stroke="#15803d" stroke-width="2" marker-end="url(#arrow-green)"/>
+<text x="639" y="182" text-anchor="middle" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10" font-weight="700" fill="#15803d">complete()</text>
+<text x="639" y="212" text-anchor="middle" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="9" fill="#475569">[now &gt;= endAt]</text>
+<rect x="640" y="305" width="235" height="80" rx="8" fill="#fffbeb" stroke="#d97706" stroke-width="1.2"/>
+<text x="652" y="325" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="10.5" font-weight="700" fill="#92400e">Append-Only Denetim İzi (FR-030)</text>
+<text x="652" y="343" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="9.5" fill="#1e293b">Her geçiş aynı transaction içinde</text>
+<text x="652" y="358" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="9.5" fill="#1e293b">appointment_status_history tablosuna</text>
+<text x="652" y="373" font-family="Helvetica, Arial, 'DejaVu Sans', sans-serif" font-size="9.5" fill="#1e293b">updatable=false olarak eklenir.</text>
+</svg>

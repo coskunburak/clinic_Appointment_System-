@@ -2,6 +2,8 @@
 
 Bu belge, **Sakarya Üniversitesi Bilgisayar ve Bilişim Bilimleri Fakültesi, Nesneye Dayalı Programlama Dersi** dönem projesi için SABİS sistemine yüklenecek olan nihai PDF proje raporunun eksiksiz metin iskeletini ve bölüm yapısını tanımlar.
 
+> **S10 Üretilen Nihai Rapor:** Bu şablon esas alınarak oluşturulan 16 sayfalık akademik PDF raporu `deliverables/Clinic_Appointment_System_Final_Report.pdf` ve HTML kaynağı [Clinic_Appointment_System_Final_Report.html](./report/Clinic_Appointment_System_Final_Report.html) konumundadır (teslim tarihi `2026-11-14`, referans SHA `8b70de2`; öğrenci numarası ve öğretim elemanı alanları teslim öncesi öğrenci tarafından doldurulacaktır).
+
 ---
 
 # T.C. SAKARYA ÜNİVERSİTESİ

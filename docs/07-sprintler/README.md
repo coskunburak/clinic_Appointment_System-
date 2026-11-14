@@ -18,7 +18,7 @@ Bu dizin, **Sakarya Üniversitesi Nesneye Dayalı Programlama (OOP) Seçenek A �
 | **[S07](./S07.md)** | **Randevu Onay Döngüsü ve Durum Makinesi** | Onay (`CONFIRMED`), red (`REJECTED`), iptal (`CANCELLED`), tamamlama (`COMPLETED`) durum makinesi, append-only denetim izi. | `FR-018` .. `FR-021`, `FR-030` / Durum Makinesi | **Uygulandı (Doğrulandı — [Rapor](./S07-implementation-report.md))** |
 | **[S08](./S08.md)** | **Spring MVC ve Thymeleaf Kullanıcı Ekranları** | Hasta, hekim ve yönetici için sunucu taraflı HTML arayüzleri, form doğrulama, yerel Bootstrap 5 varlıkları (çevrimdışı demo). | `FR-027`, `FR-028`, `NFR-009` / Kullanıcı Arayüzü | **Uygulandı (Doğrulandı — [Rapor](./S08-implementation-report.md))** |
 | **[S09](./S09.md)** | **Regresyon, Dayanıklılık, Performans ve Demo Tohumu** | Tam regresyon suite (`verify`), 5-thread eşzamanlı rezervasyon stres testi, güvenli `dev` demo tohum/sıfırlama (`DemoDataSeeder`), yerel p95 kıyaslama. | `FR-034`, `NFR-004`, `NFR-005`, `NFR-008`, `NFR-010` / Kalite, Eşzamanlılık & Demo Hazırlığı | **Uygulandı (Doğrulandı — [Rapor](./S09-implementation-report.md))** |
-| **[S10](./S10.md)** | **Nihai Kalite, SABİS Teslimi ve Canlı Savunma** | 10 farklı gün commit doğrulaması, SABİS zip ve PDF raporu, 7 slaytlık sunum ve canlı akademik savunma (7. haftadan itibaren). | `NFR-006`, `NFR-007` / Teslimat ve Savunma | *Planlandı* |
+| **[S10](./S10.md)** | **Nihai Kalite, SABİS Teslimi ve Canlı Savunma** | 10 farklı gün commit doğrulaması, SABİS zip ve PDF raporu, 7 slaytlık sunum ve canlı akademik savunma (7. haftadan itibaren). | `NFR-006`, `NFR-007` / Teslimat ve Savunma | **Uygulandı ve Doğrulandı ([Rapor](./S10-implementation-report.md) — 501 PASS)** |
 
 ---
 

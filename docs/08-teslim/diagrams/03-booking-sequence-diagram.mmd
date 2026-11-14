@@ -1,0 +1,26 @@
+sequenceDiagram
+    actor H as Hasta (Tarayıcı)
+    participant C as PatientBookingController
+    participant S as BookingService (@Transactional)
+    participant DB as PostgreSQL 17
+    participant D as Appointment & ServiceSnapshot
+
+    H->>C: POST /patient/book (CSRF + ROLE_PATIENT)
+    C->>S: bookAppointment(BookingCommand)
+    S->>S: SecurityContextFacade + Hasta Kimlik Doğrulama
+    S->>DB: SELECT ... FOR UPDATE (patient_profile)
+    S->>DB: SELECT ... FOR UPDATE (staff_profile)
+    S->>DB: Şube, Hizmet, Atama, Yetkinlik ve Mesai Kontrolü
+    S->>S: IANA Saat Dilimi & DST Boşluk/Çakışma Doğrulaması
+    S->>DB: findOverlappingAppointmentsForStaff([start, end))
+    S->>DB: findOverlappingAppointmentsForPatient([start, end))
+    alt Çakışma Var
+        S-->>C: AppointmentConflictException / PatientOverlapException
+        C-->>H: HTTP 409 / Kullanıcı Dostu Hata Mesajı
+    else Çakışma Yok
+        S->>D: branchService.toSnapshot() + Appointment.create(PENDING)
+        S->>DB: INSERT appointment + appointment_status_history (null -> PENDING)
+        DB-->>S: COMMIT
+        S-->>C: Appointment (PENDING)
+        C-->>H: Redirect /patient/appointments
+    end
