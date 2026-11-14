@@ -282,7 +282,7 @@ class StaffManagementServiceTest {
         StaffAssignment foreignAssignment = new StaffAssignment(doc, b, d);
 
         WeeklyAvailability weekly = new WeeklyAvailability(ownedAssignment, (short) 1, LocalTime.of(9, 0), LocalTime.of(12, 0));
-        AvailabilityException exc = AvailabilityException.fullDayLeave(ownedAssignment, LocalDate.now().plusDays(10), "İzin");
+        AvailabilityException exc = AvailabilityException.createFullDayLeave(ownedAssignment, LocalDate.now().plusDays(10), "İzin");
 
         when(securityContextFacade.getRequiredCurrentUser()).thenReturn(actor);
         when(staffAssignmentRepository.findById(ownedAssignment.getId())).thenReturn(Optional.of(ownedAssignment));

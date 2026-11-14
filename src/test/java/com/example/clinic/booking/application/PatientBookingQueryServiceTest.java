@@ -162,7 +162,7 @@ class PatientBookingQueryServiceTest {
         assertThat(services.get(0).name()).isEqualTo("Aktif Hizmet");
 
         Department inactiveDept = new Department(branch, "Pasif Bölüm");
-        inactiveDept.deactivate();
+        inactiveDept.setActive(false);
         UserAccount docUser = new UserAccount("doc2@clinic.test", "hash");
         StaffProfile docProfile = new StaffProfile(docUser, "Dr. Pasif Bölüm", "+905551234568", StaffType.DOCTOR, "Cildiye");
         StaffAssignment inactiveDeptAssignment = new StaffAssignment(docProfile, branch, inactiveDept);
