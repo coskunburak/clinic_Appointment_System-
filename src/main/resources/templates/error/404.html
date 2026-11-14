@@ -8,24 +8,27 @@
     <link rel="stylesheet" th:href="@{/css/clinic.css}">
 </head>
 <body class="d-flex flex-column min-vh-100 justify-content-center align-items-center bg-light">
-    <div class="container text-center py-5">
+    <main class="container text-center py-5">
         <div class="row justify-content-center">
             <div class="col-md-7 col-lg-5">
                 <div class="clinic-card p-5 text-center shadow">
-                    <div class="mb-4 text-primary">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-compass" viewBox="0 0 16 16">
-                            <path d="M8 160.1A7.9 7.9 0 0 0 15.9 8 7.9 7.9 0 0 0 8 .1 7.9 7.9 0 0 0 .1 8 7.9 7.9 0 0 0 8 160.1zm0-1A6.9 6.9 0 0 1 1.1 8 6.9 6.9 0 0 1 8 1.1 6.9 6.9 0 0 1 14.9 8 6.9 6.9 0 0 1 8 15.1z"/>
+                    <div class="mb-4 text-primary" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
                             <path d="M6.94 7.44l4.95-2.83-2.83 4.95-4.95 2.83 2.83-4.95zm.85.85l1.41 1.41 2.12-2.12-1.41-1.41-2.12 2.12z"/>
                         </svg>
                     </div>
-                    <h1 class="h3 fw-bold text-dark mb-3">404 — Sayfa Bulunamadı</h1>
-                    <p class="text-muted mb-4 lead fs-6">Aradığınız sayfa veya kaynak sistemde mevcut değil.</p>
+                    <h1 class="h3 fw-bold text-dark mb-3" th:text="${errorTitle ?: '404 — Sayfa Bulunamadı'}">404 — Sayfa Bulunamadı</h1>
+                    <p class="text-muted mb-4 lead fs-6" th:text="${errorMessage ?: 'Aradığınız sayfa veya kaynak sistemde mevcut değil.'}">
+                        Aradığınız sayfa veya kaynak sistemde mevcut değil.
+                    </p>
                     <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-                        <a th:href="@{/login}" class="btn btn-clinic-primary px-4">Giriş Ekranına Dön</a>
+                        <a th:href="@{/}" class="btn btn-clinic-primary px-4">Ana Sayfaya Dön</a>
+                        <a th:href="@{/login}" class="btn btn-outline-secondary px-4">Giriş Ekranı</a>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 </body>
 </html>

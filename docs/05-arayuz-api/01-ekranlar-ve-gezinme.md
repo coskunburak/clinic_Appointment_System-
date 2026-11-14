@@ -4,16 +4,17 @@
 | Ekran | URL örneği | İşlev | Kabul |
 |---|---|---|---|
 | Login | `/login` | CSRF korumalı giriş | hatalı şifre genel mesaj |
-| Hasta paneli | `/patient/dashboard` | yaklaşan randevu, kısayollar | yalnız kendi veri |
-| Randevu arama | `/patient/book` | şube → bölüm → hizmet → çalışan → tarih | ilişkisel seçim filtreleri |
-| Saat seçimi | `/patient/book/slots` | süreye sığan boş aralıklar | çift tıkta server güvenliği |
-| Randevu detay | `/patient/appointments/{id}` | tarih, hizmet, durum, ücret | fiyat snapshot |
-| Personel paneli | `/staff/appointments` | atanmış program, bekleyenler | sadece ilgili personel |
-| Randevu onay | `/staff/appointments/{id}` | approve / reject / complete | durum geçişi |
-| Yönetim paneli | `/admin` | şube listesi / sayaçlar | scope farkı |
-| Şube yönetimi | `/admin/branches` | create/update çalışma saatleri | negatif saat engeli |
-| Hizmet yönetimi | `/admin/services` | katalog + şube fiyat/süre | para/dakika validasyon |
-| Personel yönetimi | `/admin/staff` | çalışan, uzmanlık, atama, yetkinlik, müsaitlik | ilişkisel bütünlük |
+| Hasta paneli | `/patient/dashboard` | `/patient/appointments` yönlendirmesi | yalnız kendi veri |
+| Randevu alma sihirbazı | `/patient/book` | şube → hizmet → yetkin hekim → tarih → slot | ilişkisel ve sunucu doğrulamalı filtreler |
+| Müsait slot JSON uç noktası | `/patient/slots` | seçilen hizmet/hekim/tarih için boş saatler | çift tık ve çakışmada sunucu kilidi |
+| Randevularım | `/patient/appointments` | yaklaşan & sayfalanmış geçmiş listesi, modal iptal | fiyat snapshot & gerekçeli iptal |
+| Personel paneli | `/staff/schedule` | günlük, 7 günlük haftalık (`weeklyDays`) ve bekleyen (`pending`) takvim | sadece ilgili hekim |
+| Randevu yaşam döngüsü | `/staff/appointments/{id}/approve\|reject\|complete` | onay / gerekçeli ret / tamamlama | durum makinesi ve yetki doğrulaması |
+| Yönetici paneli | `/admin/dashboard` | yetkili kurum, şube, bölüm, hizmet ve personel sayaçları | çok kiracılı kapsam |
+| Kurum ve Şube yönetimi | `/admin/branches`, `/admin/hours`, `/admin/branches/{id}/hours` | kurum/şube düzenleme, durum, çalışma saatleri ekleme/kaldırma | org-geneli / şube kapsam ayrımı & negatif saat engeli |
+| Bölüm yönetimi | `/admin/departments` | bölüm ekleme, ad güncelleme, aktifleştirme/pasife alma | şube kapsam kontrolü |
+| Hizmet yönetimi | `/admin/services` | kurumsal hizmet tanımları + şube fiyat/süre/durum | para/dakika validasyon & org yetki sınırı |
+| Personel yönetimi | `/admin/staff`, `/admin/staff/{id}/availability` | çalışan, uzmanlık, atama, yetkinlik, haftalık mesai ve izin ekleme/silme | kapsam içi listeleme & ilişkisel bütünlük |
 
 ## Örnek hasta akışı
 ```mermaid

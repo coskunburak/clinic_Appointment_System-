@@ -2,6 +2,8 @@ package com.example.clinic.organization.application;
 
 import com.example.clinic.common.security.SecurityContextFacade;
 import com.example.clinic.identity.application.AccessPolicy;
+import com.example.clinic.identity.domain.Membership;
+import com.example.clinic.identity.domain.Role;
 import com.example.clinic.identity.domain.UserAccount;
 import com.example.clinic.identity.infrastructure.MembershipRepository;
 import com.example.clinic.organization.application.dto.BranchResponse;
@@ -302,5 +304,70 @@ class OrganizationAdminServiceTest {
         assertThatThrownBy(() -> new OpeningHoursDto(1, LocalTime.of(9, 0), LocalTime.of(9, 0)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("must strictly precede");
+    }
+
+    @Test
+    @DisplayName("getOrgWideAuthorizedOrganizations excludes branch-scoped admin memberships")
+    void getOrgWideAuthorizedOrganizationsFiltersBranchScopedAdmins() {
+        UserAccount branchAdmin = new UserAccount("branch-admin@clinic.test", "hash");
+        Organization orgWideOrg = new Organization("Kurum Geneli");
+        Organization branchOnlyOrg = new Organization("Yalnızca Şube Kurumu");
+        Branch scopedBranch = new Branch(branchOnlyOrg, "Sadece Şube", "Europe/Istanbul", "Adres");
+
+        when(securityContextFacade.getRequiredCurrentUser()).thenReturn(branchAdmin);
+        when(membershipRepository.findByUserAccountIdAndRole(branchAdmin.getId(), Role.ROLE_ADMIN))
+                .thenReturn(List.of(
+                        new Membership(branchAdmin, orgWideOrg, null, Role.ROLE_ADMIN),
+                        new Membership(branchAdmin, branchOnlyOrg, scopedBranch, Role.ROLE_ADMIN)
+                ));
+
+        List<OrganizationResponse> result = organizationAdminService.getOrgWideAuthorizedOrganizations();
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).id()).isEqualTo(orgWideOrg.getId());
+    }
+
+    @Test
+    @DisplayName("Should update branch profile and reject invalid time zones")
+    void shouldUpdateBranchProfile() {
+        Organization org = new Organization("Sağlık Grubu");
+        Branch b = new Branch(org, "Eski Şube", "Europe/Istanbul", "Eski Adres");
+        when(branchRepository.findById(b.getId())).thenReturn(Optional.of(b));
+
+        BranchResponse updated = organizationAdminService.updateBranch(b.getId(), "Yeni Şube", "Europe/Berlin", "Yeni Adres");
+
+        assertThat(updated.name()).isEqualTo("Yeni Şube");
+        assertThat(updated.timeZone()).isEqualTo("Europe/Berlin");
+        assertThat(updated.address()).isEqualTo("Yeni Adres");
+
+        assertThatThrownBy(() -> organizationAdminService.updateBranch(b.getId(), "Geçersiz", "Not/AZone", null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Invalid IANA time zone");
+    }
+
+    @Test
+    @DisplayName("Should update and toggle department lifecycle enforcing duplicate-name constraint")
+    void shouldUpdateAndToggleDepartment() {
+        Organization org = new Organization("Sağlık Grubu");
+        Branch b = new Branch(org, "Merkez Şube", "Europe/Istanbul", null);
+        Department existing = new Department(b, "Kardiyoloji");
+        Department target = new Department(b, "Dahiliye");
+
+        when(departmentRepository.findById(target.getId())).thenReturn(Optional.of(target));
+        when(departmentRepository.findByBranchIdAndName(b.getId(), "İç Hastalıkları")).thenReturn(Optional.empty());
+        when(departmentRepository.findByBranchIdAndName(b.getId(), "Kardiyoloji")).thenReturn(Optional.of(existing));
+
+        DepartmentResponse renamed = organizationAdminService.updateDepartment(target.getId(), "İç Hastalıkları");
+        assertThat(renamed.name()).isEqualTo("İç Hastalıkları");
+
+        assertThatThrownBy(() -> organizationAdminService.updateDepartment(target.getId(), "Kardiyoloji"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("already exists");
+
+        organizationAdminService.deactivateDepartment(target.getId());
+        assertThat(target.isActive()).isFalse();
+
+        organizationAdminService.activateDepartment(target.getId());
+        assertThat(target.isActive()).isTrue();
     }
 }

@@ -27,10 +27,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.Currency;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -138,5 +142,53 @@ class PatientBookingQueryServiceTest {
         List<LocalTime> result = service.getAvailableSlotTimes(staffId, branchServiceId, date);
 
         assertThat(result).containsExactly(LocalTime.of(9, 0), LocalTime.of(9, 30));
+    }
+
+    @Test
+    @DisplayName("Filters out inactive service definitions, organizations, and departments from booking options")
+    void filtersOutInactiveHierarchyFromBookingOptions() {
+        ServiceDefinition activeDef = new ServiceDefinition(organization, "Aktif Hizmet", "Açıklama");
+        ServiceDefinition inactiveDef = new ServiceDefinition(organization, "Pasif Hizmet", "Açıklama");
+        inactiveDef.deactivate();
+
+        BranchService activeBs = new BranchService(branch, activeDef, 30, new Money(new BigDecimal("300.00"), Currency.getInstance("TRY")));
+        BranchService inactiveDefBs = new BranchService(branch, inactiveDef, 30, new Money(new BigDecimal("300.00"), Currency.getInstance("TRY")));
+
+        when(branchServiceRepository.findByBranchIdAndActiveTrue(branch.getId()))
+                .thenReturn(List.of(activeBs, inactiveDefBs));
+
+        List<ServiceSummaryDto> services = service.getActiveServicesForBranch(branch.getId());
+        assertThat(services).hasSize(1);
+        assertThat(services.get(0).serviceName()).isEqualTo("Aktif Hizmet");
+
+        Department inactiveDept = new Department(branch, "Pasif Bölüm");
+        inactiveDept.deactivate();
+        UserAccount docUser = new UserAccount("doc2@clinic.test", "hash");
+        StaffProfile docProfile = new StaffProfile(docUser, "Dr. Pasif Bölüm", "555", StaffType.DOCTOR, "Cildiye");
+        StaffAssignment inactiveDeptAssignment = new StaffAssignment(docProfile, branch, inactiveDept);
+        StaffServiceEligibility ineligibleByDept = new StaffServiceEligibility(inactiveDeptAssignment, activeBs);
+
+        when(staffServiceEligibilityRepository.findByBranchServiceId(activeBs.getId()))
+                .thenReturn(List.of(ineligibleByDept));
+
+        List<StaffSummaryDto> eligibleStaff = service.getEligibleStaffForService(activeBs.getId());
+        assertThat(eligibleStaff).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Computes default booking date in branch local timezone across UTC midnight")
+    void computesDefaultBookingDateInBranchTimeZone() {
+        Clock utcLateNight = Clock.fixed(Instant.parse("2026-11-20T22:00:00Z"), ZoneId.of("UTC"));
+        PatientBookingQueryService tzAware = new PatientBookingQueryService(
+                branchRepository,
+                branchServiceRepository,
+                staffServiceEligibilityRepository,
+                availabilityCalculator,
+                utcLateNight
+        );
+        when(branchRepository.findById(branch.getId())).thenReturn(Optional.of(branch));
+
+        // 22:00 UTC on Nov 20 == 01:00 on Nov 21 in Europe/Istanbul -> +1 day = Nov 22
+        assertThat(tzAware.getDefaultBookingDate(branch.getId())).isEqualTo(LocalDate.of(2026, 11, 22));
     }
 }

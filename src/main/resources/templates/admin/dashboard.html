@@ -46,10 +46,13 @@
         <div class="col-md-6 col-lg-3">
             <div class="clinic-card h-100 d-flex flex-column justify-content-between p-4">
                 <div>
-                    <h2 class="h5 fw-bold text-dark mb-2">Şube Yönetimi</h2>
+                    <h2 class="h5 fw-bold text-dark mb-2">Şube &amp; Çalışma Saatleri</h2>
                     <p class="text-muted small">Yeni şube oluşturma, adres/zaman dilimi yapılandırması ve mesai saatleri yönetimi.</p>
                 </div>
-                <a th:href="@{/admin/branches}" class="btn btn-outline-primary btn-sm mt-3">Şubeleri Yönet &rarr;</a>
+                <div class="d-flex flex-wrap gap-2 mt-3">
+                    <a th:href="@{/admin/branches}" class="btn btn-outline-primary btn-sm">Şubeleri Yönet &rarr;</a>
+                    <a th:href="@{/admin/hours}" class="btn btn-outline-secondary btn-sm">Çalışma Saatleri &rarr;</a>
+                </div>
             </div>
         </div>
 
@@ -67,7 +70,7 @@
             <div class="clinic-card h-100 d-flex flex-column justify-content-between p-4">
                 <div>
                     <h2 class="h5 fw-bold text-dark mb-2">Hizmet Kataloğu</h2>
-                    <p class="text-muted small">Katalog hizmet tanımları, şube fiyatlandırma ve süre (dakika) politikaları.</p>
+                    <p class="text-muted small">Katalog hizmet tanımları, <span th:text="${serviceCount != null ? serviceCount : 0}">0</span> aktif şube hizmeti ve süre/ücret politikaları.</p>
                 </div>
                 <a th:href="@{/admin/services}" class="btn btn-outline-primary btn-sm mt-3">Hizmetleri Yönet &rarr;</a>
             </div>

@@ -4,6 +4,7 @@ import com.example.clinic.AbstractIntegrationTest;
 import com.example.clinic.booking.domain.AppointmentStatus;
 import com.example.clinic.booking.infrastructure.persistence.AppointmentJpaEntity;
 import com.example.clinic.booking.infrastructure.persistence.AppointmentJpaRepository;
+import com.example.clinic.booking.infrastructure.persistence.AppointmentStatusHistoryJpaEntity;
 import com.example.clinic.booking.infrastructure.persistence.AppointmentStatusHistoryJpaRepository;
 import com.example.clinic.catalog.domain.BranchService;
 import com.example.clinic.catalog.domain.ServiceDefinition;
@@ -52,13 +53,20 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 /**
  * End-to-end integration tests over real PostgreSQL container verifying MVC flows,
@@ -275,5 +283,141 @@ class RoleBasedWebMvcIT extends AbstractIntegrationTest {
                 .andExpect(redirectedUrl("/admin/departments?branchId=" + createdBranch.getId()));
 
         assertThat(departmentRepository.findByBranchIdAndName(createdBranch.getId(), "Nöroloji")).isPresent();
+    }
+
+    @Test
+    @DisplayName("End-to-end: Rejected appointment writes audit history and immediately releases booking slot")
+    void rejectionWritesHistoryAndReleasesSlot() throws Exception {
+        LocalDate appointmentDate = LocalDate.now().plusDays(4);
+
+        mockMvc.perform(post("/patient/book")
+                        .with(csrf())
+                        .with(user("it_patient@clinic.test").roles("PATIENT"))
+                        .param("branchId", branch.getId().toString())
+                        .param("branchServiceId", branchService.getId().toString())
+                        .param("staffId", doctorProfile.getId().toString())
+                        .param("appointmentDate", appointmentDate.toString())
+                        .param("startTime", "14:00"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/patient/appointments"));
+
+        AppointmentJpaEntity booked = appointmentJpaRepository.findAll().stream()
+                .filter(a -> a.getPatientId().equals(patientProfile.getId()) && a.getStatus() == AppointmentStatus.PENDING)
+                .findFirst()
+                .orElseThrow();
+
+        // While PENDING, 14:00 is blocked in /patient/slots
+        mockMvc.perform(get("/patient/slots")
+                        .with(user("it_patient@clinic.test").roles("PATIENT"))
+                        .param("staffId", doctorProfile.getId().toString())
+                        .param("branchServiceId", branchService.getId().toString())
+                        .param("date", appointmentDate.toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", not(hasItem("14:00"))));
+
+        // Doctor rejects with reason
+        mockMvc.perform(post("/staff/appointments/{id}/reject", booked.getId())
+                        .with(csrf())
+                        .with(user(doctorAccount.getEmail()).roles("STAFF"))
+                        .param("reason", "Acil konsültasyon sebebiyle ertelendi.")
+                        .param("date", appointmentDate.toString()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(flash().attributeExists("successMessage"));
+
+        AppointmentJpaEntity rejected = appointmentJpaRepository.findById(booked.getId()).orElseThrow();
+        assertThat(rejected.getStatus()).isEqualTo(AppointmentStatus.REJECTED);
+
+        List<AppointmentStatusHistoryJpaEntity> history = statusHistoryRepository
+                .findByAppointmentIdOrderByOccurredAtAscIdAsc(booked.getId());
+        assertThat(history).extracting(AppointmentStatusHistoryJpaEntity::getToStatus)
+                .containsExactly(AppointmentStatus.PENDING, AppointmentStatus.REJECTED);
+
+        // Once REJECTED, 14:00 slot must immediately be available again
+        mockMvc.perform(get("/patient/slots")
+                        .with(user("it_patient@clinic.test").roles("PATIENT"))
+                        .param("staffId", doctorProfile.getId().toString())
+                        .param("branchServiceId", branchService.getId().toString())
+                        .param("date", appointmentDate.toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasItem("14:00")));
+    }
+
+    @Test
+    @DisplayName("End-to-end: Multi-tenant administrator isolation hides foreign staff and rejects cross-tenant IDs with 403")
+    void crossTenantAdminIsolationEnforcedAcrossMvcRoutes() throws Exception {
+        Organization foreignOrg = organizationRepository.saveAndFlush(new Organization("Yabancı Klinik A.Ş."));
+        branchRepository.saveAndFlush(new Branch(foreignOrg, "Yabancı Şube", "Europe/Istanbul", "Ankara"));
+        UserAccount foreignAdmin = userAccountRepository.saveAndFlush(
+                new UserAccount("foreign_admin@clinic.test", passwordEncoder.encode("Secret123!"))
+        );
+        membershipRepository.saveAndFlush(new Membership(foreignAdmin, foreignOrg, null, Role.ROLE_ADMIN));
+
+        // Scoped staff list must not leak Tenant A doctor to Tenant B admin
+        mockMvc.perform(get("/admin/staff")
+                        .with(user("foreign_admin@clinic.test").roles("ADMIN")))
+                .andExpect(status().isOk())
+                .andExpect(content().string(not(containsString(doctorProfile.getFullName()))));
+
+        // Direct IDOR attempt on Tenant A branch departments or staff availability returns 403 Forbidden
+        mockMvc.perform(get("/admin/departments")
+                        .with(user("foreign_admin@clinic.test").roles("ADMIN"))
+                        .param("branchId", branch.getId().toString()))
+                .andExpect(status().isForbidden())
+                .andExpect(view().name("error/403"));
+
+        mockMvc.perform(get("/admin/staff/{id}/availability", doctorProfile.getId())
+                        .with(user("foreign_admin@clinic.test").roles("ADMIN")))
+                .andExpect(status().isForbidden())
+                .andExpect(view().name("error/403"));
+    }
+
+    @Test
+    @DisplayName("End-to-end: Double booking the same doctor slot redirects with safe Turkish conflict flash message")
+    void duplicateSlotBookingShowsConflictMessageSafely() throws Exception {
+        LocalDate appointmentDate = LocalDate.now().plusDays(5);
+
+        mockMvc.perform(post("/patient/book")
+                        .with(csrf())
+                        .with(user("it_patient@clinic.test").roles("PATIENT"))
+                        .param("branchId", branch.getId().toString())
+                        .param("branchServiceId", branchService.getId().toString())
+                        .param("staffId", doctorProfile.getId().toString())
+                        .param("appointmentDate", appointmentDate.toString())
+                        .param("startTime", "15:00"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/patient/appointments"));
+
+        mockMvc.perform(post("/patient/book")
+                        .with(csrf())
+                        .with(user("it_patient@clinic.test").roles("PATIENT"))
+                        .param("branchId", branch.getId().toString())
+                        .param("branchServiceId", branchService.getId().toString())
+                        .param("staffId", doctorProfile.getId().toString())
+                        .param("appointmentDate", appointmentDate.toString())
+                        .param("startTime", "15:00"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("patient/book"))
+                .andExpect(model().attribute("errorMessage", containsString("çakışma")))
+                .andExpect(content().string(containsString("çakışma")));
+    }
+
+    @Test
+    @DisplayName("End-to-end: Role-aware navbar renders role links exclusively for authorized panels")
+    void navbarRendersRoleAppropriateLinks() throws Exception {
+        mockMvc.perform(get("/admin/dashboard")
+                        .with(user("it_admin@clinic.test").roles("ADMIN")))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("/admin/branches")))
+                .andExpect(content().string(containsString("/admin/hours")))
+                .andExpect(content().string(containsString("/admin/departments")))
+                .andExpect(content().string(containsString("/admin/services")))
+                .andExpect(content().string(containsString("/admin/staff")));
+
+        mockMvc.perform(get("/patient/appointments")
+                        .with(user("it_patient@clinic.test").roles("PATIENT")))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("/patient/book")))
+                .andExpect(content().string(containsString("/patient/appointments")))
+                .andExpect(content().string(not(containsString("/admin/branches"))));
     }
 }

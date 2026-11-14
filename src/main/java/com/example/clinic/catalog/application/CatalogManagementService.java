@@ -102,6 +102,28 @@ public class CatalogManagementService {
     }
 
     @Transactional
+    public ServiceDefinitionResponse updateServiceDefinition(UUID serviceDefinitionId, String newName, String newDescription) {
+        ServiceDefinition def = findServiceDefinitionOrThrow(serviceDefinitionId);
+        accessPolicy.enforceAdminOrganizationAccess(def.getOrganization().getId(), securityContextFacade.getRequiredCurrentUser());
+
+        if (newName == null || newName.isBlank()) {
+            throw new IllegalArgumentException("New service definition name must not be blank");
+        }
+        String trimmedName = newName.strip();
+        serviceDefinitionRepository.findByOrganizationIdAndName(def.getOrganization().getId(), trimmedName)
+                .filter(existing -> !existing.getId().equals(serviceDefinitionId))
+                .ifPresent(existing -> {
+                    throw new IllegalArgumentException(
+                            "Service definition with name '" + trimmedName + "' already exists in organization: " + def.getOrganization().getId()
+                    );
+                });
+
+        def.rename(trimmedName);
+        def.changeDescription(newDescription);
+        return mapToResponse(def);
+    }
+
+    @Transactional
     public void activateServiceDefinition(UUID serviceDefinitionId) {
         ServiceDefinition def = findServiceDefinitionOrThrow(serviceDefinitionId);
         accessPolicy.enforceAdminOrganizationAccess(def.getOrganization().getId(), securityContextFacade.getRequiredCurrentUser());

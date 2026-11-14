@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>400 — Geçersiz İstek | Klinik Randevu Sistemi</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/clinic.css}">
+</head>
+<body class="d-flex flex-column min-vh-100 justify-content-center align-items-center bg-light">
+    <main class="container text-center py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-7 col-lg-5">
+                <div class="clinic-card p-5 text-center shadow">
+                    <div class="mb-4 text-warning" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                        </svg>
+                    </div>
+                    <h1 class="h3 fw-bold text-dark mb-3" th:text="${errorTitle ?: '400 — Geçersiz İstek'}">400 — Geçersiz İstek</h1>
+                    <p class="text-muted mb-4 lead fs-6" th:text="${errorMessage ?: 'Gönderilen istek parametreleri geçersiz veya eksik.'}">
+                        Gönderilen istek parametreleri geçersiz veya eksik.
+                    </p>
+                    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                        <a th:href="@{/}" class="btn btn-clinic-primary px-4">Ana Sayfaya Dön</a>
+                        <a th:href="@{/login}" class="btn btn-outline-secondary px-4">Giriş Ekranı</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

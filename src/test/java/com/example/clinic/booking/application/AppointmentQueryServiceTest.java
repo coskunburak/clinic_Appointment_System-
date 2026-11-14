@@ -1,6 +1,7 @@
 package com.example.clinic.booking.application;
 
 import com.example.clinic.booking.application.dto.AppointmentViewDto;
+import com.example.clinic.booking.application.dto.WeeklyDayScheduleDto;
 import com.example.clinic.booking.domain.AppointmentStatus;
 import com.example.clinic.booking.infrastructure.persistence.AppointmentJpaEntity;
 import com.example.clinic.booking.infrastructure.persistence.AppointmentJpaRepository;
@@ -135,5 +136,99 @@ class AppointmentQueryServiceTest {
         assertThatThrownBy(() -> service.getPatientAppointmentsForCurrentUser())
                 .isInstanceOf(AccessDeniedException.class)
                 .hasMessageContaining("hasta profili bulunamadı");
+    }
+
+    @Test
+    @DisplayName("Daily staff schedule includes early-morning branch local appointments across UTC midnight and sets exact canComplete boundary")
+    void dailyStaffScheduleRespectsBranchTimeZoneAndCanCompleteBoundary() {
+        UserAccount docUser = staffProfile.getUserAccount();
+        when(securityContextFacade.getRequiredCurrentUser()).thenReturn(docUser);
+        when(staffProfileRepository.findByUserAccountId(docUser.getId())).thenReturn(Optional.of(staffProfile));
+
+        // 2026-11-19T22:00:00Z == 2026-11-20T01:00:00+03:00 in Europe/Istanbul (fixedClock is 2026-11-20T10:00:00Z)
+        AppointmentJpaEntity earlyLocal = new AppointmentJpaEntity(
+                UUID.randomUUID(),
+                patientProfile.getId(),
+                staffProfile.getId(),
+                branch.getId(),
+                UUID.randomUUID(),
+                Instant.parse("2026-11-19T22:00:00Z"),
+                Instant.parse("2026-11-19T22:30:00Z"),
+                AppointmentStatus.CONFIRMED,
+                "Sabah Kontrolü",
+                30,
+                new BigDecimal("400.00"),
+                "TRY",
+                0L,
+                Instant.now()
+        );
+        // Appointment ending at exact fixedClock instant (10:00:00Z) -> canComplete MUST be true
+        AppointmentJpaEntity exactEnd = new AppointmentJpaEntity(
+                UUID.randomUUID(),
+                patientProfile.getId(),
+                staffProfile.getId(),
+                branch.getId(),
+                UUID.randomUUID(),
+                Instant.parse("2026-11-20T09:30:00Z"),
+                Instant.parse("2026-11-20T10:00:00Z"),
+                AppointmentStatus.CONFIRMED,
+                "Öğle Kontrolü",
+                30,
+                new BigDecimal("400.00"),
+                "TRY",
+                0L,
+                Instant.now()
+        );
+        // Previous local day in Istanbul: 2026-11-19T20:00:00Z == 2026-11-19T23:00:00+03:00 -> must be filtered out
+        AppointmentJpaEntity previousLocalDay = new AppointmentJpaEntity(
+                UUID.randomUUID(),
+                patientProfile.getId(),
+                staffProfile.getId(),
+                branch.getId(),
+                UUID.randomUUID(),
+                Instant.parse("2026-11-19T20:00:00Z"),
+                Instant.parse("2026-11-19T20:30:00Z"),
+                AppointmentStatus.CONFIRMED,
+                "Önceki Gün",
+                30,
+                new BigDecimal("400.00"),
+                "TRY",
+                0L,
+                Instant.now()
+        );
+
+        when(appointmentJpaRepository.findByStaffIdAndWindow(eq(staffProfile.getId()), any(), any()))
+                .thenReturn(List.of(previousLocalDay, earlyLocal, exactEnd));
+        when(branchRepository.findAllById(any())).thenReturn(List.of(branch));
+        when(staffProfileRepository.findAllById(any())).thenReturn(List.of(staffProfile));
+        when(patientProfileRepository.findAllById(any())).thenReturn(List.of(patientProfile));
+
+        List<AppointmentViewDto> result = service.getStaffAppointmentsForCurrentUser(LocalDate.of(2026, 11, 20), "daily");
+
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).serviceName()).isEqualTo("Sabah Kontrolü");
+        assertThat(result.get(0).localDate()).isEqualTo(LocalDate.of(2026, 11, 20));
+        assertThat(result.get(0).canComplete()).isTrue();
+        assertThat(result.get(1).serviceName()).isEqualTo("Öğle Kontrolü");
+        assertThat(result.get(1).canComplete()).isTrue();
+        assertThat(result.get(1).isPast()).isTrue();
+
+        List<WeeklyDayScheduleDto> weekDays = service.groupAppointmentsByWeekDays(LocalDate.of(2026, 11, 20), result);
+        assertThat(weekDays).hasSize(7);
+        assertThat(weekDays.get(4).selected()).isTrue();
+        assertThat(weekDays.get(4).appointments()).hasSize(2);
+    }
+
+    @Test
+    @DisplayName("Pending staff view queries all PENDING appointments across dates")
+    void pendingStaffViewQueriesPendingStatus() {
+        UserAccount docUser = staffProfile.getUserAccount();
+        when(securityContextFacade.getRequiredCurrentUser()).thenReturn(docUser);
+        when(staffProfileRepository.findByUserAccountId(docUser.getId())).thenReturn(Optional.of(staffProfile));
+        when(appointmentJpaRepository.findByStaffIdAndStatusOrderByStartAtUtcAsc(staffProfile.getId(), AppointmentStatus.PENDING))
+                .thenReturn(List.of());
+
+        List<AppointmentViewDto> pending = service.getStaffAppointmentsForCurrentUser(LocalDate.of(2026, 11, 20), "pending");
+        assertThat(pending).isEmpty();
     }
 }

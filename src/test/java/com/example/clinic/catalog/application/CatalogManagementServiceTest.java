@@ -280,4 +280,32 @@ class CatalogManagementServiceTest {
 
         assertThat(response.durationMinutes()).isEqualTo(60);
     }
+
+    @Test
+    @DisplayName("Should update service definition name/description, reject duplicate name, and toggle active status")
+    void shouldUpdateAndToggleServiceDefinition() {
+        ServiceDefinition otherDef = new ServiceDefinition(activeOrg, "MR Çekimi", "Radyoloji");
+        when(serviceDefinitionRepository.findById(activeServiceDef.getId())).thenReturn(Optional.of(activeServiceDef));
+        when(serviceDefinitionRepository.findByOrganizationIdAndName(activeOrg.getId(), "Güncel Muayene"))
+                .thenReturn(Optional.empty());
+        when(serviceDefinitionRepository.findByOrganizationIdAndName(activeOrg.getId(), "MR Çekimi"))
+                .thenReturn(Optional.of(otherDef));
+
+        ServiceDefinitionResponse updated = catalogManagementService.updateServiceDefinition(
+                activeServiceDef.getId(), "Güncel Muayene", "Yenilenmiş kapsam"
+        );
+        assertThat(updated.name()).isEqualTo("Güncel Muayene");
+        assertThat(updated.description()).isEqualTo("Yenilenmiş kapsam");
+
+        assertThatThrownBy(() -> catalogManagementService.updateServiceDefinition(
+                activeServiceDef.getId(), "MR Çekimi", "Çakışan isim"
+        )).isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("already exists");
+
+        catalogManagementService.deactivateServiceDefinition(activeServiceDef.getId());
+        assertThat(activeServiceDef.isActive()).isFalse();
+
+        catalogManagementService.activateServiceDefinition(activeServiceDef.getId());
+        assertThat(activeServiceDef.isActive()).isTrue();
+    }
 }

@@ -3,6 +3,7 @@ package com.example.clinic.web.staff;
 import com.example.clinic.booking.application.AppointmentApprovalService;
 import com.example.clinic.booking.application.AppointmentQueryService;
 import com.example.clinic.booking.application.dto.AppointmentViewDto;
+import com.example.clinic.booking.application.dto.WeeklyDayScheduleDto;
 import com.example.clinic.booking.domain.AppointmentStatus;
 import com.example.clinic.common.security.ClinicAuthenticationSuccessHandler;
 import com.example.clinic.common.security.SecurityConfig;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
@@ -210,5 +212,53 @@ class StaffScheduleControllerMvcTest {
                 .andExpect(status().isForbidden());
 
         verify(appointmentApprovalService, never()).approveAppointment(any());
+    }
+
+    @Test
+    @DisplayName("11. Weekly view populates 7-day weeklyDays grouping and pending queue loads")
+    void weeklyAndPendingViewsPopulateExpectedModels() throws Exception {
+        LocalDate date = LocalDate.of(2026, 11, 20);
+        List<AppointmentViewDto> list = List.of();
+        when(appointmentQueryService.getStaffAppointmentsForCurrentUser(date, "weekly")).thenReturn(list);
+        when(appointmentQueryService.groupAppointmentsByWeekDays(date, list)).thenReturn(List.of(
+                new WeeklyDayScheduleDto(LocalDate.of(2026, 11, 16), "Pazartesi", "16.11.2026", false, List.of()),
+                new WeeklyDayScheduleDto(LocalDate.of(2026, 11, 17), "Salı", "17.11.2026", false, List.of()),
+                new WeeklyDayScheduleDto(LocalDate.of(2026, 11, 18), "Çarşamba", "18.11.2026", false, List.of()),
+                new WeeklyDayScheduleDto(LocalDate.of(2026, 11, 19), "Perşembe", "19.11.2026", false, List.of()),
+                new WeeklyDayScheduleDto(date, "Cuma", "20.11.2026", true, List.of()),
+                new WeeklyDayScheduleDto(LocalDate.of(2026, 11, 21), "Cumartesi", "21.11.2026", false, List.of()),
+                new WeeklyDayScheduleDto(LocalDate.of(2026, 11, 22), "Pazar", "22.11.2026", false, List.of())
+        ));
+
+        mockMvc.perform(get("/staff/schedule")
+                        .with(user("doctor@clinic.test").roles("STAFF"))
+                        .param("date", date.toString())
+                        .param("view", "weekly"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("staff/schedule"))
+                .andExpect(model().attributeExists("weeklyDays", "weekStartDate", "weekEndDate"));
+
+        when(appointmentQueryService.getStaffAppointmentsForCurrentUser(date, "pending")).thenReturn(list);
+        mockMvc.perform(get("/staff/schedule")
+                        .with(user("doctor@clinic.test").roles("STAFF"))
+                        .param("date", date.toString())
+                        .param("view", "pending"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("staff/schedule"))
+                .andExpect(model().attribute("currentView", "pending"));
+    }
+
+    @Test
+    @DisplayName("12. Cross-doctor approve or reject throws AccessDeniedException and renders 403 Forbidden")
+    void crossDoctorActionReturns403() throws Exception {
+        UUID otherAppointmentId = UUID.randomUUID();
+        doThrow(new AccessDeniedException("Not assigned doctor"))
+                .when(appointmentApprovalService).approveAppointment(otherAppointmentId);
+
+        mockMvc.perform(post("/staff/appointments/{id}/approve", otherAppointmentId)
+                        .with(csrf())
+                        .with(user("doctor@clinic.test").roles("STAFF")))
+                .andExpect(status().isForbidden())
+                .andExpect(view().name("error/403"));
     }
 }

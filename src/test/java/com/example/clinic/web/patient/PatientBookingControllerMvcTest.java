@@ -34,6 +34,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
@@ -50,6 +51,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -329,5 +331,50 @@ class PatientBookingControllerMvcTest {
                 .andExpect(status().isForbidden());
 
         verify(bookingService, never()).bookAppointment(any());
+    }
+
+    @Test
+    @DisplayName("13. Blank cancellation reason is rejected by CancellationForm validation")
+    void blankCancellationReasonIsRejected() throws Exception {
+        UUID appointmentId = UUID.randomUUID();
+
+        mockMvc.perform(post("/patient/appointments/{id}/cancel", appointmentId)
+                        .with(csrf())
+                        .with(user("patient@clinic.test").roles("PATIENT"))
+                        .param("reason", "   "))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/patient/appointments"))
+                .andExpect(flash().attributeExists("errorMessage"));
+
+        verify(appointmentApprovalService, never()).cancelAppointment(any(), any());
+    }
+
+    @Test
+    @DisplayName("14. Cross-patient appointment cancellation returns 403 Forbidden")
+    void crossPatientCancelReturns403() throws Exception {
+        UUID otherAppointmentId = UUID.randomUUID();
+        doThrow(new AccessDeniedException("Forbidden"))
+                .when(appointmentApprovalService).cancelAppointment(otherAppointmentId, "İptal ediyorum.");
+
+        mockMvc.perform(post("/patient/appointments/{id}/cancel", otherAppointmentId)
+                        .with(csrf())
+                        .with(user("patient@clinic.test").roles("PATIENT"))
+                        .param("reason", "İptal ediyorum."))
+                .andExpect(status().isForbidden())
+                .andExpect(view().name("error/403"));
+    }
+
+    @Test
+    @DisplayName("15. Invalid UUID on /patient/slots returns 400 JSON without internal error details")
+    void invalidUuidOnSlotsReturns400Json() throws Exception {
+        mockMvc.perform(get("/patient/slots")
+                        .with(user("patient@clinic.test").roles("PATIENT"))
+                        .param("staffId", "not-a-uuid")
+                        .param("branchServiceId", UUID.randomUUID().toString())
+                        .param("date", LocalDate.now().plusDays(1).toString())
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").exists());
     }
 }

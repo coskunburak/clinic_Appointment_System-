@@ -2,6 +2,8 @@ package com.example.clinic.booking.infrastructure.persistence;
 
 import com.example.clinic.booking.domain.AppointmentStatus;
 import jakarta.persistence.LockModeType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
@@ -74,7 +76,11 @@ public interface AppointmentJpaRepository extends JpaRepository<AppointmentJpaEn
 
     List<AppointmentJpaEntity> findByPatientIdOrderByStartAtUtcDesc(UUID patientId);
 
+    Page<AppointmentJpaEntity> findByPatientIdOrderByStartAtUtcDesc(UUID patientId, Pageable pageable);
+
     List<AppointmentJpaEntity> findByStaffIdOrderByStartAtUtcAsc(UUID staffId);
+
+    List<AppointmentJpaEntity> findByStaffIdAndStatusOrderByStartAtUtcAsc(UUID staffId, AppointmentStatus status);
 
     @Query("SELECT a FROM AppointmentJpaEntity a WHERE a.staffId = :staffId " +
             "AND a.startAtUtc >= :windowStart AND a.startAtUtc < :windowEnd " +

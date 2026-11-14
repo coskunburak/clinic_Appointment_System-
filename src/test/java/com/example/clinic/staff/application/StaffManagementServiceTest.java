@@ -10,6 +10,7 @@ import com.example.clinic.identity.application.AccountCredentialService;
 import com.example.clinic.identity.domain.Membership;
 import com.example.clinic.identity.domain.Role;
 import com.example.clinic.identity.domain.StaffProfile;
+import com.example.clinic.identity.domain.StaffType;
 import com.example.clinic.identity.domain.UserAccount;
 import com.example.clinic.identity.infrastructure.MembershipRepository;
 import com.example.clinic.identity.infrastructure.StaffProfileRepository;
@@ -266,5 +267,61 @@ class StaffManagementServiceTest {
         assertThat(response.kind()).isEqualTo(AvailabilityExceptionKind.FULL_DAY_LEAVE);
         assertThat(response.startTime()).isNull();
         assertThat(response.endTime()).isNull();
+    }
+
+    @Test
+    @DisplayName("deleteWeeklyAvailability & deleteAvailabilityException verify ownership and prevent IDOR deletion")
+    void deleteAvailabilityAndExceptionVerifyAssignmentOwnership() {
+        Organization org = new Organization("Klinik");
+        Branch b = new Branch(org, "Merkez", "Europe/Istanbul", null);
+        Department d = new Department(b, "Kardiyoloji");
+        UserAccount actor = new UserAccount("admin-del@clinic.test", "hash");
+        UserAccount docUser = new UserAccount("doc-del@clinic.test", "hash");
+        StaffProfile doc = new StaffProfile(docUser, "Dr. Selim", "555", StaffType.DOCTOR, "Kardiyoloji");
+        StaffAssignment ownedAssignment = new StaffAssignment(doc, b, d);
+        StaffAssignment foreignAssignment = new StaffAssignment(doc, b, d);
+
+        WeeklyAvailability weekly = new WeeklyAvailability(ownedAssignment, (short) 1, LocalTime.of(9, 0), LocalTime.of(12, 0));
+        AvailabilityException exc = AvailabilityException.fullDayLeave(ownedAssignment, LocalDate.now().plusDays(10), "İzin");
+
+        when(securityContextFacade.getRequiredCurrentUser()).thenReturn(actor);
+        when(staffAssignmentRepository.findById(ownedAssignment.getId())).thenReturn(Optional.of(ownedAssignment));
+        when(weeklyAvailabilityRepository.findById(weekly.getId())).thenReturn(Optional.of(weekly));
+        when(availabilityExceptionRepository.findById(exc.getId())).thenReturn(Optional.of(exc));
+
+        service.deleteWeeklyAvailability(ownedAssignment.getId(), weekly.getId());
+        verify(weeklyAvailabilityRepository).delete(weekly);
+
+        service.deleteAvailabilityException(ownedAssignment.getId(), exc.getId());
+        verify(availabilityExceptionRepository).delete(exc);
+
+        // Attempting to delete owned record under a different assignmentId triggers AccessDeniedException
+        when(staffAssignmentRepository.findById(foreignAssignment.getId())).thenReturn(Optional.of(foreignAssignment));
+        assertThatThrownBy(() -> service.deleteWeeklyAvailability(foreignAssignment.getId(), weekly.getId()))
+                .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> service.deleteAvailabilityException(foreignAssignment.getId(), exc.getId()))
+                .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    @DisplayName("getAuthorizedStaffProfiles scopes staff directory strictly by admin authorized branch IDs")
+    void getAuthorizedStaffProfilesScopesByAuthorizedBranches() {
+        UserAccount adminUser = new UserAccount("scoped-admin@clinic.test", "hash");
+        UUID authorizedBranchId = UUID.randomUUID();
+        UserAccount docUser = new UserAccount("doc-scoped@clinic.test", "hash");
+        StaffProfile scopedDoc = new StaffProfile(docUser, "Dr. Yetkili", "555", StaffType.DOCTOR, "Göz");
+
+        when(securityContextFacade.getRequiredCurrentUser()).thenReturn(adminUser);
+        when(accessPolicy.getAdminAuthorizedBranchIds(adminUser)).thenReturn(List.of(authorizedBranchId));
+        when(staffProfileRepository.findAuthorizedStaffByBranchIds(List.of(authorizedBranchId)))
+                .thenReturn(List.of(scopedDoc));
+
+        List<StaffProfileResponse> result = service.getAuthorizedStaffProfiles();
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).fullName()).isEqualTo("Dr. Yetkili");
+
+        // Admin with zero authorized branches receives empty list cleanly without global query
+        when(accessPolicy.getAdminAuthorizedBranchIds(adminUser)).thenReturn(List.of());
+        assertThat(service.getAuthorizedStaffProfiles()).isEmpty();
     }
 }

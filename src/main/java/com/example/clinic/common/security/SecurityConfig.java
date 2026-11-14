@@ -1,5 +1,8 @@
 package com.example.clinic.common.security;
 
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -43,6 +46,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(authorize -> authorize
+                .dispatcherTypeMatchers(DispatcherType.ERROR, DispatcherType.FORWARD).permitAll()
                 .requestMatchers(
                     "/",
                     "/login",
@@ -57,6 +61,15 @@ public class SecurityConfig {
                 .requestMatchers("/staff/**").hasRole("STAFF")
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
+            )
+            .exceptionHandling(ex -> ex
+                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                    if (!response.isCommitted()) {
+                        request.setAttribute(RequestDispatcher.ERROR_STATUS_CODE, HttpServletResponse.SC_FORBIDDEN);
+                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                        request.getRequestDispatcher("/error").forward(request, response);
+                    }
+                })
             )
             .formLogin(form -> form
                 .loginPage("/login")

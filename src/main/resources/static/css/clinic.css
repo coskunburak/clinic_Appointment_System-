@@ -1,6 +1,7 @@
-/* Clinic Appointment System - Production Healthcare Design Tokens & Theme */
+/* Clinic Appointment System - Healthcare Design Tokens & Responsive UI Theme */
 :root {
   --clinic-primary: #176b86;
+  --clinic-primary-hover: #135a71;
   --clinic-primary-dark: #104e64;
   --clinic-primary-light: #e0f2fe;
   --clinic-background: #f6f8fb;
@@ -8,10 +9,25 @@
   --clinic-text: #1d2939;
   --clinic-muted: #667085;
   --clinic-border: #e4e7ec;
+  --clinic-success: #157f3d;
+  --clinic-warning: #b54708;
+  --clinic-error: #b42318;
   --clinic-radius: 0.875rem;
   --clinic-radius-sm: 0.5rem;
+  --clinic-spacing-xs: 0.25rem;
+  --clinic-spacing-sm: 0.5rem;
+  --clinic-spacing-md: 1rem;
+  --clinic-spacing-lg: 1.5rem;
+  --clinic-spacing-xl: 2rem;
+  --clinic-focus-ring: 0 0 0 3px rgba(2, 132, 199, 0.35);
   --clinic-shadow: 0 1px 3px rgba(16, 24, 40, 0.1), 0 1px 2px rgba(16, 24, 40, 0.06);
   --clinic-shadow-md: 0 4px 8px -2px rgba(16, 24, 40, 0.1), 0 2px 4px -2px rgba(16, 24, 40, 0.06);
+}
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 body {
@@ -39,11 +55,11 @@ main {
   letter-spacing: -0.01em;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--clinic-spacing-sm);
 }
 
 .navbar-clinic .navbar-brand:hover {
-  color: #e0f2fe;
+  color: var(--clinic-primary-light);
 }
 
 .navbar-clinic .nav-link {
@@ -51,13 +67,13 @@ main {
   font-weight: 500;
   padding: 0.5rem 0.85rem;
   border-radius: var(--clinic-radius-sm);
-  transition: all 0.15s ease-in-out;
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
 }
 
 .navbar-clinic .nav-link:hover,
 .navbar-clinic .nav-link.active {
   color: #ffffff;
-  background-color: rgba(255, 255, 255, 0.12);
+  background-color: rgba(255, 255, 255, 0.16);
 }
 
 /* Cards */
@@ -66,21 +82,23 @@ main {
   border: 1px solid var(--clinic-border);
   border-radius: var(--clinic-radius);
   box-shadow: var(--clinic-shadow);
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
+  padding: var(--clinic-spacing-lg);
+  margin-bottom: var(--clinic-spacing-lg);
 }
 
 .clinic-card-header {
   border-bottom: 1px solid var(--clinic-border);
-  padding-bottom: 1rem;
+  padding-bottom: var(--clinic-spacing-md);
   margin-bottom: 1.25rem;
   display: flex;
+  flex-wrap: wrap;
+  gap: var(--clinic-spacing-sm);
   justify-content: space-between;
   align-items: center;
 }
 
 .clinic-card-title {
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   font-weight: 600;
   color: var(--clinic-text);
   margin-bottom: 0;
@@ -94,12 +112,12 @@ main {
   font-weight: 500;
   border-radius: var(--clinic-radius-sm);
   padding: 0.5rem 1.25rem;
-  transition: all 0.15s ease-in-out;
+  transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
 }
 
 .btn-clinic-primary:hover,
 .btn-clinic-primary:focus {
-  background-color: var(--clinic-primary-dark);
+  background-color: var(--clinic-primary-hover);
   border-color: var(--clinic-primary-dark);
   color: #ffffff;
 }
@@ -112,19 +130,22 @@ select:focus-visible,
 textarea:focus-visible {
   outline: 3px solid #0284c7;
   outline-offset: 2px;
+  box-shadow: var(--clinic-focus-ring);
 }
 
 /* Form inputs */
-.form-control, .form-select {
+.form-control,
+.form-select {
   border: 1px solid var(--clinic-border);
   border-radius: var(--clinic-radius-sm);
-  padding: 0.6rem 0.85rem;
+  padding: 0.55rem 0.85rem;
   color: var(--clinic-text);
 }
 
-.form-control:focus, .form-select:focus {
+.form-control:focus,
+.form-select:focus {
   border-color: var(--clinic-primary);
-  box-shadow: 0 0 0 3px rgba(23, 107, 134, 0.2);
+  box-shadow: var(--clinic-focus-ring);
 }
 
 .form-label {
@@ -133,12 +154,18 @@ textarea:focus-visible {
   margin-bottom: 0.35rem;
 }
 
+.field-error-text {
+  color: var(--clinic-error);
+  font-size: 0.84rem;
+  margin-top: var(--clinic-spacing-xs);
+}
+
 /* Tables */
 .clinic-table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  margin-bottom: 1rem;
+  margin-bottom: var(--clinic-spacing-md);
 }
 
 .clinic-table th {
@@ -150,16 +177,17 @@ textarea:focus-visible {
   letter-spacing: 0.05em;
   padding: 0.75rem 1rem;
   border-bottom: 1px solid var(--clinic-border);
+  white-space: nowrap;
 }
 
 .clinic-table td {
-  padding: 1rem;
+  padding: 0.9rem 1rem;
   vertical-align: middle;
   border-bottom: 1px solid var(--clinic-border);
   color: var(--clinic-text);
 }
 
-.clinic-table tr:hover td {
+.clinic-table tbody tr:hover td {
   background-color: #f8fafc;
 }
 
@@ -179,11 +207,11 @@ textarea:focus-visible {
   margin: 0.25rem;
   border: 1px solid var(--clinic-primary);
   border-radius: var(--clinic-radius-sm);
-  background-color: #ffffff;
+  background-color: var(--clinic-surface);
   color: var(--clinic-primary);
   cursor: pointer;
   font-weight: 600;
-  transition: all 0.15s ease-in-out;
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
 }
 
 .slot-badge-btn:hover,
@@ -192,12 +220,35 @@ textarea:focus-visible {
   color: #ffffff;
 }
 
+/* Weekly day agenda group */
+.appointment-day-group {
+  border: 1px solid var(--clinic-border);
+  border-radius: var(--clinic-radius-sm);
+  background-color: var(--clinic-surface);
+  margin-bottom: var(--clinic-spacing-md);
+  overflow: hidden;
+}
+
+.appointment-day-group-header {
+  background-color: #f8fafc;
+  border-bottom: 1px solid var(--clinic-border);
+  padding: 0.65rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.appointment-day-group-selected .appointment-day-group-header {
+  background-color: var(--clinic-primary-light);
+  border-bottom-color: #bae6fd;
+}
+
 /* Footer */
 .footer-clinic {
-  background-color: #ffffff;
+  background-color: var(--clinic-surface);
   border-top: 1px solid var(--clinic-border);
-  padding: 1.5rem 0;
+  padding: var(--clinic-spacing-lg) 0;
   color: var(--clinic-muted);
   font-size: 0.875rem;
-  margin-top: 2rem;
+  margin-top: var(--clinic-spacing-xl);
 }

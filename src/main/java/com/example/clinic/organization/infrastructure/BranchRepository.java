@@ -1,6 +1,7 @@
 package com.example.clinic.organization.infrastructure;
 
 import com.example.clinic.organization.domain.Branch;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -15,6 +16,7 @@ public interface BranchRepository extends JpaRepository<Branch, UUID> {
 
     List<Branch> findByOrganizationIdAndActiveTrue(UUID organizationId);
 
+    @EntityGraph(attributePaths = {"organization"})
     List<Branch> findByActiveTrue();
 
     Optional<Branch> findByIdAndOrganizationId(UUID id, UUID organizationId);

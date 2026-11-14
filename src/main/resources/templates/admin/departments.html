@@ -1,43 +1,44 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="tr"
-      th:replace="~{fragments/layout :: mainLayout(~{::title}, ~{::section})}">
-<head>
-    <title>Tıbbi Bölümler — Klinik Randevu Sistemi</title>
-</head>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout('Bölüm Yönetimi', ~{::section})}">
 <body>
 <section>
-    <div class="row mb-4">
-        <div class="col-12">
-            <h1 class="h3 fw-bold text-dark mb-1">Tıbbi Bölüm Yönetimi</h1>
-            <p class="text-muted mb-0">Şubelerinize bağlı tıbbi poliklinik ve uzmanlık birimlerini (Kardiyoloji, Nöroloji vb.) yönetin.</p>
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+        <div>
+            <h1 class="h3 fw-bold mb-1">Tıbbi Bölüm ve Poliklinik Yönetimi</h1>
+            <p class="text-muted mb-0">Şubeler altında hizmet veren tıbbi uzmanlık bölümlerini görüntüleyin, düzenleyin ve aktifliklerini yönetin.</p>
         </div>
+        <a th:href="@{/admin/dashboard}" class="btn btn-outline-secondary btn-sm">&larr; Yönetici Paneli</a>
     </div>
 
-    <!-- Şube Filtreleme Seçicisi -->
-    <div class="clinic-card py-3 px-4 mb-4">
-        <form th:action="@{/admin/departments}" method="get" class="row align-items-center g-3">
-            <div class="col-auto">
-                <label for="filterBranchId" class="form-label fw-bold mb-0">Şube Filtresi:</label>
-            </div>
-            <div class="col-md-4">
+    <!-- Şube Seçim Filtresi -->
+    <div class="clinic-card mb-4">
+        <form th:action="@{/admin/departments}" method="get" class="row align-items-end g-3">
+            <div class="col-md-6">
+                <label for="filterBranchId" class="form-label small fw-semibold">Şube Seçiniz</label>
                 <select id="filterBranchId" name="branchId" class="form-select form-select-sm" onchange="this.form.submit()">
-                    <option th:each="b : ${branches}" th:value="${b.id}" th:text="${b.name}" th:selected="${b.id == selectedBranchId}">Merkez Şube</option>
+                    <option th:each="b : ${branches}"
+                            th:value="${b.id}"
+                            th:selected="${b.id == selectedBranchId}"
+                            th:text="${b.name}">Kadıköy Şubesi</option>
                 </select>
+            </div>
+            <div class="col-md-auto">
+                <button type="submit" class="btn btn-outline-primary btn-sm">Bölümleri Listele</button>
             </div>
         </form>
     </div>
 
     <div class="row g-4">
-        <!-- Sol Kolon: Bölümler Listesi -->
-        <div class="col-lg-8">
+        <!-- Bölüm Listesi -->
+        <div class="col-lg-7">
             <div class="clinic-card">
                 <div class="clinic-card-header">
-                    <h2 class="clinic-card-title">Kayıtlı Tıbbi Bölümler</h2>
-                    <span class="badge bg-primary rounded-pill" th:text="${#lists.size(departments)} + ' Bölüm'">0 Bölüm</span>
+                    <h2 class="clinic-card-title">Bölüm Listesi</h2>
+                    <span class="badge bg-primary bg-opacity-10 text-primary" th:text="${#lists.size(departments)} + ' Bölüm'">0 Bölüm</span>
                 </div>
 
                 <div th:if="${#lists.isEmpty(departments)}" class="text-center py-4 text-muted">
-                    <p class="mb-0">Seçilen şubede henüz kayıtlı bir tıbbi bölüm bulunmamaktadır.</p>
+                    <p class="mb-0">Seçili şubede henüz bölüm bulunmamaktadır.</p>
                 </div>
 
                 <div th:if="${not #lists.isEmpty(departments)}" class="table-responsive">
@@ -46,17 +47,38 @@
                             <tr>
                                 <th>Bölüm Adı</th>
                                 <th>Durum</th>
-                                <th>Kayıt Tarihi</th>
+                                <th class="text-end">İşlemler</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr th:each="d : ${departments}">
                                 <td class="fw-bold" th:text="${d.name}">Kardiyoloji</td>
                                 <td>
-                                    <span th:if="${d.active}" class="badge bg-success">Aktif</span>
-                                    <span th:unless="${d.active}" class="badge bg-secondary">Pasif</span>
+                                    <span class="badge-status"
+                                          th:classappend="${d.active ? 'badge-confirmed' : 'badge-cancelled'}"
+                                          th:text="${d.active ? 'Aktif' : 'Pasif'}">Aktif</span>
                                 </td>
-                                <td class="small text-muted" th:text="${#temporals.format(d.createdAt, 'yyyy-MM-dd HH:mm')}">2026-11-01</td>
+                                <td class="text-end">
+                                    <div class="d-flex justify-content-end flex-wrap gap-1">
+                                        <button type="button"
+                                                class="btn btn-outline-secondary btn-sm"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#editDepartmentModal"
+                                                th:attr="data-dept-id=${d.id}, data-dept-name=${d.name}">
+                                            Düzenle
+                                        </button>
+                                        <form th:if="${d.active}" th:action="@{/admin/departments/{id}/deactivate(id=${d.id})}" method="post" class="d-inline m-0">
+                                            <input type="hidden" th:name="${_csrf != null ? _csrf.parameterName : '_csrf'}" th:value="${_csrf != null ? _csrf.token : ''}" />
+                                            <input type="hidden" name="branchId" th:value="${selectedBranchId}" />
+                                            <button type="submit" class="btn btn-outline-warning btn-sm">Pasife Al</button>
+                                        </form>
+                                        <form th:unless="${d.active}" th:action="@{/admin/departments/{id}/activate(id=${d.id})}" method="post" class="d-inline m-0">
+                                            <input type="hidden" th:name="${_csrf != null ? _csrf.parameterName : '_csrf'}" th:value="${_csrf != null ? _csrf.token : ''}" />
+                                            <input type="hidden" name="branchId" th:value="${selectedBranchId}" />
+                                            <button type="submit" class="btn btn-outline-success btn-sm">Aktifleştir</button>
+                                        </form>
+                                    </div>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -64,10 +86,10 @@
             </div>
         </div>
 
-        <!-- Sağ Kolon: Yeni Bölüm Ekleme Formu -->
-        <div class="col-lg-4">
+        <!-- Yeni Bölüm Ekle -->
+        <div class="col-lg-5">
             <div class="clinic-card">
-                <h2 class="clinic-card-title mb-3">Yeni Bölüm Tanımla</h2>
+                <h2 class="clinic-card-title mb-3">Yeni Bölüm Ekle</h2>
 
                 <form th:action="@{/admin/departments}" th:object="${departmentForm}" method="post">
                     <input type="hidden" th:name="${_csrf != null ? _csrf.parameterName : '_csrf'}" th:value="${_csrf != null ? _csrf.token : ''}" />
@@ -75,19 +97,47 @@
                     <div class="mb-3">
                         <label for="branchId" class="form-label small">Hedef Şube <span class="text-danger">*</span></label>
                         <select id="branchId" th:field="*{branchId}" class="form-select form-select-sm" required>
-                            <option th:each="b : ${branches}" th:value="${b.id}" th:text="${b.name}">Merkez Şube</option>
+                            <option th:each="b : ${branches}"
+                                    th:value="${b.id}"
+                                    th:text="${b.name}">Kadıköy Şubesi</option>
                         </select>
-                        <div class="text-danger small mt-1" th:if="${#fields.hasErrors('branchId')}" th:errors="*{branchId}"></div>
+                        <div class="field-error-text" th:if="${#fields.hasErrors('branchId')}" th:errors="*{branchId}"></div>
                     </div>
 
                     <div class="mb-3">
                         <label for="name" class="form-label small">Bölüm Adı <span class="text-danger">*</span></label>
-                        <input type="text" id="name" th:field="*{name}" class="form-control form-control-sm" required placeholder="Örn: Kardiyoloji, Göz Hastalıkları" />
-                        <div class="text-danger small mt-1" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                        <input type="text" id="name" th:field="*{name}" class="form-control form-control-sm" required maxlength="100" placeholder="Örn: Kardiyoloji, Göz Hastalıkları" />
+                        <div class="field-error-text" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
                     </div>
 
                     <div class="d-grid mt-4">
                         <button type="submit" class="btn btn-clinic-primary btn-sm py-2">Bölümü Kaydet</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bölüm Düzenleme Modal -->
+    <div class="modal fade" id="editDepartmentModal" tabindex="-1" aria-labelledby="editDepartmentModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form id="editDepartmentForm" action="#" method="post">
+                    <input type="hidden" th:name="${_csrf != null ? _csrf.parameterName : '_csrf'}" th:value="${_csrf != null ? _csrf.token : ''}" />
+                    <input type="hidden" name="branchId" th:value="${selectedBranchId}" />
+                    <div class="modal-header">
+                        <h3 class="modal-title h5 fw-bold" id="editDepartmentModalLabel">Bölüm Adını Güncelle</h3>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="editDeptName" class="form-label small">Bölüm Adı <span class="text-danger">*</span></label>
+                            <input type="text" id="editDeptName" name="name" class="form-control form-control-sm" required maxlength="100" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">Vazgeç</button>
+                        <button type="submit" class="btn btn-clinic-primary btn-sm">Güncelle</button>
                     </div>
                 </form>
             </div>

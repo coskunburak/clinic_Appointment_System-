@@ -159,6 +159,22 @@ public class OrganizationAdminService {
     }
 
     /**
+     * Lists organizations over which the currently authenticated administrator holds
+     * organization-wide authority ({@code branch == null}).
+     */
+    public List<OrganizationResponse> getOrgWideAuthorizedOrganizations() {
+        UserAccount currentUser = securityContextFacade.getRequiredCurrentUser();
+        List<Membership> adminMemberships = membershipRepository.findByUserAccountIdAndRole(currentUser.getId(), Role.ROLE_ADMIN);
+
+        return adminMemberships.stream()
+                .filter(m -> m.getBranch() == null && m.getOrganization() != null)
+                .map(Membership::getOrganization)
+                .distinct()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+    /**
      * Lists branches authorized for the currently authenticated administrator.
      */
     public List<BranchResponse> getAuthorizedBranches() {
@@ -219,6 +235,38 @@ public class OrganizationAdminService {
         Objects.requireNonNull(branchId, "Branch ID must not be null");
         Branch branch = findBranchOrThrow(branchId);
         accessPolicy.enforceAdminBranchAccess(branchId, securityContextFacade.getRequiredCurrentUser());
+        return mapToResponse(branch);
+    }
+
+    @Transactional
+    public BranchResponse updateBranch(UUID branchId, String name, String timeZone, String address) {
+        Objects.requireNonNull(branchId, "Branch ID must not be null");
+        Branch branch = findBranchOrThrow(branchId);
+        accessPolicy.enforceAdminBranchAccess(branchId, securityContextFacade.getRequiredCurrentUser());
+
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("Branch name must not be blank");
+        }
+        String trimmedName = name.strip();
+        if (trimmedName.length() > 100) {
+            throw new IllegalArgumentException("Branch name exceeds maximum length of 100 characters");
+        }
+
+        String validTimeZone = (timeZone == null || timeZone.isBlank()) ? "Europe/Istanbul" : timeZone.strip();
+        try {
+            ZoneId.of(validTimeZone);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid IANA time zone identifier: " + validTimeZone, e);
+        }
+
+        String trimmedAddress = (address != null && !address.isBlank()) ? address.strip() : null;
+        if (trimmedAddress != null && trimmedAddress.length() > 500) {
+            throw new IllegalArgumentException("Address exceeds maximum length of 500 characters");
+        }
+
+        branch.setName(trimmedName);
+        branch.setTimeZone(validTimeZone);
+        branch.setAddress(trimmedAddress);
         return mapToResponse(branch);
     }
 
@@ -289,6 +337,48 @@ public class OrganizationAdminService {
         return departmentRepository.findByBranchId(branchId).stream()
                 .map(this::mapToResponse)
                 .toList();
+    }
+
+    @Transactional
+    public DepartmentResponse updateDepartment(UUID departmentId, String newName) {
+        Objects.requireNonNull(departmentId, "Department ID must not be null");
+        Department department = findDepartmentOrThrow(departmentId);
+        accessPolicy.enforceAdminBranchAccess(department.getBranch().getId(), securityContextFacade.getRequiredCurrentUser());
+
+        if (newName == null || newName.isBlank()) {
+            throw new IllegalArgumentException("Department name must not be blank");
+        }
+        String trimmedName = newName.strip();
+        if (trimmedName.length() > 100) {
+            throw new IllegalArgumentException("Department name exceeds maximum length of 100 characters");
+        }
+
+        departmentRepository.findByBranchIdAndName(department.getBranch().getId(), trimmedName)
+                .filter(existing -> !existing.getId().equals(departmentId))
+                .ifPresent(existing -> {
+                    throw new IllegalArgumentException(
+                            "Department with name '" + trimmedName + "' already exists in branch: " + department.getBranch().getId()
+                    );
+                });
+
+        department.setName(trimmedName);
+        return mapToResponse(department);
+    }
+
+    @Transactional
+    public void activateDepartment(UUID departmentId) {
+        Objects.requireNonNull(departmentId, "Department ID must not be null");
+        Department department = findDepartmentOrThrow(departmentId);
+        accessPolicy.enforceAdminBranchAccess(department.getBranch().getId(), securityContextFacade.getRequiredCurrentUser());
+        department.setActive(true);
+    }
+
+    @Transactional
+    public void deactivateDepartment(UUID departmentId) {
+        Objects.requireNonNull(departmentId, "Department ID must not be null");
+        Department department = findDepartmentOrThrow(departmentId);
+        accessPolicy.enforceAdminBranchAccess(department.getBranch().getId(), securityContextFacade.getRequiredCurrentUser());
+        department.setActive(false);
     }
 
     // =========================================================================
@@ -385,6 +475,12 @@ public class OrganizationAdminService {
         Objects.requireNonNull(branchId, "Branch ID must not be null");
         return branchRepository.findById(branchId)
                 .orElseThrow(() -> new IllegalArgumentException("Branch not found: " + branchId));
+    }
+
+    private Department findDepartmentOrThrow(UUID departmentId) {
+        Objects.requireNonNull(departmentId, "Department ID must not be null");
+        return departmentRepository.findById(departmentId)
+                .orElseThrow(() -> new IllegalArgumentException("Department not found: " + departmentId));
     }
 
     private OrganizationResponse mapToResponse(Organization org) {

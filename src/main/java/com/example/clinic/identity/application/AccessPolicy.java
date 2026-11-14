@@ -15,8 +15,11 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -198,6 +201,43 @@ public class AccessPolicy {
 
     public void enforceAdminBranchAccess(UUID branchId, UUID userId) {
         enforceAdminBranchAccess(branchId, resolveUserOrThrow(userId));
+    }
+
+    /**
+     * Resolves all branch IDs over which the authenticated administrator holds authority
+     * (either via organization-wide or branch-specific {@link Role#ROLE_ADMIN} membership).
+     */
+    public List<UUID> getAdminAuthorizedBranchIds(UserAccount currentAdmin) {
+        Objects.requireNonNull(currentAdmin, "currentAdmin must not be null");
+        validateUserEnabled(currentAdmin);
+
+        List<Membership> adminMemberships = membershipRepository.findByUserAccountIdAndRole(currentAdmin.getId(), Role.ROLE_ADMIN);
+        Set<UUID> branchIds = new LinkedHashSet<>();
+
+        for (Membership membership : adminMemberships) {
+            if (membership.getBranch() != null) {
+                branchIds.add(membership.getBranch().getId());
+            } else if (membership.getOrganization() != null) {
+                branchRepository.findByOrganizationId(membership.getOrganization().getId())
+                        .forEach(branch -> branchIds.add(branch.getId()));
+            }
+        }
+        return new ArrayList<>(branchIds);
+    }
+
+    /**
+     * Resolves all organization IDs over which the authenticated administrator holds
+     * organization-wide ({@code branch == null}) authority.
+     */
+    public List<UUID> getAdminAuthorizedOrganizationWideIds(UserAccount currentAdmin) {
+        Objects.requireNonNull(currentAdmin, "currentAdmin must not be null");
+        validateUserEnabled(currentAdmin);
+
+        return membershipRepository.findByUserAccountIdAndRole(currentAdmin.getId(), Role.ROLE_ADMIN).stream()
+                .filter(m -> m.getBranch() == null && m.getOrganization() != null)
+                .map(m -> m.getOrganization().getId())
+                .distinct()
+                .toList();
     }
 
     private void validateUserEnabled(UserAccount user) {

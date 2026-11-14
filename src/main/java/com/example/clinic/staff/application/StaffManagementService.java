@@ -336,9 +336,126 @@ public class StaffManagementService {
         return mapToExceptionResponse(saved);
     }
 
+    @Transactional
+    public void deleteWeeklyAvailability(UUID assignmentId, UUID availabilityId) {
+        Objects.requireNonNull(assignmentId, "assignmentId must not be null");
+        Objects.requireNonNull(availabilityId, "availabilityId must not be null");
+
+        StaffAssignment assignment = staffAssignmentRepository.findById(assignmentId)
+                .orElseThrow(() -> new IllegalArgumentException("StaffAssignment not found: " + assignmentId));
+        enforceAdminOrStaffSelfAccess(assignment, securityContextFacade.getRequiredCurrentUser());
+
+        WeeklyAvailability availability = weeklyAvailabilityRepository.findById(availabilityId)
+                .orElseThrow(() -> new IllegalArgumentException("WeeklyAvailability not found: " + availabilityId));
+
+        if (!availability.getAssignment().getId().equals(assignmentId)) {
+            throw new AccessDeniedException("Access denied: availability record does not belong to assignment " + assignmentId);
+        }
+
+        weeklyAvailabilityRepository.delete(availability);
+    }
+
+    @Transactional
+    public void deleteAvailabilityException(UUID assignmentId, UUID exceptionId) {
+        Objects.requireNonNull(assignmentId, "assignmentId must not be null");
+        Objects.requireNonNull(exceptionId, "exceptionId must not be null");
+
+        StaffAssignment assignment = staffAssignmentRepository.findById(assignmentId)
+                .orElseThrow(() -> new IllegalArgumentException("StaffAssignment not found: " + assignmentId));
+        enforceAdminOrStaffSelfAccess(assignment, securityContextFacade.getRequiredCurrentUser());
+
+        AvailabilityException exception = availabilityExceptionRepository.findById(exceptionId)
+                .orElseThrow(() -> new IllegalArgumentException("AvailabilityException not found: " + exceptionId));
+
+        if (!exception.getAssignment().getId().equals(assignmentId)) {
+            throw new AccessDeniedException("Access denied: exception record does not belong to assignment " + assignmentId);
+        }
+
+        availabilityExceptionRepository.delete(exception);
+    }
+
     // =========================================================================
     // 6. Query Methods
     // =========================================================================
+
+    public StaffProfileResponse getAuthorizedStaffProfile(UUID staffId) {
+        Objects.requireNonNull(staffId, "staffId must not be null");
+        UserAccount currentAdmin = securityContextFacade.getRequiredCurrentUser();
+        StaffProfile profile = staffProfileRepository.findById(staffId)
+                .orElseThrow(() -> new AccessDeniedException("Access denied: staff profile not accessible: " + staffId));
+
+        enforceAdminStaffAccess(profile, currentAdmin);
+        return mapToProfileResponse(profile);
+    }
+
+    public List<StaffProfileResponse> getAuthorizedStaffProfiles() {
+        UserAccount currentAdmin = securityContextFacade.getRequiredCurrentUser();
+        List<UUID> authorizedBranchIds = accessPolicy.getAdminAuthorizedBranchIds(currentAdmin);
+        if (authorizedBranchIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return staffProfileRepository.findAuthorizedStaffByBranchIds(authorizedBranchIds).stream()
+                .map(this::mapToProfileResponse)
+                .toList();
+    }
+
+    public List<StaffAssignmentResponse> getAuthorizedStaffAssignments() {
+        UserAccount currentAdmin = securityContextFacade.getRequiredCurrentUser();
+        List<UUID> authorizedBranchIds = accessPolicy.getAdminAuthorizedBranchIds(currentAdmin);
+        if (authorizedBranchIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return staffAssignmentRepository.findByBranchIdInOrderByCreatedAtAsc(authorizedBranchIds).stream()
+                .map(this::mapToAssignmentResponse)
+                .toList();
+    }
+
+    public List<StaffAssignmentResponse> getAuthorizedStaffAssignmentsByStaff(UUID staffId) {
+        Objects.requireNonNull(staffId, "staffId must not be null");
+        UserAccount currentAdmin = securityContextFacade.getRequiredCurrentUser();
+        StaffProfile profile = staffProfileRepository.findById(staffId)
+                .orElseThrow(() -> new AccessDeniedException("Access denied: staff profile not accessible: " + staffId));
+
+        enforceAdminStaffAccess(profile, currentAdmin);
+        List<UUID> authorizedBranchIds = accessPolicy.getAdminAuthorizedBranchIds(currentAdmin);
+
+        return staffAssignmentRepository.findByStaffId(staffId).stream()
+                .filter(a -> authorizedBranchIds.contains(a.getBranch().getId()))
+                .map(this::mapToAssignmentResponse)
+                .toList();
+    }
+
+    public List<StaffServiceEligibilityResponse> getAuthorizedEligibilitiesByAssignment(UUID assignmentId) {
+        Objects.requireNonNull(assignmentId, "assignmentId must not be null");
+        StaffAssignment assignment = staffAssignmentRepository.findById(assignmentId)
+                .orElseThrow(() -> new AccessDeniedException("Access denied: assignment not accessible: " + assignmentId));
+        enforceAdminOrStaffSelfAccess(assignment, securityContextFacade.getRequiredCurrentUser());
+        return staffServiceEligibilityRepository.findByAssignmentId(assignmentId).stream()
+                .map(this::mapToEligibilityResponse)
+                .toList();
+    }
+
+    public List<WeeklyAvailabilityResponse> getAuthorizedWeeklyAvailabilitiesByAssignment(UUID assignmentId) {
+        Objects.requireNonNull(assignmentId, "assignmentId must not be null");
+        StaffAssignment assignment = staffAssignmentRepository.findById(assignmentId)
+                .orElseThrow(() -> new AccessDeniedException("Access denied: assignment not accessible: " + assignmentId));
+        enforceAdminOrStaffSelfAccess(assignment, securityContextFacade.getRequiredCurrentUser());
+        return weeklyAvailabilityRepository.findByAssignmentId(assignmentId).stream()
+                .sorted(Comparator.comparing(WeeklyAvailability::getWeekday).thenComparing(WeeklyAvailability::getStartTime))
+                .map(this::mapToWeeklyResponse)
+                .toList();
+    }
+
+    public List<AvailabilityExceptionResponse> getAuthorizedAvailabilityExceptionsByAssignment(UUID assignmentId) {
+        Objects.requireNonNull(assignmentId, "assignmentId must not be null");
+        StaffAssignment assignment = staffAssignmentRepository.findById(assignmentId)
+                .orElseThrow(() -> new AccessDeniedException("Access denied: assignment not accessible: " + assignmentId));
+        enforceAdminOrStaffSelfAccess(assignment, securityContextFacade.getRequiredCurrentUser());
+        return availabilityExceptionRepository.findByAssignmentId(assignmentId).stream()
+                .sorted(Comparator.comparing(AvailabilityException::getLocalDate))
+                .map(this::mapToExceptionResponse)
+                .toList();
+    }
 
     public StaffProfileResponse getStaffProfile(UUID staffId) {
         StaffProfile profile = staffProfileRepository.findById(staffId)
@@ -393,6 +510,28 @@ public class StaffManagementService {
     // =========================================================================
     // Private Helpers
     // =========================================================================
+
+    private void enforceAdminStaffAccess(StaffProfile profile, UserAccount actor) {
+        List<UUID> authorizedBranchIds = accessPolicy.getAdminAuthorizedBranchIds(actor);
+        if (authorizedBranchIds.isEmpty()) {
+            throw new AccessDeniedException("Access denied: administrator has no authorized branches.");
+        }
+
+        boolean assignedInAuthorizedBranch = staffAssignmentRepository.findByStaffId(profile.getId()).stream()
+                .anyMatch(a -> authorizedBranchIds.contains(a.getBranch().getId()));
+        if (assignedInAuthorizedBranch) {
+            return;
+        }
+
+        boolean membershipInAuthorizedBranch = membershipRepository
+                .findByUserAccountIdAndRole(profile.getUserAccount().getId(), Role.ROLE_STAFF).stream()
+                .anyMatch(m -> m.getBranch() != null && authorizedBranchIds.contains(m.getBranch().getId()));
+        if (membershipInAuthorizedBranch) {
+            return;
+        }
+
+        throw new AccessDeniedException("Access denied: administrator is not authorized for staff " + profile.getId());
+    }
 
     private void enforceAdminOrStaffSelfAccess(StaffAssignment assignment, UserAccount actor) {
         boolean isStaffOwner = assignment.getStaff().getUserAccount().getId().equals(actor.getId());

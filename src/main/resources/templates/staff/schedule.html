@@ -6,14 +6,16 @@
 </head>
 <body>
 <section>
-    <!-- Üst Başlık ve Tarih Navigasyonu -->
+    <!-- Üst Başlık ve Tarih/Görünüm Navigasyonu -->
     <div class="row align-items-center mb-4 g-3">
         <div class="col-md-5">
             <h1 class="h3 fw-bold text-dark mb-1">Randevu Ajandası</h1>
-            <p class="text-muted mb-0">Hekim günlük ve haftalık muayene takvimi.</p>
+            <p class="text-muted mb-0" th:if="${view == 'pending'}">Onayınızı bekleyen tüm randevu talepleri.</p>
+            <p class="text-muted mb-0" th:if="${view == 'weekly'}" th:text="${weekStartDate + ' — ' + weekEndDate + ' haftalık muayene takvimi'}">Haftalık muayene takvimi</p>
+            <p class="text-muted mb-0" th:if="${view == 'daily'}">Hekim günlük muayene takvimi.</p>
         </div>
 
-        <div class="col-md-7 d-flex justify-content-md-end align-items-center gap-2">
+        <div class="col-md-7 d-flex flex-wrap justify-content-md-end align-items-center gap-2">
             <!-- Görünüm Değiştirici -->
             <div class="btn-group" role="group" aria-label="Takvim Görünümü">
                 <a th:href="@{/staff/schedule(date=${selectedDate}, view='daily')}"
@@ -22,20 +24,25 @@
                 <a th:href="@{/staff/schedule(date=${selectedDate}, view='weekly')}"
                    class="btn btn-sm"
                    th:classappend="${view == 'weekly'} ? 'btn-primary' : 'btn-outline-primary'">Haftalık</a>
+                <a th:href="@{/staff/schedule(view='pending')}"
+                   class="btn btn-sm"
+                   th:classappend="${view == 'pending'} ? 'btn-primary' : 'btn-outline-primary'">Bekleyenler</a>
             </div>
 
-            <!-- Tarih Navigasyonu -->
-            <div class="d-flex align-items-center gap-1 bg-white p-1 rounded border">
-                <a th:href="@{/staff/schedule(date=${prevDate}, view=${view})}" class="btn btn-light btn-sm px-2" aria-label="Önceki Gün / Hafta">&larr;</a>
+            <!-- Tarih Navigasyonu (Günlük & Haftalık) -->
+            <div th:if="${view != 'pending'}" class="d-flex align-items-center gap-1 bg-white p-1 rounded border">
+                <a th:href="@{/staff/schedule(date=${prevDate}, view=${view})}" class="btn btn-light btn-sm px-2" aria-label="Önceki Tarih Aralığı">&larr;</a>
                 <form th:action="@{/staff/schedule}" method="get" class="d-flex align-items-center m-0">
                     <input type="hidden" name="view" th:value="${view}" />
-                    <input type="date" name="date" th:value="${selectedDate}" class="form-control form-control-sm border-0 text-center fw-bold"
-                           onchange="this.form.submit()" style="width: 140px;" />
+                    <label for="scheduleDateInput" class="visually-hidden">Takvim Tarihi</label>
+                    <input type="date" id="scheduleDateInput" name="date" th:value="${selectedDate}"
+                           class="form-control form-control-sm border-0 text-center fw-bold"
+                           onchange="this.form.submit()" style="width: 145px;" />
                 </form>
-                <a th:href="@{/staff/schedule(date=${nextDate}, view=${view})}" class="btn btn-light btn-sm px-2" aria-label="Sonraki Gün / Hafta">&rarr;</a>
+                <a th:href="@{/staff/schedule(date=${nextDate}, view=${view})}" class="btn btn-light btn-sm px-2" aria-label="Sonraki Tarih Aralığı">&rarr;</a>
             </div>
 
-            <a th:href="@{/staff/schedule(view=${view})}" class="btn btn-outline-secondary btn-sm">Bugün</a>
+            <a th:if="${view != 'pending'}" th:href="@{/staff/schedule(view=${view})}" class="btn btn-outline-secondary btn-sm">Bugün</a>
         </div>
     </div>
 
@@ -61,19 +68,93 @@
         </div>
     </div>
 
-    <!-- Randevu Listesi Tablosu -->
-    <div class="clinic-card">
+    <!-- Haftalık 7 Günlük Gruplanmış Görünüm -->
+    <div th:if="${view == 'weekly'}" class="clinic-card">
         <div class="clinic-card-header">
-            <h2 class="clinic-card-title" th:text="${view == 'weekly'} ? 'Haftalık Randevu Listesi' : 'Günlük Randevu Listesi'">Günlük Randevu Listesi</h2>
+            <h2 class="clinic-card-title">Haftalık Ajanda (Pazartesi — Pazar)</h2>
+            <span class="badge bg-secondary rounded-pill" th:text="${#lists.size(appointments)} + ' Randevu'">0 Randevu</span>
+        </div>
+
+        <div th:each="dayGroup : ${weeklyDays}" class="appointment-day-group"
+             th:classappend="${dayGroup.selected} ? 'appointment-day-group-selected' : ''">
+            <div class="appointment-day-group-header">
+                <div>
+                    <span class="fw-bold text-dark" th:text="${dayGroup.dayNameTr}">Pazartesi</span>
+                    <span class="text-muted small ms-2" th:text="${dayGroup.formattedDate}">20.11.2026</span>
+                </div>
+                <span class="badge bg-light text-dark border" th:text="${#lists.size(dayGroup.appointments)} + ' Randevu'">0 Randevu</span>
+            </div>
+
+            <div th:if="${#lists.isEmpty(dayGroup.appointments)}" class="px-3 py-2 text-muted small">
+                Bu gün için kayıtlı randevu bulunmamaktadır.
+            </div>
+
+            <div th:if="${not #lists.isEmpty(dayGroup.appointments)}" class="table-responsive">
+                <table class="clinic-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Saat</th>
+                            <th>Hasta Adı</th>
+                            <th>Hizmet &amp; Süre</th>
+                            <th>Şube</th>
+                            <th>Durum</th>
+                            <th class="text-end">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="app : ${dayGroup.appointments}">
+                            <td class="fw-bold" th:text="${app.formattedTimeRange}">09:00 - 09:30</td>
+                            <td th:text="${app.patientName}">Ali Yılmaz</td>
+                            <td th:text="${app.serviceName + ' (' + app.durationMinutes + ' dk)'}">Genel Muayene (30 dk)</td>
+                            <td th:text="${app.branchName}">Merkez Şube</td>
+                            <td>
+                                <span th:class="${app.statusBadgeClass}" th:text="${app.statusDisplayName}">Beklemede</span>
+                            </td>
+                            <td class="text-end">
+                                <div th:if="${app.canApprove}" class="d-inline-flex gap-1">
+                                    <form th:action="@{/staff/appointments/{id}/approve(id=${app.id})}" method="post" class="d-inline">
+                                        <input type="hidden" th:name="${_csrf != null ? _csrf.parameterName : '_csrf'}" th:value="${_csrf != null ? _csrf.token : ''}" />
+                                        <button type="submit" class="btn btn-sm btn-success px-2 btn-approve-appointment">Onayla</button>
+                                    </form>
+                                    <button type="button" class="btn btn-sm btn-outline-danger px-2 btn-reject-appointment"
+                                            data-bs-toggle="modal" data-bs-target="#rejectModal"
+                                            th:data-appointment-id="${app.id}"
+                                            th:data-patient-name="${app.patientName}">Reddet</button>
+                                </div>
+                                <div th:if="${app.canComplete}" class="d-inline">
+                                    <form th:action="@{/staff/appointments/{id}/complete(id=${app.id})}" method="post" class="d-inline">
+                                        <input type="hidden" th:name="${_csrf != null ? _csrf.parameterName : '_csrf'}" th:value="${_csrf != null ? _csrf.token : ''}" />
+                                        <button type="submit" class="btn btn-sm btn-primary">Tamamlandı</button>
+                                    </form>
+                                </div>
+                                <div th:if="${!app.canApprove and !app.canComplete}" class="text-muted small">
+                                    <span th:if="${app.status.name() == 'CONFIRMED'}">Randevu Saati Bekleniyor</span>
+                                    <span th:if="${app.status.name() != 'CONFIRMED'}">-</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Günlük veya Bekleyen Randevular Tablosu -->
+    <div th:if="${view != 'weekly'}" class="clinic-card">
+        <div class="clinic-card-header">
+            <h2 class="clinic-card-title"
+                th:text="${view == 'pending'} ? 'Onay Bekleyen Randevu Talepleri' : 'Günlük Randevu Listesi'">Günlük Randevu Listesi</h2>
             <span class="badge bg-secondary rounded-pill" th:text="${#lists.size(appointments)} + ' Randevu'">0 Randevu</span>
         </div>
 
         <div th:if="${#lists.isEmpty(appointments)}" class="text-center py-5 text-muted">
-            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-calendar-x mb-2 text-muted" viewBox="0 0 16 16">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-calendar-x mb-2 text-muted" viewBox="0 0 16 16" aria-hidden="true">
                 <path d="M6.146 7.146a.5.5 0 0 1 .708 0L8 8.293l1.146-1.147a.5.5 0 1 1 .708.708L8.707 9l1.147 1.146a.5.5 0 0 1-.708.708L8 9.707l-1.146 1.147a.5.5 0 0 1-.708-.708L7.293 9 6.146 7.854a.5.5 0 0 1 0-.708z"/>
                 <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
             </svg>
-            <p class="mb-0">Seçilen tarih aralığında planlanmış randevu bulunmamaktadır.</p>
+            <p class="mb-0" th:text="${view == 'pending'} ? 'Şu anda onay bekleyen randevu bulunmamaktadır.' : 'Seçilen tarih aralığında planlanmış randevu bulunmamaktadır.'">
+                Seçilen tarih aralığında planlanmış randevu bulunmamaktadır.
+            </p>
         </div>
 
         <div th:if="${not #lists.isEmpty(appointments)}" class="table-responsive">
@@ -98,19 +179,18 @@
                             <span th:class="${app.statusBadgeClass}" th:text="${app.statusDisplayName}">Beklemede</span>
                         </td>
                         <td class="text-end">
-                            <!-- PENDING Eylemleri: Onayla & Reddet -->
                             <div th:if="${app.canApprove}" class="d-inline-flex gap-1">
                                 <form th:action="@{/staff/appointments/{id}/approve(id=${app.id})}" method="post" class="d-inline">
                                     <input type="hidden" th:name="${_csrf != null ? _csrf.parameterName : '_csrf'}" th:value="${_csrf != null ? _csrf.token : ''}" />
-                                    <button type="submit" class="btn btn-sm btn-success px-2" id="btn-approve-appointment">Onayla</button>
+                                    <button type="submit" class="btn btn-sm btn-success px-2 btn-approve-appointment" id="btn-approve-appointment">Onayla</button>
                                 </form>
 
-                                <button type="button" class="btn btn-sm btn-outline-danger px-2"
+                                <button type="button" class="btn btn-sm btn-outline-danger px-2 btn-reject-appointment"
                                         data-bs-toggle="modal" data-bs-target="#rejectModal"
-                                        th:data-appointment-id="${app.id}">Reddet</button>
+                                        th:data-appointment-id="${app.id}"
+                                        th:data-patient-name="${app.patientName}">Reddet</button>
                             </div>
 
-                            <!-- CONFIRMED Eylemleri: Tamamlandı olarak işaretleme -->
                             <div th:if="${app.canComplete}" class="d-inline">
                                 <form th:action="@{/staff/appointments/{id}/complete(id=${app.id})}" method="post" class="d-inline">
                                     <input type="hidden" th:name="${_csrf != null ? _csrf.parameterName : '_csrf'}" th:value="${_csrf != null ? _csrf.token : ''}" />
@@ -118,7 +198,6 @@
                                 </form>
                             </div>
 
-                            <!-- Terminal veya Bekleyen Durum Bilgisi -->
                             <div th:if="${!app.canApprove and !app.canComplete}" class="text-muted small">
                                 <span th:if="${app.status.name() == 'CONFIRMED'}">Randevu Saati Bekleniyor</span>
                                 <span th:if="${app.status.name() != 'CONFIRMED'}">-</span>
@@ -143,14 +222,15 @@
                     </div>
 
                     <div class="modal-body">
-                        <p class="small text-muted mb-3">Randevunun reddedilmesi durumunda seçilen zaman aralığı (slot) serbest bırakılacak ve hastaya bildirim iletilecektir.</p>
+                        <p class="small fw-semibold text-dark mb-1" id="rejectPatientName"></p>
+                        <p class="small text-muted mb-3">Randevunun reddedilmesi durumunda seçilen zaman aralığı (slot) serbest bırakılacak ve hastaya durum bildirilecektir.</p>
 
                         <div class="mb-3">
                             <label for="rejectReason" class="form-label">Red Gerekçesi <span class="text-danger">*</span></label>
                             <textarea class="form-control" id="rejectReason" name="reason" rows="3" required
                                       placeholder="Lütfen red gerekçesini yazınız (örn: Acil ameliyat nedeniyle randevu verilememektedir)..."
                                       maxlength="500"></textarea>
-                            <div class="form-text small">En fazla 500 karakter girilebilir.</div>
+                            <div class="form-text small">Zorunlu alan (en fazla 500 karakter).</div>
                         </div>
                     </div>
 
@@ -163,19 +243,5 @@
         </div>
     </div>
 </section>
-
-<script th:inline="javascript">
-document.addEventListener('DOMContentLoaded', function() {
-    const rejectModal = document.getElementById('rejectModal');
-    if (rejectModal) {
-        rejectModal.addEventListener('show.bs.modal', function(event) {
-            const button = event.relatedTarget;
-            const appointmentId = button.getAttribute('data-appointment-id');
-            const form = document.getElementById('rejectForm');
-            form.action = '/staff/appointments/' + appointmentId + '/reject';
-        });
-    }
-});
-</script>
 </body>
 </html>

@@ -5,14 +5,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.web.WebAttributes;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
- * Production-level custom error controller satisfying NFR-009 and TC-045.
+ * Custom error controller satisfying NFR-009 and TC-045.
  * Strictly prevents stack trace, SQL statement, and internal exception leakage while preserving
- * exact HTTP status codes (403 Forbidden, 404 Not Found, 500 Internal Server Error).
+ * exact HTTP status codes (400 Bad Request, 403 Forbidden, 404 Not Found, 500 Internal Server Error).
  */
 @Controller
 public class CustomErrorController implements ErrorController {
@@ -27,10 +28,18 @@ public class CustomErrorController implements ErrorController {
                 statusCode = Integer.parseInt(statusObj.toString());
             } catch (NumberFormatException ignored) {
             }
+        } else if (request.getAttribute(WebAttributes.ACCESS_DENIED_403) != null) {
+            statusCode = HttpStatus.FORBIDDEN.value();
         }
 
         response.setStatus(statusCode);
         model.addAttribute("statusCode", statusCode);
+
+        if (statusCode == HttpStatus.BAD_REQUEST.value()) {
+            model.addAttribute("errorTitle", "400 — Geçersiz İstek");
+            model.addAttribute("errorMessage", "Gönderilen istek parametreleri geçersiz veya eksik. Lütfen bilgilerinizi kontrol ederek tekrar deneyiniz.");
+            return "error/400";
+        }
 
         if (statusCode == HttpStatus.FORBIDDEN.value()) {
             model.addAttribute("errorTitle", "403 — Yetkisiz Erişim");

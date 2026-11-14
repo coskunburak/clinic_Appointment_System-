@@ -1,7 +1,7 @@
 package com.example.clinic.web.patient;
 
-import com.example.clinic.booking.application.AppointmentConflictException;
 import com.example.clinic.booking.application.AppointmentApprovalService;
+import com.example.clinic.booking.application.AppointmentConflictException;
 import com.example.clinic.booking.application.AppointmentQueryService;
 import com.example.clinic.booking.application.BookingCommand;
 import com.example.clinic.booking.application.BookingService;
@@ -12,12 +12,12 @@ import com.example.clinic.booking.application.dto.AppointmentViewDto;
 import com.example.clinic.booking.application.dto.BranchSummaryDto;
 import com.example.clinic.booking.application.dto.ServiceSummaryDto;
 import com.example.clinic.booking.application.dto.StaffSummaryDto;
-import com.example.clinic.common.security.SecurityContextFacade;
+import com.example.clinic.booking.domain.AppointmentDomainException;
+import com.example.clinic.web.common.WebErrorMessageMapper;
 import com.example.clinic.web.form.BookingForm;
 import com.example.clinic.web.form.CancellationForm;
 import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -39,31 +39,30 @@ import java.util.Objects;
 import java.util.UUID;
 
 /**
- * Spring MVC controller orchestrating patient appointment workflows (WP-S08-02, FR-027, TC-027).
- * Implements server-side booking wizard, slot availability endpoint, appointment listing, and cancellation.
+ * Spring MVC controller orchestrating patient appointment workflows (FR-027, TC-027).
+ * Implements server-side booking wizard, slot availability endpoint, bounded appointment listing,
+ * and reason-validated cancellation without swallowing security exceptions.
  */
 @Controller
 @RequestMapping("/patient")
 public class PatientBookingController {
 
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
+    private static final int DEFAULT_PAST_PAGE_SIZE = 15;
 
     private final BookingService bookingService;
     private final AppointmentApprovalService appointmentApprovalService;
     private final AppointmentQueryService appointmentQueryService;
     private final PatientBookingQueryService patientBookingQueryService;
-    private final SecurityContextFacade securityContextFacade;
 
     public PatientBookingController(BookingService bookingService,
                                     AppointmentApprovalService appointmentApprovalService,
                                     AppointmentQueryService appointmentQueryService,
-                                    PatientBookingQueryService patientBookingQueryService,
-                                    SecurityContextFacade securityContextFacade) {
+                                    PatientBookingQueryService patientBookingQueryService) {
         this.bookingService = Objects.requireNonNull(bookingService);
         this.appointmentApprovalService = Objects.requireNonNull(appointmentApprovalService);
         this.appointmentQueryService = Objects.requireNonNull(appointmentQueryService);
         this.patientBookingQueryService = Objects.requireNonNull(patientBookingQueryService);
-        this.securityContextFacade = Objects.requireNonNull(securityContextFacade);
     }
 
     /**
@@ -71,26 +70,22 @@ public class PatientBookingController {
      */
     @GetMapping("/dashboard")
     public String patientDashboard(Model model) {
-        try {
-            List<AppointmentViewDto> appointments = appointmentQueryService.getPatientAppointmentsForCurrentUser();
-            List<AppointmentViewDto> upcoming = appointments.stream()
-                    .filter(a -> !a.isPast() && (a.canCancel() || a.status().name().equals("CONFIRMED")))
-                    .limit(3)
-                    .toList();
+        List<AppointmentViewDto> appointments = appointmentQueryService.getPatientAppointmentsForCurrentUser();
+        List<AppointmentViewDto> safeAppointments = appointments != null ? appointments : Collections.emptyList();
 
-            model.addAttribute("upcomingAppointments", upcoming);
-            model.addAttribute("totalCount", appointments.size());
-            model.addAttribute("pendingCount", appointments.stream().filter(a -> "PENDING".equals(a.status().name())).count());
-        } catch (Exception e) {
-            model.addAttribute("upcomingAppointments", Collections.emptyList());
-            model.addAttribute("totalCount", 0);
-            model.addAttribute("pendingCount", 0);
-        }
+        List<AppointmentViewDto> upcoming = safeAppointments.stream()
+                .filter(a -> !a.isPast() && (a.canCancel() || "CONFIRMED".equals(a.status().name())))
+                .limit(3)
+                .toList();
+
+        model.addAttribute("upcomingAppointments", upcoming);
+        model.addAttribute("totalCount", safeAppointments.size());
+        model.addAttribute("pendingCount", safeAppointments.stream().filter(a -> "PENDING".equals(a.status().name())).count());
         return "patient/dashboard";
     }
 
     /**
-     * Patient booking screen rendering selection filters and form elements (WP-S08-02, TC-027).
+     * Patient booking screen rendering selection filters and form elements (TC-027).
      */
     @GetMapping("/book")
     public String showBookingPage(@RequestParam(value = "branchId", required = false) UUID branchId,
@@ -99,14 +94,15 @@ public class PatientBookingController {
                                   @RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
                                   Model model) {
 
-        populateBookingModel(model, branchId, branchServiceId, staffId, date);
+        LocalDate resolvedDate = (date != null) ? date : patientBookingQueryService.getDefaultBookingDate(branchId);
+        populateBookingModel(model, branchId, branchServiceId, staffId, resolvedDate);
 
         if (!model.containsAttribute("bookingForm")) {
             BookingForm form = new BookingForm();
             form.setBranchId(branchId);
             form.setBranchServiceId(branchServiceId);
             form.setStaffId(staffId);
-            form.setAppointmentDate(date != null ? date : LocalDate.now());
+            form.setAppointmentDate(resolvedDate);
             model.addAttribute("bookingForm", form);
         }
 
@@ -119,8 +115,8 @@ public class PatientBookingController {
     @GetMapping("/slots")
     @ResponseBody
     public List<String> getAvailableSlots(@RequestParam("staffId") UUID staffId,
-                                         @RequestParam("branchServiceId") UUID branchServiceId,
-                                         @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+                                          @RequestParam("branchServiceId") UUID branchServiceId,
+                                          @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         List<LocalTime> times = patientBookingQueryService.getAvailableSlotTimes(staffId, branchServiceId, date);
         return times.stream()
                 .map(t -> t.format(TIME_FORMATTER))
@@ -137,7 +133,10 @@ public class PatientBookingController {
                                 RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
-            populateBookingModel(model, form.getBranchId(), form.getBranchServiceId(), form.getStaffId(), form.getAppointmentDate());
+            LocalDate fallbackDate = form.getAppointmentDate() != null
+                    ? form.getAppointmentDate()
+                    : patientBookingQueryService.getDefaultBookingDate(form.getBranchId());
+            populateBookingModel(model, form.getBranchId(), form.getBranchServiceId(), form.getStaffId(), fallbackDate);
             return "patient/book";
         }
 
@@ -155,42 +154,47 @@ public class PatientBookingController {
                     "Randevunuz başarıyla oluşturuldu. Başlangıç durumu: Beklemede (PENDING). Hekim onayından sonra kesinleşecektir.");
             return "redirect:/patient/appointments";
 
-        } catch (AppointmentConflictException | PatientOverlapException e) {
-            model.addAttribute("errorMessage",
-                    "Seçilen zaman diliminde randevu çakışması tespit edildi. Lütfen listeden başka bir randevu saati seçiniz.");
-            populateBookingModel(model, form.getBranchId(), form.getBranchServiceId(), form.getStaffId(), form.getAppointmentDate());
-            return "patient/book";
-
-        } catch (BookingValidationException e) {
-            model.addAttribute("errorMessage", "Rezervasyon kuralı ihlali: " + e.getMessage());
-            populateBookingModel(model, form.getBranchId(), form.getBranchServiceId(), form.getStaffId(), form.getAppointmentDate());
-            return "patient/book";
-
-        } catch (Exception e) {
-            model.addAttribute("errorMessage", "Randevu oluşturulamadı: " + e.getMessage());
+        } catch (AppointmentConflictException | PatientOverlapException | BookingValidationException
+                 | AppointmentDomainException | IllegalArgumentException | IllegalStateException e) {
+            model.addAttribute("errorMessage", WebErrorMessageMapper.mapBookingError(e));
             populateBookingModel(model, form.getBranchId(), form.getBranchServiceId(), form.getStaffId(), form.getAppointmentDate());
             return "patient/book";
         }
     }
 
     /**
-     * Lists appointments owned by the authenticated patient (FR-022, TC-022, TC-027).
+     * Lists appointments owned by the authenticated patient with bounded past history pagination (FR-022, TC-022, TC-027).
      */
     @GetMapping("/appointments")
-    public String listAppointments(Model model) {
+    public String listAppointments(@RequestParam(value = "page", defaultValue = "0") int page,
+                                   @RequestParam(value = "size", defaultValue = "15") int size,
+                                   Model model) {
         List<AppointmentViewDto> appointments = appointmentQueryService.getPatientAppointmentsForCurrentUser();
+        List<AppointmentViewDto> safeAppointments = appointments != null ? appointments : Collections.emptyList();
 
-        List<AppointmentViewDto> upcoming = appointments.stream()
+        List<AppointmentViewDto> upcoming = safeAppointments.stream()
                 .filter(a -> !a.isPast())
                 .toList();
 
-        List<AppointmentViewDto> past = appointments.stream()
+        List<AppointmentViewDto> allPast = safeAppointments.stream()
                 .filter(AppointmentViewDto::isPast)
                 .toList();
 
+        int safeSize = Math.clamp(size, 1, 50);
+        int totalPast = allPast.size();
+        int totalPages = Math.max(1, (int) Math.ceil((double) totalPast / safeSize));
+        int safePage = Math.clamp(page, 0, totalPages - 1);
+        int fromIdx = Math.min(safePage * safeSize, totalPast);
+        int toIdx = Math.min(fromIdx + safeSize, totalPast);
+        List<AppointmentViewDto> pastPage = allPast.subList(fromIdx, toIdx);
+
         model.addAttribute("upcomingAppointments", upcoming);
-        model.addAttribute("pastAppointments", past);
-        model.addAttribute("allAppointments", appointments);
+        model.addAttribute("pastAppointments", pastPage);
+        model.addAttribute("totalPastCount", totalPast);
+        model.addAttribute("pastPage", safePage);
+        model.addAttribute("pastTotalPages", totalPages);
+        model.addAttribute("pastPageSize", safeSize);
+        model.addAttribute("allAppointments", safeAppointments);
         if (!model.containsAttribute("cancellationForm")) {
             model.addAttribute("cancellationForm", new CancellationForm());
         }
@@ -203,14 +207,23 @@ public class PatientBookingController {
      */
     @PostMapping("/appointments/{id}/cancel")
     public String cancelAppointment(@PathVariable("id") UUID id,
-                                    @RequestParam(value = "reason", required = false, defaultValue = "Hasta tarafından randevu iptal edildi.") String reason,
+                                    @Valid @ModelAttribute("cancellationForm") CancellationForm form,
+                                    BindingResult bindingResult,
                                     RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            String validationMsg = bindingResult.hasFieldErrors("reason") && bindingResult.getFieldError("reason") != null
+                    ? bindingResult.getFieldError("reason").getDefaultMessage()
+                    : "İptal gerekçesi boş bırakılamaz ve en fazla 500 karakter olabilir.";
+            redirectAttributes.addFlashAttribute("errorMessage", validationMsg);
+            return "redirect:/patient/appointments";
+        }
+
         try {
-            String trimmedReason = (reason != null && !reason.isBlank()) ? reason.strip() : "Hasta tarafından randevu iptal edildi.";
-            appointmentApprovalService.cancelAppointment(id, trimmedReason);
+            appointmentApprovalService.cancelAppointment(id, form.getReason().strip());
             redirectAttributes.addFlashAttribute("successMessage", "Randevunuz başarıyla iptal edildi.");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Randevu iptal edilemedi: " + e.getMessage());
+        } catch (AppointmentDomainException | IllegalStateException | IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    WebErrorMessageMapper.mapLifecycleError(e, "Randevu iptal edilemedi."));
         }
         return "redirect:/patient/appointments";
     }
@@ -235,9 +248,11 @@ public class PatientBookingController {
         }
         model.addAttribute("staffList", staffList);
 
+        LocalDate effectiveDate = date != null ? date : patientBookingQueryService.getDefaultBookingDate(branchId);
+
         List<String> slotTimes = Collections.emptyList();
-        if (staffId != null && branchServiceId != null && date != null) {
-            slotTimes = patientBookingQueryService.getAvailableSlotTimes(staffId, branchServiceId, date)
+        if (staffId != null && branchServiceId != null && effectiveDate != null) {
+            slotTimes = patientBookingQueryService.getAvailableSlotTimes(staffId, branchServiceId, effectiveDate)
                     .stream()
                     .map(t -> t.format(TIME_FORMATTER))
                     .toList();
@@ -247,6 +262,20 @@ public class PatientBookingController {
         model.addAttribute("selectedBranchId", branchId);
         model.addAttribute("selectedServiceId", branchServiceId);
         model.addAttribute("selectedStaffId", staffId);
-        model.addAttribute("selectedDate", date != null ? date : LocalDate.now());
+        model.addAttribute("selectedDate", effectiveDate);
+
+        BranchSummaryDto selectedBranch = branchId != null
+                ? branches.stream().filter(b -> b.id().equals(branchId)).findFirst().orElse(null)
+                : null;
+        ServiceSummaryDto selectedService = branchServiceId != null
+                ? services.stream().filter(s -> s.id().equals(branchServiceId)).findFirst().orElse(null)
+                : null;
+        StaffSummaryDto selectedStaff = staffId != null
+                ? staffList.stream().filter(st -> st.id().equals(staffId)).findFirst().orElse(null)
+                : null;
+
+        model.addAttribute("selectedBranch", selectedBranch);
+        model.addAttribute("selectedService", selectedService);
+        model.addAttribute("selectedStaff", selectedStaff);
     }
 }

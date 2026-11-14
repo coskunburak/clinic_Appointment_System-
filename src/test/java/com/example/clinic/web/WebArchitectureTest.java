@@ -1,6 +1,11 @@
 package com.example.clinic.web;
 
-import com.example.clinic.web.admin.AdminManagementController;
+import com.example.clinic.web.admin.AdminBranchController;
+import com.example.clinic.web.admin.AdminDashboardController;
+import com.example.clinic.web.admin.AdminDepartmentController;
+import com.example.clinic.web.admin.AdminServiceController;
+import com.example.clinic.web.admin.AdminStaffController;
+import com.example.clinic.web.error.CustomErrorController;
 import com.example.clinic.web.patient.PatientBookingController;
 import com.example.clinic.web.staff.StaffScheduleController;
 import org.junit.jupiter.api.DisplayName;
@@ -25,7 +30,12 @@ class WebArchitectureTest {
     private final List<Class<?>> controllerClasses = List.of(
             PatientBookingController.class,
             StaffScheduleController.class,
-            AdminManagementController.class
+            AdminDashboardController.class,
+            AdminBranchController.class,
+            AdminDepartmentController.class,
+            AdminServiceController.class,
+            AdminStaffController.class,
+            CustomErrorController.class
     );
 
     @Test

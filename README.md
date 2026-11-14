@@ -10,7 +10,7 @@
 
 Bu proje, üniversite **Nesneye Dayalı Programlama (OOP)** dersi kapsamında geliştirilen, tek ve çok şubeli sağlık kuruluşlarının randevu süreçlerini uçtan uca yönetmeyi amaçlayan web tabanlı bir hastane/klinik randevu yönetim sistemidir.
 
-> **Mevcut Proje Durumu:** **Sprint S08 — Spring MVC ve Thymeleaf Kullanıcı Ekranları (3 Rol)** sunucu taraflı render edilen (SSR) dinamik HTML arayüzleri, Spring MVC denetleyicileri (`PatientBookingController`, `StaffScheduleController`, `AdminManagementController`), form doğrulama modelleri (`@Valid` Jakarta Bean Validation), çevrimdışı yerel Bootstrap 5 varlıkları, özel hata sayfaları (403, 404, 500) ve 51 yeni otomatik test ile tamamlanmıştır (Mevcut Statü: `VERIFIED_BY_OWNER` — 437/437 test: 320 birim/MVC testi + 117 Testcontainers PostgreSQL entegrasyon testi başarıyla geçmiştir). Detaylar için [S08 Uygulama Raporu](docs/07-sprintler/S08-implementation-report.md) incelenebilir.
+> **Mevcut Proje Durumu:** **Sprint S08 — Spring MVC ve Thymeleaf Kullanıcı Ekranları (3 Rol)** sunucu taraflı render edilen (SSR) dinamik HTML arayüzleri, ince (thin) rol bazlı Spring MVC denetleyicileri (`PatientBookingController`, `StaffScheduleController`, `AdminDashboardController`, `AdminBranchController`, `AdminDepartmentController`, `AdminServiceController`, `AdminStaffController`, `CustomErrorController`), `@Valid` form DTO doğrulaması, yerel Bootstrap 5 + `clinic.css`/`clinic.js` varlıkları, güvenli özel hata sayfaları (`400`, `403`, `404`, `500`) ve 88 S08 otomatik test metodu (81 birim/MVC/mimari + 7 `RoleBasedWebMvcIT` PostgreSQL Testcontainers entegrasyon testi) ile kod tamamlanmış durumdadır (Statü: `CODE_COMPLETE_AWAITING_OWNER_TEST` — ürün sahibinin manuel `./mvnw clean verify` doğrulaması beklenmektedir). S07 tabanı (`386` test) `VERIFIED_BY_OWNER` olarak doğrulanmıştır. Detaylar için [S08 Uygulama Raporu](docs/07-sprintler/S08-implementation-report.md) incelenebilir.
 
 ---
 
@@ -62,9 +62,9 @@ Projede kullanılan teknolojiler **mevcut kurulu bağımlılıklar** ve **gelece
 - **Derleme Aracı:** Apache Maven Wrapper (`mvnw`, `mvnw.cmd` — Maven 3.9.9, Failsafe entegrasyonu)
 - **CI / CD:** GitHub Actions (`.github/workflows/ci.yml` — Java 21 & Maven verify)
 
-### B. Gelecek Sprintlerde Planlanan Teknolojiler
-- **Güvenlik & Yetkilendirme:** Spring Security (S04 sprintinde planlandı)
-- **Arayüz Bileşenleri:** Bootstrap 5 (S08 sprintinde planlandı)
+### B. Uygulanan Ek Ekosistem Bileşenleri (S04 / S08)
+- **Güvenlik & Yetkilendirme:** Spring Security 6 (`spring-boot-starter-security` — S04 sprintinde uygulandı)
+- **Arayüz Bileşenleri:** Bootstrap 5.3.3 yerel statik CSS/JS paketi (`clinic.css`, `clinic.js` — S08 sprintinde uygulandı)
 
 ---
 
@@ -131,7 +131,7 @@ Sağlık denetimi endpoint'i:
 curl http://localhost:8080/actuator/health
 ```
 
-> **Önemli Not:** S01 aşamasında veritabanı, Flyway migrasyonu, JPA eşlemeleri ve sağlık denetimi endpoint'i aktiftir. Web controller ve kullanıcı ekranları S08'de eklenecektir. Bu nedenle `http://localhost:8080/` adresine tarayıcı ile gidildiğinde Spring Boot'un varsayılan `404 Not Found` yanıtı vermesi **beklenen ve normal** bir durumdur.
+> **Önemli Not:** S08 ile birlikte giriş (`/login`), hasta (`/patient/**`), personel (`/staff/**`), yönetici (`/admin/**`) ekranları ve `/error` sayfaları eklenmiştir. Sağlık denetimi için `/actuator/health` aktiftir.
 
 ---
 
@@ -202,7 +202,7 @@ clinic-appointment/
 | **S05** | Personel Yönetimi ve Çalışma Saatleri | **Uygulandı (Doğrulandı)** | Doktor/personel uygunluk aralıkları, izinler, haftalık mesai |
 | **S06** | Randevu Rezervasyonu ve Çakışma Önleme | **Uygulandı (Doğrulandı)** | Slot arama, satır kilitleme (pessimistic lock), çakışmasız PENDING randevu |
 | **S07** | Randevu Onay Yaşam Döngüsü ve Geçmiş | **Uygulandı (Doğrulandı)** | Onay/ret/iptal akışı, durum makinesi, append-only denetim geçmişi |
-| **S08** | Spring MVC ve Thymeleaf Kullanıcı Ekranları | *Planlandı* | Hasta, personel ve yönetici arayüzleri, form doğrulama, hata sayfaları |
+| **S08** | Spring MVC ve Thymeleaf Kullanıcı Ekranları | **Kod Tamamlandı (`CODE_COMPLETE_AWAITING_OWNER_TEST`)** | Hasta, personel ve yönetici arayüzleri, form doğrulama, hata sayfaları |
 | **S09** | Test Regresyonu, Eşzamanlılık ve Demo Seed | *Planlandı* | Entegrasyon testleri, eşzamanlı rezervasyon testi, kurmaca seed verisi |
 | **S10** | Nihai Kalite Kapısı, Sunum ve Akademik Teslim | *Planlandı* | 10 farklı gün commit kontrolü, sunum hazırlığı, akademik rapor |
 

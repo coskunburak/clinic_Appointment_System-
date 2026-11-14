@@ -13,7 +13,11 @@ import com.example.clinic.identity.infrastructure.PatientProfileRepository;
 import com.example.clinic.identity.infrastructure.UserAccountRepository;
 import com.example.clinic.organization.application.OrganizationAdminService;
 import com.example.clinic.staff.application.StaffManagementService;
-import com.example.clinic.web.admin.AdminManagementController;
+import com.example.clinic.web.admin.AdminBranchController;
+import com.example.clinic.web.admin.AdminDashboardController;
+import com.example.clinic.web.admin.AdminDepartmentController;
+import com.example.clinic.web.admin.AdminServiceController;
+import com.example.clinic.web.admin.AdminStaffController;
 import com.example.clinic.web.common.GlobalModelAttributesAdvice;
 import com.example.clinic.web.error.CustomErrorController;
 import com.example.clinic.web.error.WebExceptionHandler;
@@ -53,7 +57,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = {
         PatientBookingController.class,
         StaffScheduleController.class,
-        AdminManagementController.class,
+        AdminDashboardController.class,
+        AdminBranchController.class,
+        AdminDepartmentController.class,
+        AdminServiceController.class,
+        AdminStaffController.class,
         CustomErrorController.class
 })
 @Import({SecurityConfig.class, GlobalModelAttributesAdvice.class, WebExceptionHandler.class})

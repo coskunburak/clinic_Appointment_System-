@@ -6,20 +6,25 @@
 |---|---|---|---|---|---|
 | GET | `/login` | public | oturum formu | 200 | — |
 | POST | `/login` | public, CSRF | Spring form-login | 302 | 302/mesaj |
-| GET | `/patient/book` | PATIENT | filtre formu | 200 | 403 |
-| GET | `/patient/available-slots` | PATIENT | branchService,staff,date filtreleri | 200 | 400/404 |
-| POST | `/patient/appointments` | PATIENT, CSRF | yeni randevu | 303 | 409/422 |
-| GET | `/patient/appointments` | PATIENT | kendi liste | 200 | 403 |
-| GET | `/patient/appointments/{id}` | owner | kendi detay | 200 | 404 |
-| POST | `/patient/appointments/{id}/cancel` | owner, CSRF | iptal | 303 | 409/403 |
-| GET | `/staff/appointments` | STAFF | kendi programı | 200 | 403 |
-| POST | `/staff/appointments/{id}/approve` | STAFF/ADMIN, scope | onay | 303 | 409/403 |
-| POST | `/staff/appointments/{id}/reject` | STAFF/ADMIN, scope | ret | 303 | 409/403 |
-| POST | `/staff/appointments/{id}/complete` | STAFF/ADMIN, scope | tamamla | 303 | 409/403 |
-| GET/POST | `/admin/branches` | ADMIN scoped | şube liste/ekle | 200/303 | 403/422 |
-| GET/POST | `/admin/services` | ADMIN scoped | hizmet liste/ekle | 200/303 | 403/422 |
-| GET/POST | `/admin/staff` | ADMIN scoped | personel liste/ekle | 200/303 | 403/422 |
-| GET/POST | `/admin/availability` | ADMIN scoped | program ve izin | 200/303 | 403/422 |
+| GET | `/patient/dashboard` | PATIENT | `/patient/appointments` yönlendirmesi | 302 | 403 |
+| GET | `/patient/book` | PATIENT | şube/hizmet/hekim/tarih/slot sihirbazı | 200 | 403/400 |
+| GET | `/patient/slots` | PATIENT | JSON boş saat listesi (`staffId`, `branchServiceId`, `date`) | 200 | 400/403 |
+| POST | `/patient/book` | PATIENT, CSRF | yeni `PENDING` randevu (`BookingForm`) | 302 | 200 (form/çakışma mesajı) |
+| GET | `/patient/appointments` | PATIENT | yaklaşan & sayfalı geçmiş randevular | 200 | 403 |
+| POST | `/patient/appointments/{id}/cancel` | owner, CSRF | gerekçeli iptal (`CancellationForm`) | 302 | 302/flash, 403 |
+| GET | `/staff/dashboard` | STAFF | `/staff/schedule` yönlendirmesi | 302 | 403 |
+| GET | `/staff/schedule` | STAFF | `view=daily\|weekly\|pending` takvimi | 200 | 403/400 |
+| POST | `/staff/appointments/{id}/approve` | STAFF, scope, CSRF | randevu onayı | 302 | 302/flash, 403 |
+| POST | `/staff/appointments/{id}/reject` | STAFF, scope, CSRF | gerekçeli red (`RejectionForm`) | 302 | 302/flash, 403 |
+| POST | `/staff/appointments/{id}/complete` | STAFF, scope, CSRF | randevu tamamlama | 302 | 302/flash, 403 |
+| GET | `/admin`, `/admin/dashboard` | ADMIN scoped | yetki kapsamı özet metrikleri | 200 | 403 |
+| POST | `/admin/organizations/{id}/edit` | ORG_ADMIN, CSRF | kurum adı güncelleme | 302 | 403/flash |
+| GET/POST | `/admin/branches/**` | ADMIN scoped, CSRF | şube listesi, ekleme, düzenleme, aktifleştirme/pasifleştirme | 200/302 | 403/400 |
+| GET/POST | `/admin/hours`, `/admin/branches/{id}/hours/**` | ADMIN scoped, CSRF | şube çalışma saatleri görüntüleme, kaydetme, silme | 200/302 | 403/400 |
+| GET/POST | `/admin/departments/**` | ADMIN scoped, CSRF | bölüm listesi, ekleme, düzenleme, aktifleştirme/pasifleştirme | 200/302 | 403/400 |
+| GET/POST | `/admin/services/**` | ADMIN scoped, CSRF | kurumsal tanımlar, şube atama, süre/fiyat ve durum güncelleme | 200/302 | 403/400 |
+| GET/POST | `/admin/staff/**` | ADMIN scoped, CSRF | kapsam içi personel kaydı, atama, yetkinlik, mesai/izin ekleme-silme | 200/302 | 403/400 |
+| GET | `/error` | permitAll (forward/error) | özel `400`, `403`, `404`, `500` hata sayfaları | 400–500 | — |
 
 ## `CreateAppointmentForm` sözleşmesi
 ```text
