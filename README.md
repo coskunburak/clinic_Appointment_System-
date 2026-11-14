@@ -5,12 +5,12 @@
 [![Build Tool](https://img.shields.io/badge/Maven%20Wrapper-3.9.9-blue.svg)](https://maven.apache.org/)
 [![Database](https://img.shields.io/badge/PostgreSQL-17-blue.svg)](https://www.postgresql.org/)
 [![Migration](https://img.shields.io/badge/Flyway-V4-red.svg)](https://flywaydb.org/)
-[![Sprint](https://img.shields.io/badge/Sprint-S08%20(Spring%20MVC%20ve%20Thymeleaf%20Ekranları)-brightgreen.svg)](docs/07-sprintler/S08.md)
+[![Sprint](https://img.shields.io/badge/Sprint-S09%20(Verified%20by%20Owner)-brightgreen.svg)](docs/07-sprintler/S09.md)
 [![Academic Status](https://img.shields.io/badge/Academic%20Project-OOP%20Seçenek%20A-informational.svg)](docs/00-baslangic/02-proje-kunyesi-ve-basari.md)
 
 Bu proje, üniversite **Nesneye Dayalı Programlama (OOP)** dersi kapsamında geliştirilen, tek ve çok şubeli sağlık kuruluşlarının randevu süreçlerini uçtan uca yönetmeyi amaçlayan web tabanlı bir hastane/klinik randevu yönetim sistemidir.
 
-> **Mevcut Proje Durumu:** **Sprint S08 — Spring MVC ve Thymeleaf Kullanıcı Ekranları (3 Rol)** sunucu taraflı render edilen (SSR) dinamik HTML arayüzleri, ince (thin) rol bazlı Spring MVC denetleyicileri (`PatientBookingController`, `StaffScheduleController`, `AdminDashboardController`, `AdminBranchController`, `AdminDepartmentController`, `AdminServiceController`, `AdminStaffController`, `CustomErrorController`), `@Valid` form DTO doğrulaması, yerel Bootstrap 5 + `clinic.css`/`clinic.js` varlıkları, güvenli özel hata sayfaları (`400`, `403`, `404`, `500`) ve 88 S08 otomatik test metodu (81 birim/MVC/mimari + 7 `RoleBasedWebMvcIT` PostgreSQL Testcontainers entegrasyon testi) ile tamamlanmış ve depo sahibi tarafından `./mvnw clean verify` (`BUILD SUCCESS`, `121` Failsafe entegrasyon testi sıfır hata/atlama + Surefire kapısı geçildi) ile doğrulanmıştır (Statü: `VERIFIED_BY_OWNER`, commit `9c35715`). S07 tabanı (`386` test) da `VERIFIED_BY_OWNER` olarak doğrulanmıştır. Detaylar için [S08 Uygulama Raporu](docs/07-sprintler/S08-implementation-report.md) incelenebilir.
+> **Mevcut Proje Durumu:** **Sprint S09 — Regresyon, Eşzamanlılık, Demo Veri Tohumu ve Yerel Performans Doğrulaması (`VERIFIED_BY_OWNER`)** tamamlanmış ve ürün sahibi tarafından `./mvnw clean verify` ile doğrulanmıştır (`366/366` Surefire, `135/135` Failsafe PostgreSQL 17 Testcontainers IT, `0` hata/atlama). Paket; yalnızca `dev` profiline kısıtlı deterministik ve idempotent `DemoDataSeeder` (`DemoEnvironmentGuard`, `DemoDataSeedService`, `DemoDataResetService`), 5 iş parçacıklı `ConcurrentBookingIT` stres testi, 50 personel / 1.000 randevulu `PerformanceBenchmarkIT` kıyaslaması (`availability-slot-search p95=21.86 ms`, `booking-tx p95=14.74 ms`, `< 1000 ms` hedefi doğrulandı) ve genişletilmiş `WebArchitectureTest`/`DomainArchitectureTest` sınır kontrollerini içerir. Detaylar için [S08 Uygulama Raporu](docs/07-sprintler/S08-implementation-report.md) ve [S09 Uygulama Raporu](docs/07-sprintler/S09-implementation-report.md) incelenebilir.
 
 ---
 
@@ -72,15 +72,16 @@ Projede kullanılan teknolojiler **mevcut kurulu bağımlılıklar** ve **gelece
 
 Sistemin tam teslimatta destekleyeceği ana modüller ve mevcut durumları:
 
-1. **Kurum ve Şube Altyapısı:** Çok şubeli sağlık organizasyonu, şube çalışma gün/saatleri ve zaman dilimi modeli *(S01'de veritabanı şeması ve entity katmanı hazırlandı; yönetim servisleri S03)*.
-2. **Kimlik ve Profil Altyapısı:** Kullanıcı hesapları, hasta/personel profilleri ve kurum/şube yetki kapsamı *(S01'de V1 tablosu ve entity katmanı hazırlandı; kimlik doğrulama S04)*.
-3. **Bölüm ve Hizmet Kataloğu:** Tıbbi bölümler, hizmet adları, işlem süreleri ve ücret tanımları *(Planlandı — S03)*.
-4. **Doktor ve Sağlık Personeli:** Personel türleri, uzmanlık alanları ve personelin verebileceği hizmet eşleştirmeleri *(Planlandı — S05)*.
-5. **Uygunluk ve Çalışma Takvimi:** Haftalık mesai şablonları, özel izinler ve müsaitlik aralıkları *(Planlandı — S05)*.
-6. **Randevu Rezervasyonu:** Şube, hizmet, doktor ve geçerli zaman aralığı seçerek randevu alma *(Planlandı — S06)*.
-7. **Çakışma ve Çift Rezervasyon Önleme:** Eşzamanlı isteklerde satır kilitleme ve çakışma kontrolü *(Planlandı — S06)*.
+1. **Kurum ve Şube Altyapısı:** Çok şubeli sağlık organizasyonu, şube çalışma gün/saatleri ve zaman dilimi modeli *(Uygulandı — S01, S03)*.
+2. **Kimlik ve Profil Altyapısı:** Kullanıcı hesapları, hasta/personel profilleri ve kurum/şube yetki kapsamı *(Uygulandı — S01, S04)*.
+3. **Bölüm ve Hizmet Kataloğu:** Tıbbi bölümler, hizmet adları, işlem süreleri ve ücret tanımları *(Uygulandı — S03)*.
+4. **Doktor ve Sağlık Personeli:** Personel türleri, uzmanlık alanları ve personelin verebileceği hizmet eşleştirmeleri *(Uygulandı — S05)*.
+5. **Uygunluk ve Çalışma Takvimi:** Haftalık mesai şablonları, özel izinler ve müsaitlik aralıkları *(Uygulandı — S05)*.
+6. **Randevu Rezervasyonu:** Şube, hizmet, doktor ve geçerli zaman aralığı seçerek randevu alma *(Uygulandı — S06)*.
+7. **Çakışma ve Çift Rezervasyon Önleme:** Eşzamanlı isteklerde satır kilitleme ve çakışma kontrolü *(Uygulandı — S06, 5-thread stres doğrulaması S09)*.
 8. **Randevu Yaşam Döngüsü:** `PENDING` -> `CONFIRMED` / `REJECTED` / `CANCELLED` / `COMPLETED` geçişleri ve append-only denetim geçmişi *(Uygulandı — S07)*.
 9. **Rol ve Erişim Yönetimi & Kullanıcı Ekranları:** Hasta, Doktor/Sağlık Personeli ve Yönetici rolleri için sunucu taraflı dinamik Thymeleaf kullanıcı arayüzleri *(Uygulandı — S08)*.
+10. **Geliştirme Demo Tohumu & Güvenli Sıfırlama:** Yalnızca `dev` profilinde aktif, idempotent demo veri tohumlayıcısı ve kapsamlandırılmış sıfırlama mekanizması *(Uygulandı — S09, `VERIFIED_BY_OWNER`)*.
 
 ---
 
@@ -120,18 +121,35 @@ Tüm birim ve Testcontainers tabanlı PostgreSQL entegrasyon testlerini çalış
 ./mvnw clean verify
 ```
 
-### 5. Uygulamayı Başlatın
+### 5. Uygulamayı Geliştirme (`dev`) Profili ve Demo Verisiyle Başlatın
+Güvenlik gereği `dev` profili varsayılan olarak etkin değildir; demo veri tohumlayıcısının çalışması için `dev` profilini açıkça belirtin:
 ```bash
-./mvnw spring-boot:run
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
 ```
-Uygulama varsayılan olarak `http://localhost:8080` adresinde başlayacaktır.
+Uygulama `http://localhost:8080` adresinde başlayacak ve `Örnek Sağlık Grubu` altında **Merkez Hastanesi (Kadıköy)** ile **Sahil Polikliniği (Beşiktaş)** şubelerini, tıbbi bölümleri, hizmetleri (`Genel Muayene`, `Eko Çekimi`, `Radyoloji Akciğer Grafisi`, `Kan Tahlili`), uygunluk kurallarını ve 5 randevu durumunu idempotent biçimde hazırlayacaktır.
+
+**Kurmaca Demo Hesapları (`dev` Profili):**
+
+| Rol | E-posta | Parola Ortam Değişkeni (`dev` Varsayılanı) | Kapsam / Uzmanlık |
+|---|---|---|---|
+| Yönetici (`ROLE_ADMIN`) | `admin@clinic.test` | `DEMO_ADMIN_PASSWORD` (`Admin123!`) | `Örnek Sağlık Grubu` (Tüm şubeler) |
+| Hekim (`ROLE_STAFF`) | `doctor.ahmet@clinic.test` | `DEMO_DOCTOR_PASSWORD` (`Doctor123!`) | Dr. Ahmet Kaya — Kardiyoloji (`Merkez Hastanesi`) |
+| Hekim (`ROLE_STAFF`) | `doctor.ayse@clinic.test` | `DEMO_DOCTOR_PASSWORD` (`Doctor123!`) | Dr. Ayşe Demir — Dahiliye (`Sahil Polikliniği`) |
+| Hasta (`ROLE_PATIENT`) | `patient.ali@clinic.test` | `DEMO_PATIENT_PASSWORD` (`Patient123!`) | Ali Yılmaz |
+| Hasta (`ROLE_PATIENT`) | `patient.zeynep@clinic.test` | `DEMO_PATIENT_PASSWORD` (`Patient123!`) | Zeynep Kaya |
+
+**Kapsamlandırılmış Demo Sıfırlama (Yalnızca Açık Onaylı `dev` CLI Modu):**
+HTTP/UI üzerinden sıfırlama uç noktası bulunmaz. Yalnızca demo kayıtlarını yabancı anahtar sırasına göre temizleyip yeniden tohumlamak için:
+```bash
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev -Dspring-boot.run.arguments="--spring.main.web-application-type=none --clinic.demo.reset.enabled=true --clinic.demo.reset.reseed=true"
+```
 
 Sağlık denetimi endpoint'i:
 ```bash
 curl http://localhost:8080/actuator/health
 ```
 
-> **Önemli Not:** S08 ile birlikte giriş (`/login`), hasta (`/patient/**`), personel (`/staff/**`), yönetici (`/admin/**`) ekranları ve `/error` sayfaları eklenmiştir. Sağlık denetimi için `/actuator/health` aktiftir.
+> **Önemli Not:** Giriş (`/login`), hasta (`/patient/**`), personel (`/staff/**`), yönetici (`/admin/**`) ekranları ve `/error` sayfaları aktiftir. Sağlık denetimi için `/actuator/health` aktiftir. Demo tohumlayıcı (`DemoDataSeeder`), `DemoEnvironmentGuard` korumasıyla üretim profilleri ve yerel olmayan veritabanı hedeflerinde kesinlikle reddedilir.
 
 ---
 
@@ -203,7 +221,7 @@ clinic-appointment/
 | **S06** | Randevu Rezervasyonu ve Çakışma Önleme | **Uygulandı (Doğrulandı)** | Slot arama, satır kilitleme (pessimistic lock), çakışmasız PENDING randevu |
 | **S07** | Randevu Onay Yaşam Döngüsü ve Geçmiş | **Uygulandı (Doğrulandı)** | Onay/ret/iptal akışı, durum makinesi, append-only denetim geçmişi |
 | **S08** | Spring MVC ve Thymeleaf Kullanıcı Ekranları | **Uygulandı (Doğrulandı)** | Hasta, personel ve yönetici arayüzleri, form doğrulama, hata sayfaları |
-| **S09** | Test Regresyonu, Eşzamanlılık ve Demo Seed | *Planlandı* | Entegrasyon testleri, eşzamanlı rezervasyon testi, kurmaca seed verisi |
+| **S09** | Test Regresyonu, Eşzamanlılık ve Demo Seed | **Uygulandı (Doğrulandı — [Rapor](docs/07-sprintler/S09-implementation-report.md))** | `DemoDataSeeder`, güvenli reset, 5-thread stres testi (`ConcurrentBookingIT`), p95 kıyaslama (`PerformanceBenchmarkIT`) |
 | **S10** | Nihai Kalite Kapısı, Sunum ve Akademik Teslim | *Planlandı* | 10 farklı gün commit kontrolü, sunum hazırlığı, akademik rapor |
 
 ---

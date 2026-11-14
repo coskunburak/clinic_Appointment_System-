@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,4 +24,10 @@ public interface AppointmentStatusHistoryJpaRepository extends JpaRepository<App
     List<AppointmentStatusHistoryJpaEntity> findByAppointmentIdOrderByOccurredAtAsc(@Param("appointmentId") UUID appointmentId);
 
     List<AppointmentStatusHistoryJpaEntity> findByAppointmentIdOrderByOccurredAtAscIdAsc(UUID appointmentId);
+
+    @Query("SELECT h.id FROM AppointmentStatusHistoryJpaEntity h WHERE h.appointmentId IN :appointmentIds")
+    List<UUID> findIdsByAppointmentIdIn(@Param("appointmentIds") Collection<UUID> appointmentIds);
+
+    @Query("SELECT h.id FROM AppointmentStatusHistoryJpaEntity h WHERE h.actorUserId IN :actorUserIds")
+    List<UUID> findIdsByActorUserIdIn(@Param("actorUserIds") Collection<UUID> actorUserIds);
 }

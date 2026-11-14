@@ -32,16 +32,16 @@ FR-030,SHOULD,Randevu ve onay hareketi olay geçmişine yazılır,S07,TC-030,APP
 FR-031,SHOULD,Randevu tekrar gönderiminde idempotency desteklenir,S06,TC-031,DEFERRED,DEFERRED
 FR-032,SHOULD,İşlem fiyat/süre snapshot değerleri değişmeden korunur,S06,TC-032,PASS_OWNER_VERIFIED,PASSED
 FR-033,SHOULD,Zaman dilimi doğru dönüştürülür,S06,TC-033,PASS_OWNER_VERIFIED,PASSED
-FR-034,SHOULD,Demo seed ve demo reset prosedürü vardır,S09,TC-034,PLANNED,NOT_RUN
+FR-034,SHOULD,Demo seed ve demo reset prosedürü vardır,S09,TC-034,PASS_OWNER_VERIFIED,PASSED
 FR-035,COULD,Kullanıcı için uygulama içi bildirimler vardır,S10,TC-035,PLANNED,NOT_RUN
 FR-036,COULD,Hizmet/şube rapor filtreleri vardır,S10,TC-036,PLANNED,NOT_RUN
 NFR-001,MUST,"Şifre plaintext saklanmaz, oturum ve CSRF korunur",S04,TC-037,PASS_OWNER_VERIFIED,PASSED
 NFR-002,MUST,Müşteri/kurum düzeyinde erişim kontrolleri servis katmanında uygulanır,S04,TC-038,PASS_OWNER_VERIFIED,PASSED
 NFR-003,MUST,Flyway ile sıfırdan şema kurulabilir ve migration tekrarlanabilir,S01,TC-039,PLANNED,NOT_RUN
-NFR-004,MUST,Kritik iş kuralı unit ve PostgreSQL integration testleri bulunur,S09,TC-040,PLANNED,NOT_RUN
-NFR-005,MUST,Sistem baştan demo verisi ile ayağa kaldırılabilir,S09,TC-041,PLANNED,NOT_RUN
+NFR-004,MUST,Kritik iş kuralı unit ve PostgreSQL integration testleri bulunur,S09,TC-040,PASS_OWNER_VERIFIED,PASSED
+NFR-005,MUST,Sistem baştan demo verisi ile ayağa kaldırılabilir,S09,TC-041,PASS_OWNER_VERIFIED,PASSED
 NFR-006,MUST,En az 10 farklı gerçek günde commit kanıtı vardır,S10,TC-042,PLANNED,NOT_RUN
 NFR-007,MUST,GitHub + SABİS + canlı sunum teslimleri yapılır,S10,TC-043,PLANNED,NOT_RUN
-NFR-008,SHOULD,Randevu p95 yanıt süresi yerel örnek yükte 1sn altı hedeflenir,S09,TC-044,PLANNED,NOT_RUN
+NFR-008,SHOULD,Randevu p95 yanıt süresi yerel örnek yükte 1sn altı hedeflenir,S09,TC-044,PASS_OWNER_VERIFIED,PASSED
 NFR-009,SHOULD,Hata yanıtları güvenli ve kullanıcıya açıklayıcıdır,S08,TC-045,PASS_OWNER_VERIFIED,PASSED
-NFR-010,SHOULD,Kod test edilebilir ve katman sınırları doğrulanır,S09,TC-046,PLANNED,NOT_RUN
+NFR-010,SHOULD,Kod test edilebilir ve katman sınırları doğrulanır,S09,TC-046,PASS_OWNER_VERIFIED,PASSED

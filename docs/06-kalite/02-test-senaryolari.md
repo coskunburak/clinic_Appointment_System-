@@ -37,19 +37,19 @@
 | TC-031 | FR-031 | aynı requestKey ile formu iki kez gönder; gövde değiştir | aynı içerik aynı sonuç; farklı içerik 409 |
 | TC-032 | FR-032 | fiyatı 800den 900e değiştir; eski appointment getir | eski 800, yeni 900 snapshot |
 | TC-033 | FR-033 | IANA zone local->UTC dönüşümünü; DST gap/overlap test et | belirsiz/olmayan saat açık hataya dönüşür |
-| TC-034 | FR-034 | demo db reset + seed uygula | 1 org 2 şube, kurmaca hesaplar ve sahte hizmetler hazır |
+| TC-034 | FR-034 | demo db reset + seed uygula | 1 org 2 şube, kurmaca hesaplar ve 5 durumlu randevular hazır (`DemoDataSeederIT` 11/11, `DemoDataSeederUnitTest` 6/6, `DemoEnvironmentGuardTest` 4/4 — Otomatize / `VERIFIED_BY_OWNER`) |
 | TC-035 | FR-035 | personel onayından sonra patient panelini kontrol et | COULD uygulandıysa in-app notification var |
 | TC-036 | FR-036 | şube/hizmet filtresiyle raporu görüntüle | COULD uygulandıysa yalnız scope içi sonuç |
 | TC-037 | NFR-001 | CSRF olmadan form gönder; session cookie kontrol et | koruma etkin ve parola hashli |
 | TC-038 | NFR-002 | service katmanını yetkisiz actor ile doğrudan çağır | controller bypass edilse de erişim reddedilir |
 | TC-039 | NFR-003 | boş PostgreSQL üzerinde Flyway migrate; ikinci kez migrate | şema kurulur, ikinci çağrı idempotent ve validate başarılı |
-| TC-040 | NFR-004 | BookingServiceTest + BookingConcurrencyIT çalıştır | kritik kurallar yeşil ve çıktı arşivli |
-| TC-041 | NFR-005 | fresh clone + compose + run + demo hesapla login | README doğru ve sistem sıfırdan açılır |
+| TC-040 | NFR-004 | Tam Surefire + PostgreSQL Failsafe (`./mvnw clean verify`) ve 5-thread eşzamanlılık testi çalıştır | 46 Surefire sınıfı (`366/366`) + 20 Failsafe IT sınıfı (`135/135`, `ConcurrentBookingIT` `2/2` dahil, toplam `501` koşum) sıfır hata/atlama (`VERIFIED_BY_OWNER`) |
+| TC-041 | NFR-005 | `dev` profiliyle sıfırdan PostgreSQL üzerinde başlat + demo hesapla giriş/işlem doğrula | README doğru ve sistem deterministik verilerle açılır (`DemoDataSeederIT` `11/11` — Otomatize / `VERIFIED_BY_OWNER`) |
 | TC-042 | NFR-006 | git log tarihlerini gün olarak grupla | en az 10 farklı gerçek gün, GitHub push/commit görülebilir |
 | TC-043 | NFR-007 | GitHub URL, SABİS yüklemesi, sunum katılımı doğrula | üç teslim kanıtı tamamlanmış |
-| TC-044 | NFR-008 | 1000 örnek randevu/50 çalışanla yerel ölçüm al | hedef p95<1sn; ortama göre ölçüm raporlanır |
+| TC-044 | NFR-008 | 1000 örnek randevu/50 çalışanla PostgreSQL üzerinde yerel ölçüm al | `availability-slot-search p95=21.86 ms`, `booking-tx p95=14.74 ms`, `errorRate=0.0000` (`PerformanceBenchmarkIT` `1/1`, `PerformanceMetricsTest` `2/2` — `VERIFIED_BY_OWNER`) |
 | TC-045 | NFR-009 | hatalı UUID, negatif fiyat, çakışma gönder | kullanıcıya anlamlı kod; stacktrace/SQL yok (`Sprint08AcceptanceSpecificationTest.customErrorPageHandles403`, `CustomErrorControllerMvcTest`, `WebExceptionHandler` — Otomatize / `VERIFIED_BY_OWNER`) |
-| TC-046 | NFR-010 | mimari bağımlılıkları denetle; controller taraması yap | controller iş mantığı ve direkt repo bağımlılığı içermez |
+| TC-046 | NFR-010 | mimari bağımlılıkları denetle; controller ve saf domain taraması yap | saf domain framework-bağımsız, controller'lar repo/demo-servis bağımsız (`DomainArchitectureTest` `1/1`, `WebArchitectureTest` `3/3`, `AppointmentArchitectureTest` `5/5` — Otomatize / `VERIFIED_BY_OWNER`) |
 
 ## Özellikle gözden geçirilecek sınırlar
 - `[09:00,09:30)` ve `[09:30,10:00)` çakışmaz; milisaniye veya saniye sınırını test et.

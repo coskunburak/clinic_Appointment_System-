@@ -19,7 +19,9 @@ class DomainArchitectureTest {
             "jakarta.persistence",
             "org.hibernate",
             "java.sql",
-            "javax.sql"
+            "javax.sql",
+            "com.example.clinic.common.infrastructure",
+            "com.example.clinic.web"
     );
 
     @Test

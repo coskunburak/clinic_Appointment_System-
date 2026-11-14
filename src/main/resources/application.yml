@@ -1,8 +1,6 @@
 spring:
   application:
     name: clinic-appointment
-  profiles:
-    default: dev
   thymeleaf:
     cache: false
     encoding: UTF-8
@@ -39,3 +37,11 @@ management:
       show-details: when-authorized
       probes:
         enabled: true
+
+clinic:
+  demo:
+    seed:
+      enabled: false
+    reset:
+      enabled: false
+      reseed: false

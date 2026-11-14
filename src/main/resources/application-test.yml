@@ -11,3 +11,11 @@ logging:
   level:
     com.example.clinic: DEBUG
     org.flywaydb: INFO
+
+clinic:
+  demo:
+    seed:
+      enabled: false
+    reset:
+      enabled: false
+      reseed: false

@@ -92,4 +92,16 @@ public interface AppointmentJpaRepository extends JpaRepository<AppointmentJpaEn
     );
 
     List<AppointmentJpaEntity> findByBranchId(UUID branchId);
+
+    @Query("SELECT a.id FROM AppointmentJpaEntity a WHERE a.branchId IN :branchIds")
+    List<UUID> findIdsByBranchIdIn(@Param("branchIds") Collection<UUID> branchIds);
+
+    @Query("SELECT a.id FROM AppointmentJpaEntity a WHERE a.branchServiceId IN :branchServiceIds")
+    List<UUID> findIdsByBranchServiceIdIn(@Param("branchServiceIds") Collection<UUID> branchServiceIds);
+
+    @Query("SELECT a.id FROM AppointmentJpaEntity a WHERE a.patientId IN :patientIds")
+    List<UUID> findIdsByPatientIdIn(@Param("patientIds") Collection<UUID> patientIds);
+
+    @Query("SELECT a.id FROM AppointmentJpaEntity a WHERE a.staffId IN :staffIds")
+    List<UUID> findIdsByStaffIdIn(@Param("staffIds") Collection<UUID> staffIds);
 }

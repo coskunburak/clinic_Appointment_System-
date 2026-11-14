@@ -14,3 +14,15 @@ logging:
   level:
     com.example.clinic: DEBUG
     org.flywaydb: INFO
+
+clinic:
+  demo:
+    seed:
+      enabled: true
+    reset:
+      enabled: false
+      reseed: true
+    credentials:
+      admin-password: ${DEMO_ADMIN_PASSWORD:Admin123!}
+      doctor-password: ${DEMO_DOCTOR_PASSWORD:Doctor123!}
+      patient-password: ${DEMO_PATIENT_PASSWORD:Patient123!}

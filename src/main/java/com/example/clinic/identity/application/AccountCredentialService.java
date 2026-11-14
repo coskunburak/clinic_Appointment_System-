@@ -126,6 +126,22 @@ public class AccountCredentialService {
         return passwordEncoder.matches(rawPassword, encodedHash);
     }
 
+    /**
+     * Validates a raw plaintext credential against system password policy and returns a BCrypt hash.
+     * Ensures controlled provisioning flows reuse a single security boundary without storing plaintext.
+     */
+    public String encodeVerifiedPassword(String rawPassword) {
+        validateRawPassword(rawPassword);
+        return passwordEncoder.encode(rawPassword);
+    }
+
+    /**
+     * Validates and canonicalizes an account email address.
+     */
+    public String normalizeEmail(String rawEmail) {
+        return validateAndNormalizeEmail(rawEmail);
+    }
+
     private String validateAndNormalizeEmail(String rawEmail) {
         if (rawEmail == null || rawEmail.isBlank()) {
             throw new IllegalArgumentException("Email must not be null or blank");

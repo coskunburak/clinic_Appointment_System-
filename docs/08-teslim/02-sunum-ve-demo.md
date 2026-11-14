@@ -32,9 +32,9 @@ Bu belge, **Sakarya Üniversitesi Nesneye Dayalı Programlama (OOP)** dersi Seç
 Canlı sunumda öğretim elemanına gösterilecek deterministik akış:
 
 ### Adım 1: Yönetici (Admin) Rolü ile Başlangıç (1 dk)
-1. Tarayıcıda `http://localhost:8080/login` adresine gidin ve Yönetici olarak giriş yapın.
-2. **Kurum ve Şube Tanımı:** "Merkez Şube" ve "Sahil Şubesi" detaylarını gösterin; şubelerin farklı çalışma saatleri (`09:00 - 18:00`) ve zaman dilimlerini sergileyin.
-3. **Bölüm ve Hizmet Kataloğu:** "Kardiyoloji" ve "Radyoloji" bölümlerini; "Genel Muayene" (30 dk, 1500 TL) ve "Eko Çekimi" (45 dk, 2500 TL) hizmetlerinin tanımlarını gösterin.
+1. Uygulamayı `dev` profiliyle başlatın (`./mvnw spring-boot:run -Dspring-boot.run.profiles=dev`), tarayıcıda `http://localhost:8080/login` adresine gidin ve `admin@clinic.test` (dev varsayılanı: `Admin123!`) ile giriş yapın.
+2. **Kurum ve Şube Tanımı:** `Örnek Sağlık Grubu` altında **"Merkez Hastanesi (Kadıköy)"** ve **"Sahil Polikliniği (Beşiktaş)"** detaylarını, farklı çalışma saatlerini (`08:30–18:00` + Cmt `09:00–14:00` ve `09:00–18:00`) sergileyin.
+3. **Bölüm ve Hizmet Kataloğu:** "Kardiyoloji", "Radyoloji", "Dahiliye", "Laboratuvar" bölümlerini; "Genel Muayene" (30 dk, 1500 TL), "Eko Çekimi" (45 dk, 2500 TL), "Radyoloji Akciğer Grafisi" (20 dk, 1200 TL) ve "Kan Tahlili" (15 dk, 600 TL) tanımlarını gösterin.
 
 ### Adım 2: Doktor Tanımlama ve Müsaitlik Takvimi (1 dk)
 1. "Dr. Ahmet Kaya" personel kaydını açın; uzmanlık alanının Kardiyoloji olduğunu ve Genel Muayene hizmetine yetkilendirildiğini (`StaffServiceEligibility`) gösterin.
@@ -81,9 +81,10 @@ Sunum günü internet bağlantısı kesilebilir veya yavaşlayabilir. Aşağıda
 
 - [ ] **Docker PostgreSQL Hazırlığı:** `docker compose up -d` komutu sunumdan önce çalıştırılmalı ve container'ın sağlıklı (`healthy`) olduğu `docker compose ps` ile teyit edilmelidir.
 - [ ] **İnternetsiz Çalışma (Offline Test):** Tarayıcıda CDN kaynaklı CSS/JS kırılmalarını önlemek için statik varlıklar (Bootstrap vb.) yerel `src/main/resources/static/` dizininde hazır bulunmalıdır.
-- [ ] **Önceden Hazır Demo Hesapları:**
+- [ ] **Önceden Hazır Demo Hesapları (`dev` profili):**
   - Admin: `admin@clinic.test`
-  - Doktor: `doctor1@clinic.test`
-  - Hasta: `patient1@clinic.test`
+  - Doktorlar: `doctor.ahmet@clinic.test` (Kardiyoloji — Merkez), `doctor.ayse@clinic.test` (Dahiliye — Sahil)
+  - Hastalar: `patient.ali@clinic.test`, `patient.zeynep@clinic.test`
+  *(Parolalar `.env` veya `application-dev.yml` üzerinden `DEMO_ADMIN_PASSWORD` / `DEMO_DOCTOR_PASSWORD` / `DEMO_PATIENT_PASSWORD` değişkenleriyle tanımlanır.)*
 - [ ] **Test Kanıtlarının Hazır Bulundurulması:** Terminalde `./mvnw verify` çıktısı ve Testcontainers test raporları bir sekmede açık tutulmalıdır.
 - [ ] **GitHub 10 Gün Commit Geçmişi:** `git log --format='%h %as %s' --reverse` çıktısı hazırda bekletilmelidir.
