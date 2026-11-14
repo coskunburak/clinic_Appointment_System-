@@ -25,8 +25,8 @@ FR-023,MUST,Personel rolü yalnız yetkili şube/kendi programını görür,S04,
 FR-024,MUST,Yönetici rolü şube/kurum yönetimini yapar,S04,TC-024,PASS_OWNER_VERIFIED,PASSED
 FR-025,MUST,Kimlik doğrulama ve parola hash sistemi vardır,S04,TC-025,PASS_OWNER_VERIFIED,PASSED
 FR-026,MUST,Yetkisiz kuruma/şubeye erişim engellenir,S04,TC-026,PASS_OWNER_VERIFIED,PASSED
-FR-027,MUST,Hasta ve personel için ekran akışları vardır,S08,TC-027,PRESENTATION_IMPLEMENTED,CODE_COMPLETE_AWAITING_OWNER_TEST
-FR-028,MUST,Yönetim ekranları kurum/şube/hizmet/saat/personel yönetir,S08,TC-028,PRESENTATION_IMPLEMENTED,CODE_COMPLETE_AWAITING_OWNER_TEST
+FR-027,MUST,Hasta ve personel için ekran akışları vardır,S08,TC-027,PASS_OWNER_VERIFIED,PASSED
+FR-028,MUST,Yönetim ekranları kurum/şube/hizmet/saat/personel yönetir,S08,TC-028,PASS_OWNER_VERIFIED,PASSED
 FR-029,SHOULD,Hasta aynı anda iki randevuda bulunamaz,S06,TC-029,PASS_OWNER_VERIFIED,PASSED
 FR-030,SHOULD,Randevu ve onay hareketi olay geçmişine yazılır,S07,TC-030,APPLICATION_SERVICE_IMPLEMENTED,OWNER_TEST_PENDING
 FR-031,SHOULD,Randevu tekrar gönderiminde idempotency desteklenir,S06,TC-031,DEFERRED,DEFERRED
@@ -43,5 +43,5 @@ NFR-005,MUST,Sistem baştan demo verisi ile ayağa kaldırılabilir,S09,TC-041,P
 NFR-006,MUST,En az 10 farklı gerçek günde commit kanıtı vardır,S10,TC-042,PLANNED,NOT_RUN
 NFR-007,MUST,GitHub + SABİS + canlı sunum teslimleri yapılır,S10,TC-043,PLANNED,NOT_RUN
 NFR-008,SHOULD,Randevu p95 yanıt süresi yerel örnek yükte 1sn altı hedeflenir,S09,TC-044,PLANNED,NOT_RUN
-NFR-009,SHOULD,Hata yanıtları güvenli ve kullanıcıya açıklayıcıdır,S08,TC-045,PRESENTATION_IMPLEMENTED,CODE_COMPLETE_AWAITING_OWNER_TEST
+NFR-009,SHOULD,Hata yanıtları güvenli ve kullanıcıya açıklayıcıdır,S08,TC-045,PASS_OWNER_VERIFIED,PASSED
 NFR-010,SHOULD,Kod test edilebilir ve katman sınırları doğrulanır,S09,TC-046,PLANNED,NOT_RUN

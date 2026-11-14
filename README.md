@@ -5,12 +5,12 @@
 [![Build Tool](https://img.shields.io/badge/Maven%20Wrapper-3.9.9-blue.svg)](https://maven.apache.org/)
 [![Database](https://img.shields.io/badge/PostgreSQL-17-blue.svg)](https://www.postgresql.org/)
 [![Migration](https://img.shields.io/badge/Flyway-V4-red.svg)](https://flywaydb.org/)
-[![Sprint](https://img.shields.io/badge/Sprint-S08%20(Spring%20MVC%20ve%20Thymeleaf%20Ekranları)-yellowgreen.svg)](docs/07-sprintler/S08.md)
+[![Sprint](https://img.shields.io/badge/Sprint-S08%20(Spring%20MVC%20ve%20Thymeleaf%20Ekranları)-brightgreen.svg)](docs/07-sprintler/S08.md)
 [![Academic Status](https://img.shields.io/badge/Academic%20Project-OOP%20Seçenek%20A-informational.svg)](docs/00-baslangic/02-proje-kunyesi-ve-basari.md)
 
 Bu proje, üniversite **Nesneye Dayalı Programlama (OOP)** dersi kapsamında geliştirilen, tek ve çok şubeli sağlık kuruluşlarının randevu süreçlerini uçtan uca yönetmeyi amaçlayan web tabanlı bir hastane/klinik randevu yönetim sistemidir.
 
-> **Mevcut Proje Durumu:** **Sprint S08 — Spring MVC ve Thymeleaf Kullanıcı Ekranları (3 Rol)** sunucu taraflı render edilen (SSR) dinamik HTML arayüzleri, ince (thin) rol bazlı Spring MVC denetleyicileri (`PatientBookingController`, `StaffScheduleController`, `AdminDashboardController`, `AdminBranchController`, `AdminDepartmentController`, `AdminServiceController`, `AdminStaffController`, `CustomErrorController`), `@Valid` form DTO doğrulaması, yerel Bootstrap 5 + `clinic.css`/`clinic.js` varlıkları, güvenli özel hata sayfaları (`400`, `403`, `404`, `500`) ve 88 S08 otomatik test metodu (81 birim/MVC/mimari + 7 `RoleBasedWebMvcIT` PostgreSQL Testcontainers entegrasyon testi) ile kod tamamlanmış durumdadır (Statü: `CODE_COMPLETE_AWAITING_OWNER_TEST` — ürün sahibinin manuel `./mvnw clean verify` doğrulaması beklenmektedir). S07 tabanı (`386` test) `VERIFIED_BY_OWNER` olarak doğrulanmıştır. Detaylar için [S08 Uygulama Raporu](docs/07-sprintler/S08-implementation-report.md) incelenebilir.
+> **Mevcut Proje Durumu:** **Sprint S08 — Spring MVC ve Thymeleaf Kullanıcı Ekranları (3 Rol)** sunucu taraflı render edilen (SSR) dinamik HTML arayüzleri, ince (thin) rol bazlı Spring MVC denetleyicileri (`PatientBookingController`, `StaffScheduleController`, `AdminDashboardController`, `AdminBranchController`, `AdminDepartmentController`, `AdminServiceController`, `AdminStaffController`, `CustomErrorController`), `@Valid` form DTO doğrulaması, yerel Bootstrap 5 + `clinic.css`/`clinic.js` varlıkları, güvenli özel hata sayfaları (`400`, `403`, `404`, `500`) ve 88 S08 otomatik test metodu (81 birim/MVC/mimari + 7 `RoleBasedWebMvcIT` PostgreSQL Testcontainers entegrasyon testi) ile tamamlanmış ve depo sahibi tarafından `./mvnw clean verify` (`BUILD SUCCESS`, `121` Failsafe entegrasyon testi sıfır hata/atlama + Surefire kapısı geçildi) ile doğrulanmıştır (Statü: `VERIFIED_BY_OWNER`, commit `9c35715`). S07 tabanı (`386` test) da `VERIFIED_BY_OWNER` olarak doğrulanmıştır. Detaylar için [S08 Uygulama Raporu](docs/07-sprintler/S08-implementation-report.md) incelenebilir.
 
 ---
 
@@ -202,7 +202,7 @@ clinic-appointment/
 | **S05** | Personel Yönetimi ve Çalışma Saatleri | **Uygulandı (Doğrulandı)** | Doktor/personel uygunluk aralıkları, izinler, haftalık mesai |
 | **S06** | Randevu Rezervasyonu ve Çakışma Önleme | **Uygulandı (Doğrulandı)** | Slot arama, satır kilitleme (pessimistic lock), çakışmasız PENDING randevu |
 | **S07** | Randevu Onay Yaşam Döngüsü ve Geçmiş | **Uygulandı (Doğrulandı)** | Onay/ret/iptal akışı, durum makinesi, append-only denetim geçmişi |
-| **S08** | Spring MVC ve Thymeleaf Kullanıcı Ekranları | **Kod Tamamlandı (`CODE_COMPLETE_AWAITING_OWNER_TEST`)** | Hasta, personel ve yönetici arayüzleri, form doğrulama, hata sayfaları |
+| **S08** | Spring MVC ve Thymeleaf Kullanıcı Ekranları | **Uygulandı (Doğrulandı)** | Hasta, personel ve yönetici arayüzleri, form doğrulama, hata sayfaları |
 | **S09** | Test Regresyonu, Eşzamanlılık ve Demo Seed | *Planlandı* | Entegrasyon testleri, eşzamanlı rezervasyon testi, kurmaca seed verisi |
 | **S10** | Nihai Kalite Kapısı, Sunum ve Akademik Teslim | *Planlandı* | 10 farklı gün commit kontrolü, sunum hazırlığı, akademik rapor |
 

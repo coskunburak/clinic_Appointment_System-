@@ -4,7 +4,7 @@
 - **Sprint Kodu:** S08
 - **Sprint Başlığı:** Complete Role-Based Spring MVC, Server-Side Rendered Thymeleaf 3 User Interfaces (Patient, Staff, Admin), Offline Local Bootstrap 5 Design System, Form Validation, and Secure Error Handling
 - **Sorumlu:** Principal Java/Spring Boot Architect, Senior Spring MVC/Thymeleaf Engineer, Application Security Architect, PostgreSQL Engineer, Accessibility Engineer, QA Architect, Academic OOP Compliance Reviewer
-- **Sprint Statüsü:** `CODE_COMPLETE_AWAITING_OWNER_TEST` *(Akademik Kural 1.1 gereğince hiçbir derleme, Testcontainers, Flyway veya Maven test komutu ajan tarafından çalıştırılmamıştır. Tüm çalışma zamanı doğrulamaları ürün sahibinin manuel çalıştırmasını beklemektedir.)*
+- **Sprint Statüsü:** `VERIFIED_BY_OWNER` *(Akademik Kural 1.1 gereğince hiçbir derleme, Testcontainers, Flyway veya Maven test komutu ajan tarafından çalıştırılmamıştır; tüm testler ürün sahibi tarafından `9c35715` commit'i üzerinde `./mvnw clean verify` ile çalıştırılmış ve `BUILD SUCCESS` — `121` Failsafe PostgreSQL entegrasyon testi `0` hata/atlama + Surefire birim/MVC kapısı tam geçiş olarak doğrulanmıştır.)*
 
 ---
 
@@ -24,7 +24,7 @@ Sprint S08'in temel hedefleri:
 - **Depo (Repository):** `https://github.com/coskunburak/clinic_Appointment_System-`
 - **Etkin Dal (Branch):** `main`
 - **S07 Doğrulanmış Temel (Verified Baseline):** `9c81d86590160a5ad6e675b4531ced087df11dbb` (`VERIFIED_BY_OWNER` — 272 birim testi + 114 entegrasyon testi = 386 geçen test)
-- **Bu Tamamlama Turunun Başlangıç HEAD SHA'sı:** `1fe6b389824b482548ee302c7c374141a40f2ccd` (`docs(s08): record owner-verified test success and complete S08 milestone [skip ci] [skip actions]`)
+- **Doğrulanan Kaynak Kod ve Test Commit'i:** `9c35715d8ff9fa93f514e4fab99d90db8e9bbec9` (`fix(s08): assert canonical view model attribute in StaffScheduleControllerMvcTest [skip ci] [skip actions]` — ürün sahibi `./mvnw clean verify` çalıştırmasıyla `BUILD SUCCESS`)
 - **Korunan Çekirdek ve Teknoloji Tabanı:** Java 21, Spring Boot 3.4.2, Spring MVC, Spring Security 6.4, Thymeleaf 3, Jakarta Bean Validation, Spring Data JPA, PostgreSQL 17, Flyway Community (`V1`–`V4` migrasyonları değiştirilmeden korundu), `pom.xml` sürüm ve bağımlılıkları korundu.
 
 ---
@@ -123,10 +123,10 @@ Sprint S08'in temel hedefleri:
 
 ---
 
-## 6. S08 Test Envanteri ve Sayısal Özeti (Authoring Summary — Not Executed by Agent)
+## 6. S08 Test Envanteri ve Sahip Doğrulama Özeti (`VERIFIED_BY_OWNER`)
 
 > [!IMPORTANT]
-> Akademik Kural 1.1 gereğince hiçbir Maven, JUnit veya Testcontainers komutu ajan tarafından **çalıştırılmamıştır**. Aşağıdaki sayılar kaynak dosyalardaki statik `@Test` / `@ParameterizedTest` / `@RepeatedTest` anotasyon sayılarına dayanmaktadır.
+> Akademik Kural 1.1 gereğince hiçbir Maven, JUnit veya Testcontainers komutu ajan tarafından çalıştırılmamıştır. Aşağıdaki statik sayılar kaynak dosyalardaki `@Test` / `@ParameterizedTest` / `@RepeatedTest` anotasyon sayılarına, çalışma zamanı doğrulaması ise ürün sahibinin `9c35715` commit'i üzerinde yürüttüğü `./mvnw clean verify` (`BUILD SUCCESS`, `39.354 s`, Failsafe `Tests run: 121, Failures: 0, Errors: 0, Skipped: 0`) çıktısına dayanmaktadır.
 
 ### S08 Kapsamında Eklenen / Genişletilen Test Sınıfları
 
@@ -153,7 +153,7 @@ Sprint S08'in temel hedefleri:
 *(Eski monolitik `AdminManagementControllerMvcTest.java` kaldırılmıştır.)*
 
 - **Tüm Depo Statik Test Envanteri:** 60 test dosyasında toplam **447** test anotasyonu (**326** birim/MVC/mimari + **121** PostgreSQL entegrasyon testi).
-- **Not (Statik Sayım vs. Surefire Çalıştırma Sayısı):** S07 doğrulamasında yer alan 7 adet `@ParameterizedTest` metodu çalışma zamanında birden fazla veri kümesine açıldığı için Surefire raporundaki koşulan senaryo sayısı statik anotasyon sayısından biraz farklı görünebilir. Gerçek yeşil/kırmızı test sonucu ürün sahibinin çalıştırmasıyla teyit edilecektir.
+- **Ürün Sahibi Doğrulama Sonucu (`VERIFIED_BY_OWNER`):** Ürün sahibi tarafından `9c35715` commit'i üzerinde `./mvnw clean verify` çalıştırılarak `BUILD SUCCESS` (`39.354 s`) elde edilmiştir; Failsafe PostgreSQL entegrasyon testleri `Tests run: 121, Failures: 0, Errors: 0, Skipped: 0` ile geçmiş, Surefire birim/MVC fazı da hatasız tamamlanarak `verify` kapısından geçmiştir (`@ParameterizedTest` açılımları nedeniyle önceki Surefire koşumunda `353` senaryo yürütülmüş ve tek assertion farkı `9c35715` ile giderilmiştir).
 
 ---
 
@@ -161,12 +161,12 @@ Sprint S08'in temel hedefleri:
 
 | Kimlik | Tür | Kapsam Özeti | S08 Kaynak & Test Eşlemesi | Durum |
 |---|---|---|---|---|
-| **FR-027** | Gereksinim | Hasta ve klinisyen/personel uçtan uca MVC akışları | `PatientBookingController`, `StaffScheduleController`, `AppointmentQueryService`, `PatientBookingQueryService`, `PatientBookingControllerMvcTest`, `StaffScheduleControllerMvcTest`, `RoleBasedWebMvcIT` | `CODE_COMPLETE_AWAITING_OWNER_TEST` |
-| **FR-028** | Gereksinim | Klinik/hastane yöneticisi kaynak, hizmet, saat ve personel ekranları | `AdminDashboardController`, `AdminBranchController`, `AdminDepartmentController`, `AdminServiceController`, `AdminStaffController`, `Admin*ControllerMvcTest`, `RoleBasedWebMvcIT` | `CODE_COMPLETE_AWAITING_OWNER_TEST` |
-| **NFR-009** | Gereksinim | Güvenli ve anlaşılır hata yönetimi (400/403/404/500) | `CustomErrorController`, `WebExceptionHandler`, `WebErrorMessageMapper`, `templates/error/{400,403,404,500}.html`, `CustomErrorControllerMvcTest` | `CODE_COMPLETE_AWAITING_OWNER_TEST` |
-| **TC-027** | Kabul Testi | Hasta randevu alma ve hekim onay/red/tamamlama akışı | `Sprint08AcceptanceSpecificationTest`, `PatientBookingControllerMvcTest`, `StaffScheduleControllerMvcTest`, `RoleBasedWebMvcIT` | `AUTHORED_AWAITING_OWNER_RUN` |
-| **TC-028** | Kabul Testi | Yönetici şube/bölüm/hizmet/saat/personel akışları | `AdminDashboardControllerMvcTest`, `AdminBranchControllerMvcTest`, `AdminDepartmentControllerMvcTest`, `AdminServiceControllerMvcTest`, `AdminStaffControllerMvcTest`, `RoleBasedWebMvcIT` | `AUTHORED_AWAITING_OWNER_RUN` |
-| **TC-045** | Kabul Testi | Hatalı girdi (400), yetkisiz erişim (403), bulunamayan kaynak (404) ve 500 güvenliği | `Sprint08AcceptanceSpecificationTest`, `CustomErrorControllerMvcTest`, `RoleBasedWebMvcIT` | `AUTHORED_AWAITING_OWNER_RUN` |
+| **FR-027** | Gereksinim | Hasta ve klinisyen/personel uçtan uca MVC akışları | `PatientBookingController`, `StaffScheduleController`, `AppointmentQueryService`, `PatientBookingQueryService`, `PatientBookingControllerMvcTest`, `StaffScheduleControllerMvcTest`, `RoleBasedWebMvcIT` | `VERIFIED_BY_OWNER` |
+| **FR-028** | Gereksinim | Klinik/hastane yöneticisi kaynak, hizmet, saat ve personel ekranları | `AdminDashboardController`, `AdminBranchController`, `AdminDepartmentController`, `AdminServiceController`, `AdminStaffController`, `Admin*ControllerMvcTest`, `RoleBasedWebMvcIT` | `VERIFIED_BY_OWNER` |
+| **NFR-009** | Gereksinim | Güvenli ve anlaşılır hata yönetimi (400/403/404/500) | `CustomErrorController`, `WebExceptionHandler`, `WebErrorMessageMapper`, `templates/error/{400,403,404,500}.html`, `CustomErrorControllerMvcTest` | `VERIFIED_BY_OWNER` |
+| **TC-027** | Kabul Testi | Hasta randevu alma ve hekim onay/red/tamamlama akışı | `Sprint08AcceptanceSpecificationTest`, `PatientBookingControllerMvcTest`, `StaffScheduleControllerMvcTest`, `RoleBasedWebMvcIT` | `VERIFIED_BY_OWNER` |
+| **TC-028** | Kabul Testi | Yönetici şube/bölüm/hizmet/saat/personel akışları | `AdminDashboardControllerMvcTest`, `AdminBranchControllerMvcTest`, `AdminDepartmentControllerMvcTest`, `AdminServiceControllerMvcTest`, `AdminStaffControllerMvcTest`, `RoleBasedWebMvcIT` | `VERIFIED_BY_OWNER` |
+| **TC-045** | Kabul Testi | Hatalı girdi (400), yetkisiz erişim (403), bulunamayan kaynak (404) ve 500 güvenliği | `Sprint08AcceptanceSpecificationTest`, `CustomErrorControllerMvcTest`, `RoleBasedWebMvcIT` | `VERIFIED_BY_OWNER` |
 
 ---
 
