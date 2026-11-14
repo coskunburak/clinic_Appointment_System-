@@ -151,20 +151,20 @@ class PatientBookingQueryServiceTest {
         ServiceDefinition inactiveDef = new ServiceDefinition(organization, "Pasif Hizmet", "Açıklama");
         inactiveDef.deactivate();
 
-        BranchService activeBs = new BranchService(branch, activeDef, 30, new Money(new BigDecimal("300.00"), Currency.getInstance("TRY")));
-        BranchService inactiveDefBs = new BranchService(branch, inactiveDef, 30, new Money(new BigDecimal("300.00"), Currency.getInstance("TRY")));
+        BranchService activeBs = new BranchService(branch, activeDef, 30, Money.of(new BigDecimal("300.00"), Currency.getInstance("TRY")));
+        BranchService inactiveDefBs = new BranchService(branch, inactiveDef, 30, Money.of(new BigDecimal("300.00"), Currency.getInstance("TRY")));
 
         when(branchServiceRepository.findByBranchIdAndActiveTrue(branch.getId()))
                 .thenReturn(List.of(activeBs, inactiveDefBs));
 
         List<ServiceSummaryDto> services = service.getActiveServicesForBranch(branch.getId());
         assertThat(services).hasSize(1);
-        assertThat(services.get(0).serviceName()).isEqualTo("Aktif Hizmet");
+        assertThat(services.get(0).name()).isEqualTo("Aktif Hizmet");
 
         Department inactiveDept = new Department(branch, "Pasif Bölüm");
         inactiveDept.deactivate();
         UserAccount docUser = new UserAccount("doc2@clinic.test", "hash");
-        StaffProfile docProfile = new StaffProfile(docUser, "Dr. Pasif Bölüm", "555", StaffType.DOCTOR, "Cildiye");
+        StaffProfile docProfile = new StaffProfile(docUser, "Dr. Pasif Bölüm", "+905551234568", StaffType.DOCTOR, "Cildiye");
         StaffAssignment inactiveDeptAssignment = new StaffAssignment(docProfile, branch, inactiveDept);
         StaffServiceEligibility ineligibleByDept = new StaffServiceEligibility(inactiveDeptAssignment, activeBs);
 

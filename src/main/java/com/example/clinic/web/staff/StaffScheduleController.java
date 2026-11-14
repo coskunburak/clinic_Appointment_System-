@@ -5,7 +5,6 @@ import com.example.clinic.booking.application.AppointmentConflictException;
 import com.example.clinic.booking.application.AppointmentQueryService;
 import com.example.clinic.booking.application.dto.AppointmentViewDto;
 import com.example.clinic.booking.application.dto.WeeklyDayScheduleDto;
-import com.example.clinic.booking.domain.AppointmentDomainException;
 import com.example.clinic.web.common.WebErrorMessageMapper;
 import com.example.clinic.web.form.RejectionForm;
 import jakarta.validation.Valid;
@@ -110,7 +109,7 @@ public class StaffScheduleController {
         try {
             appointmentApprovalService.approveAppointment(id);
             redirectAttributes.addFlashAttribute("successMessage", "Randevu başarıyla onaylandı (CONFIRMED).");
-        } catch (AppointmentConflictException | AppointmentDomainException | IllegalStateException | IllegalArgumentException e) {
+        } catch (AppointmentConflictException | IllegalStateException | IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage",
                     WebErrorMessageMapper.mapLifecycleError(e, "Randevu onaylanamadı."));
         }
@@ -136,7 +135,7 @@ public class StaffScheduleController {
         try {
             appointmentApprovalService.rejectAppointment(id, form.getReason().strip());
             redirectAttributes.addFlashAttribute("successMessage", "Randevu başarıyla reddedildi ve zaman aralığı serbest bırakıldı.");
-        } catch (AppointmentDomainException | IllegalStateException | IllegalArgumentException e) {
+        } catch (IllegalStateException | IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage",
                     WebErrorMessageMapper.mapLifecycleError(e, "Randevu reddedilemedi."));
         }
@@ -152,7 +151,7 @@ public class StaffScheduleController {
         try {
             appointmentApprovalService.completeAppointment(id);
             redirectAttributes.addFlashAttribute("successMessage", "Randevu başarıyla tamamlandı olarak işaretlendi (COMPLETED).");
-        } catch (AppointmentDomainException | IllegalStateException | IllegalArgumentException e) {
+        } catch (IllegalStateException | IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage",
                     WebErrorMessageMapper.mapLifecycleError(e, "Randevu tamamlanamadı."));
         }

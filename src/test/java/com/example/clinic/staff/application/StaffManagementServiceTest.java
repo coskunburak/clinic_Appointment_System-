@@ -277,7 +277,7 @@ class StaffManagementServiceTest {
         Department d = new Department(b, "Kardiyoloji");
         UserAccount actor = new UserAccount("admin-del@clinic.test", "hash");
         UserAccount docUser = new UserAccount("doc-del@clinic.test", "hash");
-        StaffProfile doc = new StaffProfile(docUser, "Dr. Selim", "555", StaffType.DOCTOR, "Kardiyoloji");
+        StaffProfile doc = new StaffProfile(docUser, "Dr. Selim", "+905551234567", StaffType.DOCTOR, "Kardiyoloji");
         StaffAssignment ownedAssignment = new StaffAssignment(doc, b, d);
         StaffAssignment foreignAssignment = new StaffAssignment(doc, b, d);
 
@@ -309,7 +309,7 @@ class StaffManagementServiceTest {
         UserAccount adminUser = new UserAccount("scoped-admin@clinic.test", "hash");
         UUID authorizedBranchId = UUID.randomUUID();
         UserAccount docUser = new UserAccount("doc-scoped@clinic.test", "hash");
-        StaffProfile scopedDoc = new StaffProfile(docUser, "Dr. Yetkili", "555", StaffType.DOCTOR, "Göz");
+        StaffProfile scopedDoc = new StaffProfile(docUser, "Dr. Yetkili", "+905551234568", StaffType.DOCTOR, "Göz");
 
         when(securityContextFacade.getRequiredCurrentUser()).thenReturn(adminUser);
         when(accessPolicy.getAdminAuthorizedBranchIds(adminUser)).thenReturn(List.of(authorizedBranchId));

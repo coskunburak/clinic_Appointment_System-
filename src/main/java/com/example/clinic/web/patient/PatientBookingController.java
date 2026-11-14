@@ -12,7 +12,6 @@ import com.example.clinic.booking.application.dto.AppointmentViewDto;
 import com.example.clinic.booking.application.dto.BranchSummaryDto;
 import com.example.clinic.booking.application.dto.ServiceSummaryDto;
 import com.example.clinic.booking.application.dto.StaffSummaryDto;
-import com.example.clinic.booking.domain.AppointmentDomainException;
 import com.example.clinic.web.common.WebErrorMessageMapper;
 import com.example.clinic.web.form.BookingForm;
 import com.example.clinic.web.form.CancellationForm;
@@ -155,7 +154,7 @@ public class PatientBookingController {
             return "redirect:/patient/appointments";
 
         } catch (AppointmentConflictException | PatientOverlapException | BookingValidationException
-                 | AppointmentDomainException | IllegalArgumentException | IllegalStateException e) {
+                 | IllegalArgumentException | IllegalStateException e) {
             model.addAttribute("errorMessage", WebErrorMessageMapper.mapBookingError(e));
             populateBookingModel(model, form.getBranchId(), form.getBranchServiceId(), form.getStaffId(), form.getAppointmentDate());
             return "patient/book";
@@ -221,7 +220,7 @@ public class PatientBookingController {
         try {
             appointmentApprovalService.cancelAppointment(id, form.getReason().strip());
             redirectAttributes.addFlashAttribute("successMessage", "Randevunuz başarıyla iptal edildi.");
-        } catch (AppointmentDomainException | IllegalStateException | IllegalArgumentException e) {
+        } catch (IllegalStateException | IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage",
                     WebErrorMessageMapper.mapLifecycleError(e, "Randevu iptal edilemedi."));
         }

@@ -33,9 +33,7 @@ public class WebExceptionHandler {
                                      HttpServletResponse response) {
         log.warn("Yetkisiz erişim engellendi [uri={}]: {}", safeUri(request), ex.getMessage());
         if (expectsJson(request)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(Map.of("error", "Bu işlem için yetkiniz bulunmamaktadır."));
+            return buildJsonErrorResponse(HttpStatus.FORBIDDEN, "Bu işlem için yetkiniz bulunmamaktadır.");
         }
         return buildErrorView(
                 response,
@@ -51,9 +49,7 @@ public class WebExceptionHandler {
                                  HttpServletRequest request,
                                  HttpServletResponse response) {
         if (expectsJson(request)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(Map.of("error", "İstenen kaynak bulunamadı."));
+            return buildJsonErrorResponse(HttpStatus.NOT_FOUND, "İstenen kaynak bulunamadı.");
         }
         return buildErrorView(
                 response,
@@ -70,9 +66,7 @@ public class WebExceptionHandler {
                                    HttpServletResponse response) {
         log.debug("Geçersiz istek parametresi [uri={}]", safeUri(request));
         if (expectsJson(request)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(Map.of("error", "Geçersiz veya eksik istek parametresi."));
+            return buildJsonErrorResponse(HttpStatus.BAD_REQUEST, "Geçersiz veya eksik istek parametresi.");
         }
         return buildErrorView(
                 response,
@@ -89,9 +83,10 @@ public class WebExceptionHandler {
                                             HttpServletResponse response) {
         log.error("Beklenmeyen sunucu hatası [uri={}]", safeUri(request), ex);
         if (expectsJson(request)) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(Map.of("error", "İşleminiz gerçekleştirilirken beklenmeyen bir teknik hata oluştu."));
+            return buildJsonErrorResponse(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "İşleminiz gerçekleştirilirken beklenmeyen bir teknik hata oluştu."
+            );
         }
         return buildErrorView(
                 response,
@@ -100,6 +95,16 @@ public class WebExceptionHandler {
                 "500 — Beklenmeyen Sistem Hatası",
                 "İşleminiz gerçekleştirilirken beklenmeyen bir teknik hata oluştu. Lütfen daha sonra tekrar deneyiniz."
         );
+    }
+
+    private ResponseEntity<Map<String, Object>> buildJsonErrorResponse(HttpStatus status, String message) {
+        return ResponseEntity.status(status)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Map.of(
+                        "status", status.value(),
+                        "error", status.getReasonPhrase(),
+                        "message", message
+                ));
     }
 
     private ModelAndView buildErrorView(HttpServletResponse response,
