@@ -245,7 +245,7 @@ class StaffScheduleControllerMvcTest {
                         .param("view", "pending"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("staff/schedule"))
-                .andExpect(model().attribute("currentView", "pending"));
+                .andExpect(model().attribute("view", "pending"));
     }
 
     @Test
