@@ -5,12 +5,18 @@
     <title>Hekim Paneli — Klinik Randevu Sistemi</title>
 </head>
 <body>
-<section>
-    <div class="row justify-content-center py-5">
-        <div class="col-md-6 text-center">
+<section class="page-staff page-dashboard">
+    <div class="patient-overview">
+        <div>
+            <div class="page-eyebrow">Klinik çalışma alanı</div>
             <h1 class="h3 fw-bold text-dark mb-3">Sağlık Personeli Paneli</h1>
-            <p class="text-muted mb-4">Randevu ajandanızı görüntülemek ve hasta taleplerini onaylamak için doğrudan takvim sayfasına yönlendiriliyorsunuz.</p>
+            <p class="text-muted mb-4">Günlük ve haftalık muayene programınızı inceleyin; bekleyen randevu taleplerini ajandanızdan yönetin.</p>
             <a th:href="@{/staff/schedule}" class="btn btn-clinic-primary px-4 py-2">Randevu Ajandasına Git &rarr;</a>
+        </div>
+        <div class="patient-hero-media">
+            <img th:src="@{/images/staff-clinical-scene.svg}"
+                 alt="Hekim randevu ajandası ve muayene listesi görseli"
+                 class="staff-hero-img" width="260" height="150" />
         </div>
     </div>
 </section>

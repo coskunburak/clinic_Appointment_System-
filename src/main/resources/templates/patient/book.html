@@ -5,9 +5,10 @@
     <title>Randevu Al — Klinik Randevu Sistemi</title>
 </head>
 <body>
-<section>
-    <div class="row mb-3">
+<section class="page-patient page-book">
+    <div class="page-header row mb-3">
         <div class="col-12">
+            <div class="page-eyebrow">Hasta işlemleri</div>
             <h1 class="h3 fw-bold text-dark">Randevu Oluştur</h1>
             <p class="text-muted">Lütfen muayene olmak istediğiniz şube, tıbbi hizmet, hekim ve randevu saatini seçiniz.</p>
         </div>
@@ -16,18 +17,31 @@
     <form th:action="@{/patient/book}" th:object="${bookingForm}" method="post" id="booking-form"
           th:data-book-url="@{/patient/book}" th:data-slots-url="@{/patient/slots}"
           th:data-selected-slot="${bookingForm.startTime != null ? bookingForm.startTime.toString() : ''}">
+        <div class="error-summary" th:if="${#fields.hasErrors('*')}" tabindex="-1" role="alert" aria-labelledby="bookingForm-error-title">
+            <h2 id="bookingForm-error-title">Bilgileri kontrol edin</h2>
+            <p class="small mb-2">Aşağıdaki alanları düzeltip yeniden gönderin.</p>
+            <ul>
+                <li th:if="${#fields.hasErrors('branchId')}"><a href="#branchId" th:errors="*{branchId}"></a></li>
+                <li th:if="${#fields.hasErrors('branchServiceId')}"><a href="#branchServiceId" th:errors="*{branchServiceId}"></a></li>
+                <li th:if="${#fields.hasErrors('staffId')}"><a href="#staffId" th:errors="*{staffId}"></a></li>
+                <li th:if="${#fields.hasErrors('appointmentDate')}"><a href="#appointmentDate" th:errors="*{appointmentDate}"></a></li>
+                <li th:if="${#fields.hasErrors('startTime')}"><a href="#slots-container" th:errors="*{startTime}"></a></li>
+            </ul>
+        </div>
+
         <input type="hidden" th:name="${_csrf != null ? _csrf.parameterName : '_csrf'}" th:value="${_csrf != null ? _csrf.token : ''}" />
 
         <div class="row g-4">
             <!-- Sol Kolon: Seçim Alanları -->
             <div class="col-lg-8">
-                <div class="clinic-card">
-                    <h2 class="clinic-card-title mb-3">1. Şube, Hizmet ve Hekim Seçimi</h2>
+                <fieldset class="clinic-card booking-step">
+                    <legend class="clinic-card-title mb-3"><span class="step-number" aria-hidden="true">1</span> Şube, Hizmet ve Hekim</legend>
+                    <p class="form-note">Önce şubeyi, ardından hizmeti ve hekiminizi seçin. * işaretli alanlar zorunludur.</p>
 
                     <!-- Şube Seçimi -->
                     <div class="mb-3">
                         <label for="branchId" class="form-label">Şube <span class="text-danger">*</span></label>
-                        <select id="branchId" th:field="*{branchId}" class="form-select" required aria-describedby="branchHelp">
+                        <select id="branchId" th:field="*{branchId}" class="form-select" required th:aria-invalid="${#fields.hasErrors('branchId')}" th:aria-describedby="${#fields.hasErrors('branchId')} ? 'branchHelp bookingForm-branchId-error' : 'branchHelp'">
                             <option value="">-- Lütfen bir şube seçiniz --</option>
                             <option th:each="b : ${branches}"
                                     th:value="${b.id}"
@@ -36,13 +50,13 @@
                                     th:selected="${b.id == selectedBranchId}">Merkez Şube</option>
                         </select>
                         <div id="branchHelp" class="form-text small">Şube seçimi sonrasında sunulan hizmetler otomatik güncellenir.</div>
-                        <div class="field-error-text" th:if="${#fields.hasErrors('branchId')}" th:errors="*{branchId}"></div>
+                        <div id="bookingForm-branchId-error" class="field-error-text" th:if="${#fields.hasErrors('branchId')}" th:errors="*{branchId}"></div>
                     </div>
 
                     <!-- Tıbbi Hizmet Seçimi -->
                     <div class="mb-3">
                         <label for="branchServiceId" class="form-label">Tıbbi Hizmet <span class="text-danger">*</span></label>
-                        <select id="branchServiceId" th:field="*{branchServiceId}" class="form-select" required>
+                        <select id="branchServiceId" th:field="*{branchServiceId}" class="form-select" required th:aria-invalid="${#fields.hasErrors('branchServiceId')}" th:aria-describedby="${#fields.hasErrors('branchServiceId')} ? 'bookingForm-branchServiceId-error' : null">
                             <option value="">-- Lütfen önce bir şube seçiniz --</option>
                             <option th:each="s : ${services}"
                                     th:value="${s.id}"
@@ -52,13 +66,13 @@
                                     th:text="${s.name + ' — ' + s.durationMinutes + ' dk — ' + s.feeAmount + ' ' + s.currency}"
                                     th:selected="${s.id == selectedServiceId}">Genel Muayene</option>
                         </select>
-                        <div class="field-error-text" th:if="${#fields.hasErrors('branchServiceId')}" th:errors="*{branchServiceId}"></div>
+                        <div id="bookingForm-branchServiceId-error" class="field-error-text" th:if="${#fields.hasErrors('branchServiceId')}" th:errors="*{branchServiceId}"></div>
                     </div>
 
                     <!-- Hekim Seçimi -->
                     <div class="mb-3">
                         <label for="staffId" class="form-label">Hekim / Uzman <span class="text-danger">*</span></label>
-                        <select id="staffId" th:field="*{staffId}" class="form-select" required>
+                        <select id="staffId" th:field="*{staffId}" class="form-select" required th:aria-invalid="${#fields.hasErrors('staffId')}" th:aria-describedby="${#fields.hasErrors('staffId')} ? 'bookingForm-staffId-error' : null">
                             <option value="">-- Lütfen önce bir hizmet seçiniz --</option>
                             <option th:each="st : ${staffList}"
                                     th:value="${st.id}"
@@ -66,29 +80,30 @@
                                     th:text="${st.fullName + ' (' + st.specialty + ')'}"
                                     th:selected="${st.id == selectedStaffId}">Dr. Ahmet Yılmaz</option>
                         </select>
-                        <div class="field-error-text" th:if="${#fields.hasErrors('staffId')}" th:errors="*{staffId}"></div>
+                        <div id="bookingForm-staffId-error" class="field-error-text" th:if="${#fields.hasErrors('staffId')}" th:errors="*{staffId}"></div>
                     </div>
-                </div>
+                </fieldset>
 
                 <!-- Randevu Tarihi ve Slotlar -->
-                <div class="clinic-card">
-                    <h2 class="clinic-card-title mb-3">2. Tarih ve Uygun Saat (Slot) Seçimi</h2>
+                <fieldset class="clinic-card booking-step">
+                    <legend class="clinic-card-title mb-3"><span class="step-number" aria-hidden="true">2</span> Tarih ve Uygun Saat</legend>
+                    <p class="form-note">Seçtiğiniz hekim ve tarihe ait uygun saatlerden birini işaretleyin.</p>
 
                     <div class="mb-3">
                         <label for="appointmentDate" class="form-label">Randevu Tarihi <span class="text-danger">*</span></label>
-                        <input type="date" id="appointmentDate" th:field="*{appointmentDate}" class="form-control" required />
-                        <div class="field-error-text" th:if="${#fields.hasErrors('appointmentDate')}" th:errors="*{appointmentDate}"></div>
+                        <input type="date" id="appointmentDate" th:field="*{appointmentDate}" class="form-control" required th:aria-invalid="${#fields.hasErrors('appointmentDate')}" th:aria-describedby="${#fields.hasErrors('appointmentDate')} ? 'bookingForm-appointmentDate-error' : null" />
+                        <div id="bookingForm-appointmentDate-error" class="field-error-text" th:if="${#fields.hasErrors('appointmentDate')}" th:errors="*{appointmentDate}"></div>
                     </div>
 
                     <div class="mb-3">
                         <div class="d-flex justify-content-between align-items-center mb-1">
                             <span class="form-label mb-0">Müsait Saat Dilimleri <span class="text-danger">*</span></span>
-                            <span id="slots-loading" class="small text-primary d-none" aria-live="polite">
+                            <span id="slots-loading" role="status" class="small text-primary d-none" aria-live="polite">
                                 <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
                                 Saatler yükleniyor...
                             </span>
                         </div>
-                        <div id="slots-container" class="p-3 bg-light rounded border">
+                        <div id="slots-container" role="group" aria-label="Uygun randevu saatleri" aria-live="polite" aria-relevant="additions text" tabindex="-1" th:aria-describedby="${#fields.hasErrors('startTime')} ? 'bookingForm-startTime-error' : null">
                             <div th:if="${#lists.isEmpty(availableSlots)}" class="text-muted small text-center py-2" id="no-slots-msg">
                                 Seçilen hekim ve tarih için uygun randevu saati bulunamadı veya henüz hekim seçilmedi.
                             </div>
@@ -102,18 +117,23 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="field-error-text" th:if="${#fields.hasErrors('startTime')}" th:errors="*{startTime}"></div>
+                        <div id="bookingForm-startTime-error" class="field-error-text" th:if="${#fields.hasErrors('startTime')}" th:errors="*{startTime}"></div>
                     </div>
-                </div>
+                </fieldset>
             </div>
 
             <!-- Sağ Kolon: Randevu Onay Özeti -->
             <div class="col-lg-4">
-                <div class="clinic-card sticky-top" style="top: 80px;">
-                    <h2 class="clinic-card-title mb-3">Randevu Özeti</h2>
+                <div class="clinic-card booking-summary">
+                    <div class="clinic-card-header">
+                        <h2 class="clinic-card-title card-title-with-icon">
+                            <svg class="card-title-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 3h6v4H9zM9 12l2 2 4-4"/></svg>
+                            <span>Randevu Özeti</span>
+                        </h2>
+                    </div>
 
-                    <div class="mb-3 text-muted small">
-                        Seçimleriniz tamamlandığında randevunuz <strong>Beklemede (PENDING)</strong> statüsünde oluşturulacak ve hekim onayına sunulacaktır.
+                    <div class="mb-3 text-muted small summary-note">
+                        Seçimleriniz tamamlandığında randevunuz <strong>Beklemede</strong> durumunda oluşturulacak ve hekim onayına sunulacaktır.
                     </div>
 
                     <ul class="list-group list-group-flush mb-4 small">
@@ -149,7 +169,7 @@
 
                     <div class="d-grid">
                         <button type="submit" id="btn-confirm-booking" class="btn btn-clinic-primary py-2 fw-bold">
-                            Randevuyu Onayla ve Gönder
+                            Randevu Talebini Gönder
                         </button>
                     </div>
                 </div>

@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 260" width="480" height="260" role="img" aria-label="Klinik randevu takvimi, stetoskop ve muayene planlama illüstrasyonu">
+  <rect x="1" y="1" width="478" height="258" rx="10" fill="#e8f1f0" stroke="#dfe7e4" stroke-width="2"/>
+  <!-- Subtle architectural grid lines -->
+  <path d="M24 44h432M24 216h432" stroke="#d1dedb" stroke-width="1"/>
+  <path d="M160 20v220M320 20v220" stroke="#d1dedb" stroke-width="1" stroke-dasharray="4 4"/>
+
+  <!-- Main appointment calendar card -->
+  <rect x="44" y="34" width="224" height="176" rx="8" fill="#ffffff" stroke="#778a88" stroke-width="1.5"/>
+  <rect x="44" y="34" width="224" height="40" rx="8" fill="#20575b"/>
+  <rect x="44" y="62" width="224" height="12" fill="#20575b"/>
+  <circle cx="72" cy="54" r="4" fill="#e8f1f0"/>
+  <circle cx="90" cy="54" r="4" fill="#e8f1f0"/>
+  <rect x="108" y="49" width="96" height="10" rx="3" fill="#e8f1f0"/>
+  <!-- Medical cross badge on calendar header -->
+  <rect x="230" y="42" width="24" height="24" rx="5" fill="#174e59"/>
+  <path d="M242 48v12M236 54h12" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Calendar time slots -->
+  <rect x="62" y="92" width="56" height="26" rx="5" fill="#f6f8f7" stroke="#dfe7e4" stroke-width="1.2"/>
+  <rect x="72" y="102" width="36" height="6" rx="2" fill="#54666b"/>
+
+  <rect x="128" y="92" width="56" height="26" rx="5" fill="#20575b"/>
+  <rect x="138" y="102" width="26" height="6" rx="2" fill="#ffffff"/>
+  <path d="M169 105l3 3 5-6" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <rect x="194" y="92" width="56" height="26" rx="5" fill="#f6f8f7" stroke="#dfe7e4" stroke-width="1.2"/>
+  <rect x="204" y="102" width="36" height="6" rx="2" fill="#54666b"/>
+
+  <rect x="62" y="128" width="56" height="26" rx="5" fill="#eaf4ed" stroke="#24694a" stroke-width="1.2"/>
+  <rect x="72" y="138" width="36" height="6" rx="2" fill="#24694a"/>
+
+  <rect x="128" y="128" width="56" height="26" rx="5" fill="#f6f8f7" stroke="#dfe7e4" stroke-width="1.2"/>
+  <rect x="138" y="138" width="36" height="6" rx="2" fill="#54666b"/>
+
+  <rect x="194" y="128" width="56" height="26" rx="5" fill="#f6f8f7" stroke="#dfe7e4" stroke-width="1.2"/>
+  <rect x="204" y="138" width="36" height="6" rx="2" fill="#54666b"/>
+
+  <!-- ECG / Pulse bar inside calendar card -->
+  <rect x="62" y="168" width="188" height="26" rx="5" fill="#f6f8f7" stroke="#dfe7e4" stroke-width="1"/>
+  <path d="M74 181h34l8-8 9 16 10-20 8 12h92" fill="none" stroke="#20575b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Right side: Physician & Clinical Summary Card -->
+  <rect x="288" y="54" width="148" height="172" rx="8" fill="#ffffff" stroke="#778a88" stroke-width="1.5"/>
+  <!-- Hospital / Clinic emblem -->
+  <rect x="306" y="72" width="44" height="44" rx="8" fill="#e8f1f0" stroke="#20575b" stroke-width="1.5"/>
+  <circle cx="328" cy="87" r="7" fill="#20575b"/>
+  <path d="M316 107c0-6.5 5.4-11 12-11s12 4.5 12 11" fill="#20575b"/>
+  <rect x="362" y="78" width="56" height="8" rx="3" fill="#20343b"/>
+  <rect x="362" y="94" width="42" height="6" rx="2" fill="#54666b"/>
+  <rect x="362" y="106" width="30" height="6" rx="2" fill="#24694a"/>
+
+  <!-- Stethoscope illustration -->
+  <path d="M316 142v18c0 12 10 22 22 22s22-10 22-22v-18" fill="none" stroke="#20575b" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="316" cy="140" r="4" fill="#174e59"/>
+  <circle cx="360" cy="140" r="4" fill="#174e59"/>
+  <path d="M338 182v14c0 9 7 15 16 15h14" fill="none" stroke="#20575b" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="378" cy="211" r="9" fill="#e8f1f0" stroke="#20575b" stroke-width="2.5"/>
+  <circle cx="378" cy="211" r="3.5" fill="#20575b"/>
+
+  <!-- Confirmed status pill -->
+  <rect x="386" y="142" width="34" height="34" rx="17" fill="#eaf4ed" stroke="#24694a" stroke-width="1.5"/>
+  <path d="M396 159l5 5 10-10" fill="none" stroke="#24694a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

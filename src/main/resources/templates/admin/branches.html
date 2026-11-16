@@ -5,9 +5,10 @@
     <title>Kurum ve Şubeler — Klinik Randevu Sistemi</title>
 </head>
 <body>
-<section>
-    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+<section class="page-admin page-branches">
+    <div class="page-header d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
         <div>
+            <div class="page-eyebrow">Kurum yönetimi</div>
             <h1 class="h3 fw-bold mb-1">Kurum ve Şube Yönetimi</h1>
             <p class="text-muted mb-0">Yetkili kurumlarınızı, şubelerinizi, zaman dilimlerini ve aktiflik durumlarını yönetin.</p>
         </div>
@@ -20,13 +21,14 @@
             <h2 class="clinic-card-title">Yetkili Kurumlar</h2>
             <span class="badge bg-primary bg-opacity-10 text-primary" th:text="${#lists.size(organizations)} + ' Kurum'">1 Kurum</span>
         </div>
-        <div class="table-responsive">
+        <div class="table-responsive" tabindex="0" role="region" aria-label="Kayıt tablosu, yatay kaydırılabilir">
             <table class="clinic-table">
+                <caption class="visually-hidden">Yetkili Kurumlar</caption>
                 <thead>
                     <tr>
-                        <th>Kurum Adı</th>
-                        <th>Durum</th>
-                        <th class="text-end">İşlemler</th>
+                        <th scope="col">Kurum Adı</th>
+                        <th scope="col">Durum</th>
+                        <th scope="col" class="text-end">İşlemler</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -55,7 +57,7 @@
         </div>
     </div>
 
-    <div class="row g-4">
+    <div class="row g-4 management-layout">
         <!-- Şube Listesi -->
         <div class="col-lg-8">
             <div class="clinic-card">
@@ -68,15 +70,16 @@
                     <p class="mb-0">Yetkiniz kapsamında tanımlı bir şube bulunmamaktadır.</p>
                 </div>
 
-                <div th:if="${not #lists.isEmpty(branches)}" class="table-responsive">
+                <div th:if="${not #lists.isEmpty(branches)}" class="table-responsive" tabindex="0" role="region" aria-label="Kayıt tablosu, yatay kaydırılabilir">
                     <table class="clinic-table">
+                        <caption class="visually-hidden">Şube Listesi</caption>
                         <thead>
                             <tr>
-                                <th>Şube Adı</th>
-                                <th>Zaman Dilimi</th>
-                                <th>Adres</th>
-                                <th>Durum</th>
-                                <th class="text-end">İşlemler</th>
+                                <th scope="col">Şube Adı</th>
+                                <th scope="col">Zaman Dilimi</th>
+                                <th scope="col">Adres</th>
+                                <th scope="col">Durum</th>
+                                <th scope="col" class="text-end">İşlemler</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -122,43 +125,54 @@
 
         <!-- Yeni Şube Oluşturma -->
         <div class="col-lg-4">
-            <div class="clinic-card">
+            <div class="clinic-card form-panel">
                 <h2 class="clinic-card-title mb-3">Yeni Şube Ekle</h2>
 
                 <div th:if="${orgWideOrganizations != null and #lists.isEmpty(orgWideOrganizations)}" class="alert alert-info small mb-0" role="status">
-                    Yeni şube oluşturma işlemi yalnızca kurum geneli yönetici (ORG_ADMIN) yetkisi gerektirir. Mevcut şubelerinizi tablodan düzenleyebilirsiniz.
+                    Yeni şube oluşturma işlemi yalnızca kurum geneli yönetici yetkisi gerektirir. Mevcut şubelerinizi tablodan düzenleyebilirsiniz.
                 </div>
 
                 <form th:if="${orgWideOrganizations == null or not #lists.isEmpty(orgWideOrganizations)}"
                       th:action="@{/admin/branches}" th:object="${branchForm}" method="post">
+                    <div class="error-summary" th:if="${#fields.hasErrors('*')}" tabindex="-1" role="alert" aria-labelledby="branchForm-error-title">
+                        <h2 id="branchForm-error-title">Bilgileri kontrol edin</h2>
+                        <p class="small mb-2">Aşağıdaki alanları düzeltip yeniden gönderin.</p>
+                        <ul>
+                            <li th:if="${#fields.hasErrors('organizationId')}"><a href="#organizationId" th:errors="*{organizationId}"></a></li>
+                            <li th:if="${#fields.hasErrors('name')}"><a href="#branchName" th:errors="*{name}"></a></li>
+                            <li th:if="${#fields.hasErrors('timeZone')}"><a href="#timeZone" th:errors="*{timeZone}"></a></li>
+                            <li th:if="${#fields.hasErrors('address')}"><a href="#address" th:errors="*{address}"></a></li>
+                        </ul>
+                    </div>
+
                     <input type="hidden" th:name="${_csrf != null ? _csrf.parameterName : '_csrf'}" th:value="${_csrf != null ? _csrf.token : ''}" />
 
                     <div class="mb-3">
                         <label for="organizationId" class="form-label small">Bağlı Kurum <span class="text-danger">*</span></label>
-                        <select id="organizationId" th:field="*{organizationId}" class="form-select form-select-sm" required>
+                        <select id="organizationId" th:field="*{organizationId}" class="form-select form-select-sm" required th:aria-invalid="${#fields.hasErrors('organizationId')}" th:aria-describedby="${#fields.hasErrors('organizationId')} ? 'branchForm-organizationId-error' : null">
                             <option th:each="org : ${orgWideOrganizations != null ? orgWideOrganizations : organizations}"
                                     th:value="${org.id}"
                                     th:text="${org.name}">Klinik Kurumu</option>
                         </select>
-                        <div class="field-error-text" th:if="${#fields.hasErrors('organizationId')}" th:errors="*{organizationId}"></div>
+                        <div id="branchForm-organizationId-error" class="field-error-text" th:if="${#fields.hasErrors('organizationId')}" th:errors="*{organizationId}"></div>
                     </div>
 
                     <div class="mb-3">
                         <label for="branchName" class="form-label small">Şube Adı <span class="text-danger">*</span></label>
-                        <input type="text" id="branchName" th:field="*{name}" class="form-control form-control-sm" required maxlength="100" placeholder="Örn: Kadıköy Şubesi" />
-                        <div class="field-error-text" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                        <input type="text" id="branchName" th:field="*{name}" class="form-control form-control-sm" required maxlength="100" placeholder="Örn: Kadıköy Şubesi" th:aria-invalid="${#fields.hasErrors('name')}" th:aria-describedby="${#fields.hasErrors('name')} ? 'branchForm-name-error' : null" />
+                        <div id="branchForm-name-error" class="field-error-text" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
                     </div>
 
                     <div class="mb-3">
                         <label for="timeZone" class="form-label small">Zaman Dilimi (IANA) <span class="text-danger">*</span></label>
-                        <input type="text" id="timeZone" th:field="*{timeZone}" class="form-control form-control-sm" required placeholder="Europe/Istanbul" />
-                        <div class="field-error-text" th:if="${#fields.hasErrors('timeZone')}" th:errors="*{timeZone}"></div>
+                        <input type="text" id="timeZone" th:field="*{timeZone}" class="form-control form-control-sm" required placeholder="Europe/Istanbul" th:aria-invalid="${#fields.hasErrors('timeZone')}" th:aria-describedby="${#fields.hasErrors('timeZone')} ? 'branchForm-timeZone-error' : null" />
+                        <div id="branchForm-timeZone-error" class="field-error-text" th:if="${#fields.hasErrors('timeZone')}" th:errors="*{timeZone}"></div>
                     </div>
 
                     <div class="mb-3">
                         <label for="address" class="form-label small">Adres</label>
-                        <textarea id="address" th:field="*{address}" class="form-control form-control-sm" rows="3" maxlength="500" placeholder="Şube adresi ve lokasyon bilgisi..."></textarea>
-                        <div class="field-error-text" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></div>
+                        <textarea id="address" th:field="*{address}" class="form-control form-control-sm" rows="3" maxlength="500" placeholder="Şube adresi ve lokasyon bilgisi..." th:aria-invalid="${#fields.hasErrors('address')}" th:aria-describedby="${#fields.hasErrors('address')} ? 'branchForm-address-error' : null"></textarea>
+                        <div id="branchForm-address-error" class="field-error-text" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></div>
                     </div>
 
                     <div class="d-grid mt-4">

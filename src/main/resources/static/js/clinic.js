@@ -482,7 +482,26 @@
         }
     }
 
+    // Presentation bindings: same GET form submission as the former inline handlers.
+    function initPresentationBindings() {
+        document.querySelectorAll("[data-submit-on-change]").forEach(function (control) {
+            control.addEventListener("change", function () {
+                if (control.form) control.form.submit();
+            });
+        });
+
+        const errorSummary = document.querySelector(".error-summary");
+        if (errorSummary) errorSummary.focus();
+        document.querySelectorAll(".error-summary a").forEach(function (link) {
+            link.addEventListener("click", function () {
+                const field = document.getElementById(link.hash.slice(1));
+                if (field) field.focus();
+            });
+        });
+    }
+
     document.addEventListener("DOMContentLoaded", function () {
+        initPresentationBindings();
         initPatientBookingWizard();
         initPatientCancellationModal();
         initStaffRejectModal();

@@ -5,9 +5,10 @@
     <title>Personel Müsaitlik &amp; İzin — Klinik Randevu Sistemi</title>
 </head>
 <body>
-<section>
-    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+<section class="page-admin page-staff-availability">
+    <div class="page-header d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
         <div>
+            <div class="page-eyebrow">Kurum yönetimi</div>
             <h1 class="h3 fw-bold mb-1">Personel Çalışma Planı ve İzin İstisnaları</h1>
             <p class="text-muted mb-0">
                 Personel: <span class="fw-semibold text-primary" th:text="${staff.fullName}">Dr. Ahmet Yılmaz</span>
@@ -25,7 +26,7 @@
 
     <div th:if="${selectedAssignmentId != null}">
         <!-- Çoklu Görevlendirme Geçişi -->
-        <div class="clinic-card mb-4 py-3" th:if="${assignments != null and #lists.size(assignments) > 1}">
+        <div class="clinic-card filter-toolbar mb-4 py-3" th:if="${assignments != null and #lists.size(assignments) > 1}">
             <div class="d-flex flex-wrap align-items-center gap-2">
                 <span class="small fw-semibold text-muted me-2">Şube / Bölüm Görevlendirmesi:</span>
                 <a th:each="asg : ${assignments}"
@@ -37,11 +38,12 @@
         </div>
 
         <!-- 1. Bölüm: Haftalık Sabit Mesai Saatleri -->
-        <div class="row g-4 mb-5">
+        <h2 class="section-heading section-anchor" id="weekly-hours">Haftalık çalışma</h2>
+        <div class="row g-4 management-layout mb-5">
             <div class="col-lg-7">
                 <div class="clinic-card">
                     <div class="clinic-card-header">
-                        <h2 class="clinic-card-title">Haftalık Çalışma Saatleri</h2>
+                        <h3 class="clinic-card-title">Haftalık Çalışma Saatleri</h3>
                         <span class="badge bg-primary bg-opacity-10 text-primary" th:text="${#lists.size(weeklyAvailabilities)} + ' Aralık'">0 Aralık</span>
                     </div>
 
@@ -49,14 +51,15 @@
                         <p class="mb-0">Personel için henüz haftalık sabit mesai tanımlanmamış.</p>
                     </div>
 
-                    <div th:if="${not #lists.isEmpty(weeklyAvailabilities)}" class="table-responsive">
+                    <div th:if="${not #lists.isEmpty(weeklyAvailabilities)}" class="table-responsive" tabindex="0" role="region" aria-label="Kayıt tablosu, yatay kaydırılabilir">
                         <table class="clinic-table">
+                            <caption class="visually-hidden">Haftalık Çalışma Saatleri</caption>
                             <thead>
                                 <tr>
-                                    <th>Gün</th>
-                                    <th>Mesai Başlangıç</th>
-                                    <th>Mesai Bitiş</th>
-                                    <th class="text-end">İşlem</th>
+                                    <th scope="col">Gün</th>
+                                    <th scope="col">Mesai Başlangıç</th>
+                                    <th scope="col">Mesai Bitiş</th>
+                                    <th scope="col" class="text-end">İşlem</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -81,18 +84,28 @@
             </div>
 
             <div class="col-lg-5">
-                <div class="clinic-card">
-                    <h2 class="clinic-card-title mb-3">Haftalık Çalışma Saatini Ekle</h2>
+                <div class="clinic-card form-panel">
+                    <h3 class="clinic-card-title mb-3">Haftalık Çalışma Saatini Ekle</h3>
 
                     <form th:action="@{/admin/staff/assignments/{assignmentId}/weekly-availability(assignmentId=${selectedAssignmentId})}"
                           th:object="${weeklyForm}" method="post">
+                        <div class="error-summary" th:if="${#fields.hasErrors('*')}" tabindex="-1" role="alert" aria-labelledby="weeklyForm-error-title">
+                            <h2 id="weeklyForm-error-title">Bilgileri kontrol edin</h2>
+                            <p class="small mb-2">Aşağıdaki alanları düzeltip yeniden gönderin.</p>
+                            <ul>
+                                <li th:if="${#fields.hasErrors('weekday')}"><a href="#weekday" th:errors="*{weekday}"></a></li>
+                                <li th:if="${#fields.hasErrors('startTime')}"><a href="#startTime" th:errors="*{startTime}"></a></li>
+                                <li th:if="${#fields.hasErrors('endTime')}"><a href="#endTime" th:errors="*{endTime}"></a></li>
+                            </ul>
+                        </div>
+
                         <input type="hidden" th:name="${_csrf != null ? _csrf.parameterName : '_csrf'}" th:value="${_csrf != null ? _csrf.token : ''}" />
                         <input type="hidden" th:field="*{assignmentId}" />
                         <input type="hidden" name="staffId" th:value="${staff.id}" />
 
                         <div class="mb-3">
                             <label for="weekday" class="form-label small">Gün <span class="text-danger">*</span></label>
-                            <select id="weekday" th:field="*{weekday}" class="form-select form-select-sm" required>
+                            <select id="weekday" th:field="*{weekday}" class="form-select form-select-sm" required th:aria-invalid="${#fields.hasErrors('weekday')}" th:aria-describedby="${#fields.hasErrors('weekday')} ? 'weeklyForm-weekday-error' : null">
                                 <option value="1">1 - Pazartesi</option>
                                 <option value="2">2 - Salı</option>
                                 <option value="3">3 - Çarşamba</option>
@@ -101,19 +114,19 @@
                                 <option value="6">6 - Cumartesi</option>
                                 <option value="7">7 - Pazar</option>
                             </select>
-                            <div class="field-error-text" th:if="${#fields.hasErrors('weekday')}" th:errors="*{weekday}"></div>
+                            <div id="weeklyForm-weekday-error" class="field-error-text" th:if="${#fields.hasErrors('weekday')}" th:errors="*{weekday}"></div>
                         </div>
 
                         <div class="row g-2 mb-3">
                             <div class="col-6">
                                 <label for="startTime" class="form-label small">Başlangıç <span class="text-danger">*</span></label>
-                                <input type="time" id="startTime" th:field="*{startTime}" class="form-control form-control-sm" required />
-                                <div class="field-error-text" th:if="${#fields.hasErrors('startTime')}" th:errors="*{startTime}"></div>
+                                <input type="time" id="startTime" th:field="*{startTime}" class="form-control form-control-sm" required th:aria-invalid="${#fields.hasErrors('startTime')}" th:aria-describedby="${#fields.hasErrors('startTime')} ? 'weeklyForm-startTime-error' : null" />
+                                <div id="weeklyForm-startTime-error" class="field-error-text" th:if="${#fields.hasErrors('startTime')}" th:errors="*{startTime}"></div>
                             </div>
                             <div class="col-6">
                                 <label for="endTime" class="form-label small">Bitiş <span class="text-danger">*</span></label>
-                                <input type="time" id="endTime" th:field="*{endTime}" class="form-control form-control-sm" required />
-                                <div class="field-error-text" th:if="${#fields.hasErrors('endTime')}" th:errors="*{endTime}"></div>
+                                <input type="time" id="endTime" th:field="*{endTime}" class="form-control form-control-sm" required th:aria-invalid="${#fields.hasErrors('endTime')}" th:aria-describedby="${#fields.hasErrors('endTime')} ? 'weeklyForm-endTime-error' : null" />
+                                <div id="weeklyForm-endTime-error" class="field-error-text" th:if="${#fields.hasErrors('endTime')}" th:errors="*{endTime}"></div>
                             </div>
                         </div>
 
@@ -126,11 +139,12 @@
         </div>
 
         <!-- 2. Bölüm: Tarih Özelinde İzin ve Mesai İstisnaları -->
-        <div class="row g-4">
+        <h2 class="section-heading section-anchor" id="date-exceptions">İzin ve istisnalar</h2>
+        <div class="row g-4 management-layout">
             <div class="col-lg-7">
                 <div class="clinic-card">
                     <div class="clinic-card-header">
-                        <h2 class="clinic-card-title">Tarih Bazlı İzin ve İstisnalar</h2>
+                        <h3 class="clinic-card-title">Tarih Bazlı İzin ve İstisnalar</h3>
                         <span class="badge bg-secondary" th:text="${#lists.size(exceptions)} + ' İstisna'">0 İstisna</span>
                     </div>
 
@@ -138,22 +152,23 @@
                         <p class="mb-0">Kayıtlı herhangi bir izin veya mesai istisnası bulunmamaktadır.</p>
                     </div>
 
-                    <div th:if="${not #lists.isEmpty(exceptions)}" class="table-responsive">
+                    <div th:if="${not #lists.isEmpty(exceptions)}" class="table-responsive" tabindex="0" role="region" aria-label="Kayıt tablosu, yatay kaydırılabilir">
                         <table class="clinic-table">
+                            <caption class="visually-hidden">Tarih Bazlı İzin ve İstisnalar</caption>
                             <thead>
                                 <tr>
-                                    <th>Tarih</th>
-                                    <th>Tür</th>
-                                    <th>Saat Aralığı</th>
-                                    <th>Açıklama</th>
-                                    <th class="text-end">İşlem</th>
+                                    <th scope="col">Tarih</th>
+                                    <th scope="col">Tür</th>
+                                    <th scope="col">Saat Aralığı</th>
+                                    <th scope="col">Açıklama</th>
+                                    <th scope="col" class="text-end">İşlem</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr th:each="ex : ${exceptions}">
                                     <td class="fw-bold" th:text="${ex.localDate}">2026-11-25</td>
                                     <td>
-                                        <span class="badge bg-warning text-dark" th:text="${ex.kind}">FULL_DAY_LEAVE</span>
+                                        <span class="badge bg-warning text-dark" th:text="${ex.kind == null ? '' : (ex.kind.name() == 'FULL_DAY_LEAVE' ? 'Tam gün izin' : (ex.kind.name() == 'PARTIAL_LEAVE' ? 'Kısmi izin' : 'Fazla mesai'))}">Tam gün izin</span>
                                     </td>
                                     <td>
                                         <span th:if="${ex.startTime != null}" th:text="${ex.startTime + ' - ' + ex.endTime}">09:00 - 12:00</span>
@@ -176,48 +191,60 @@
             </div>
 
             <div class="col-lg-5">
-                <div class="clinic-card">
-                    <h2 class="clinic-card-title mb-3">İstisna / İzin Tanımla</h2>
+                <div class="clinic-card form-panel">
+                    <h3 class="clinic-card-title mb-3">İstisna / İzin Tanımla</h3>
 
                     <form th:action="@{/admin/staff/assignments/{assignmentId}/exceptions(assignmentId=${selectedAssignmentId})}"
                           th:object="${exceptionForm}" method="post">
+                        <div class="error-summary" th:if="${#fields.hasErrors('*')}" tabindex="-1" role="alert" aria-labelledby="exceptionForm-error-title">
+                            <h2 id="exceptionForm-error-title">Bilgileri kontrol edin</h2>
+                            <p class="small mb-2">Aşağıdaki alanları düzeltip yeniden gönderin.</p>
+                            <ul>
+                                <li th:if="${#fields.hasErrors('localDate')}"><a href="#localDate" th:errors="*{localDate}"></a></li>
+                                <li th:if="${#fields.hasErrors('kind')}"><a href="#exceptionKind" th:errors="*{kind}"></a></li>
+                                <li th:if="${#fields.hasErrors('startTime')}"><a href="#excStart" th:errors="*{startTime}"></a></li>
+                                <li th:if="${#fields.hasErrors('endTime')}"><a href="#excEnd" th:errors="*{endTime}"></a></li>
+                                <li th:if="${#fields.hasErrors('reason')}"><a href="#reason" th:errors="*{reason}"></a></li>
+                            </ul>
+                        </div>
+
                         <input type="hidden" th:name="${_csrf != null ? _csrf.parameterName : '_csrf'}" th:value="${_csrf != null ? _csrf.token : ''}" />
                         <input type="hidden" th:field="*{assignmentId}" />
                         <input type="hidden" name="staffId" th:value="${staff.id}" />
 
                         <div class="mb-3">
                             <label for="localDate" class="form-label small">İstisna Tarihi <span class="text-danger">*</span></label>
-                            <input type="date" id="localDate" th:field="*{localDate}" class="form-control form-control-sm" required />
-                            <div class="field-error-text" th:if="${#fields.hasErrors('localDate')}" th:errors="*{localDate}"></div>
+                            <input type="date" id="localDate" th:field="*{localDate}" class="form-control form-control-sm" required th:aria-invalid="${#fields.hasErrors('localDate')}" th:aria-describedby="${#fields.hasErrors('localDate')} ? 'exceptionForm-localDate-error' : null" />
+                            <div id="exceptionForm-localDate-error" class="field-error-text" th:if="${#fields.hasErrors('localDate')}" th:errors="*{localDate}"></div>
                         </div>
 
                         <div class="mb-3">
                             <label for="exceptionKind" class="form-label small">İstisna Türü <span class="text-danger">*</span></label>
-                            <select id="exceptionKind" th:field="*{kind}" class="form-select form-select-sm" required>
-                                <option value="FULL_DAY_LEAVE">Tam Gün İzin (Slotları Kapatır)</option>
-                                <option value="PARTIAL_LEAVE">Kısmi İzin (Saat Aralığını Kapatır)</option>
-                                <option value="OVERTIME">Fazla Mesai (Ek Slot Açar)</option>
+                            <select id="exceptionKind" th:field="*{kind}" class="form-select form-select-sm" required th:aria-invalid="${#fields.hasErrors('kind')}" th:aria-describedby="${#fields.hasErrors('kind')} ? 'exceptionForm-kind-error' : null">
+                                <option value="FULL_DAY_LEAVE">Tam Gün İzin</option>
+                                <option value="PARTIAL_LEAVE">Kısmi İzin</option>
+                                <option value="OVERTIME">Fazla Mesai</option>
                             </select>
-                            <div class="field-error-text" th:if="${#fields.hasErrors('kind')}" th:errors="*{kind}"></div>
+                            <div id="exceptionForm-kind-error" class="field-error-text" th:if="${#fields.hasErrors('kind')}" th:errors="*{kind}"></div>
                         </div>
 
                         <div id="exceptionTimeFields" class="row g-2 mb-3">
                             <div class="col-6">
                                 <label for="excStart" class="form-label small">Başlangıç Saati</label>
-                                <input type="time" id="excStart" th:field="*{startTime}" class="form-control form-control-sm" />
-                                <div class="field-error-text" th:if="${#fields.hasErrors('startTime')}" th:errors="*{startTime}"></div>
+                                <input type="time" id="excStart" th:field="*{startTime}" class="form-control form-control-sm" th:aria-invalid="${#fields.hasErrors('startTime')}" th:aria-describedby="${#fields.hasErrors('startTime')} ? 'exceptionForm-startTime-error' : null" />
+                                <div id="exceptionForm-startTime-error" class="field-error-text" th:if="${#fields.hasErrors('startTime')}" th:errors="*{startTime}"></div>
                             </div>
                             <div class="col-6">
                                 <label for="excEnd" class="form-label small">Bitiş Saati</label>
-                                <input type="time" id="excEnd" th:field="*{endTime}" class="form-control form-control-sm" />
-                                <div class="field-error-text" th:if="${#fields.hasErrors('endTime')}" th:errors="*{endTime}"></div>
+                                <input type="time" id="excEnd" th:field="*{endTime}" class="form-control form-control-sm" th:aria-invalid="${#fields.hasErrors('endTime')}" th:aria-describedby="${#fields.hasErrors('endTime')} ? 'exceptionForm-endTime-error' : null" />
+                                <div id="exceptionForm-endTime-error" class="field-error-text" th:if="${#fields.hasErrors('endTime')}" th:errors="*{endTime}"></div>
                             </div>
                         </div>
 
                         <div class="mb-3">
                             <label for="reason" class="form-label small">Gerekçe / Not</label>
-                            <input type="text" id="reason" th:field="*{reason}" class="form-control form-control-sm" maxlength="255" placeholder="Örn: Kongre katılımı" />
-                            <div class="field-error-text" th:if="${#fields.hasErrors('reason')}" th:errors="*{reason}"></div>
+                            <input type="text" id="reason" th:field="*{reason}" class="form-control form-control-sm" maxlength="255" placeholder="Örn: Kongre katılımı" th:aria-invalid="${#fields.hasErrors('reason')}" th:aria-describedby="${#fields.hasErrors('reason')} ? 'exceptionForm-reason-error' : null" />
+                            <div id="exceptionForm-reason-error" class="field-error-text" th:if="${#fields.hasErrors('reason')}" th:errors="*{reason}"></div>
                         </div>
 
                         <div class="d-grid mt-4">

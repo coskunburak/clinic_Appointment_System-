@@ -5,58 +5,86 @@
     <title>Hasta Paneli — Klinik Randevu Sistemi</title>
 </head>
 <body>
-<section>
-    <div class="row mb-4">
+<section class="page-patient page-dashboard">
+    <div class="page-header row mb-4">
         <div class="col-12">
+            <div class="page-eyebrow">Hasta işlemleri</div>
             <h1 class="h3 fw-bold text-dark">Hasta Paneli</h1>
             <p class="text-muted">Hoş geldiniz. Buradan aktif randevularınızı takip edebilir ve yeni muayene randevusu alabilirsiniz.</p>
         </div>
     </div>
 
+    <div class="patient-overview" aria-label="Randevu özeti">
+        <div>
+            <h2 class="overview-heading">Randevularınız ve muayene takibiniz tek ekranda</h2>
+            <p class="text-muted small mb-0">Şube, poliklinik hizmeti ve hekim seçerek yeni randevu talebi oluşturun; yaklaşan muayenelerinizi ve onay durumlarını takip edin.</p>
+            <div class="metric-strip">
+                <div class="metric"><span class="metric-label">Toplam randevu kaydı</span><strong class="metric-value" th:text="${totalCount}">0</strong></div>
+                <div class="metric"><span class="metric-label">Onay bekleyen</span><strong class="metric-value" th:text="${pendingCount}">0</strong></div>
+            </div>
+        </div>
+        <div class="patient-hero-media">
+            <img th:src="@{/images/patient-care-illustration.svg}"
+                 alt="Klinik randevu takvimi ve sağlık hizmeti görseli"
+                 width="280" height="170" />
+        </div>
+    </div>
+
     <!-- Hızlı Eylem Kartları -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-6">
-            <div class="clinic-card d-flex align-items-center justify-content-between p-4">
+    <div class="patient-actions">
+        <div class="patient-action patient-action-primary">
+            <div class="patient-action-body">
+                <span class="clinical-icon-box clinical-icon-box-neutral" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 11h18m-9 3v5m-2.5-2.5h5"/></svg>
+                </span>
                 <div>
                     <h2 class="h5 fw-bold text-dark mb-1">Yeni Randevu Oluştur</h2>
                     <p class="text-muted small mb-0">Şube, hizmet ve hekim seçerek size en uygun saati belirleyin.</p>
                 </div>
-                <a th:href="@{/patient/book}" class="btn btn-clinic-primary px-3">Randevu Al</a>
             </div>
+            <a th:href="@{/patient/book}" class="btn btn-clinic-primary px-3">Randevu Al</a>
         </div>
 
-        <div class="col-md-6">
-            <div class="clinic-card d-flex align-items-center justify-content-between p-4">
+        <div class="patient-action">
+            <div class="patient-action-body">
+                <span class="clinical-icon-box" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 3h6v4H9zM8 12h8m-8 4h5"/></svg>
+                </span>
                 <div>
                     <h2 class="h5 fw-bold text-dark mb-1">Randevularım</h2>
                     <p class="text-muted small mb-0">Aktif ve geçmiş randevu kayıtlarınızı inceleyin veya iptal edin.</p>
                 </div>
-                <a th:href="@{/patient/appointments}" class="btn btn-outline-secondary px-3">Listeyi Görüntüle</a>
             </div>
+            <a th:href="@{/patient/appointments}" class="btn btn-outline-secondary px-3">Listeyi Görüntüle</a>
         </div>
     </div>
 
     <!-- Yaklaşan Randevular Özeti -->
     <div class="clinic-card">
         <div class="clinic-card-header">
-            <h2 class="clinic-card-title">Yaklaşan Randevularınız</h2>
+            <h2 class="clinic-card-title card-title-with-icon">
+                <svg class="card-title-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/><path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4"/><circle cx="20" cy="10" r="2"/></svg>
+                <span>Yaklaşan Randevularınız</span>
+            </h2>
             <a th:href="@{/patient/appointments}" class="small text-decoration-none">Tümünü Gör &rarr;</a>
         </div>
 
-        <div th:if="${#lists.isEmpty(upcomingAppointments)}" class="text-center py-4 text-muted">
-            <p class="mb-2">Yaklaşan aktif bir randevunuz bulunmamaktadır.</p>
+        <div th:if="${#lists.isEmpty(upcomingAppointments)}" class="empty-state-visual">
+            <img th:src="@{/images/empty-calendar.svg}" alt="" width="120" height="88" />
+            <p class="mb-1">Yaklaşan aktif bir randevunuz bulunmamaktadır.</p>
             <a th:href="@{/patient/book}" class="btn btn-clinic-primary btn-sm">Hemen Randevu Al</a>
         </div>
 
-        <div th:if="${not #lists.isEmpty(upcomingAppointments)}" class="table-responsive">
+        <div th:if="${not #lists.isEmpty(upcomingAppointments)}" class="table-responsive" tabindex="0" role="region" aria-label="Kayıt tablosu, yatay kaydırılabilir">
             <table class="clinic-table">
+                <caption class="visually-hidden">Yaklaşan Randevularınız</caption>
                 <thead>
                     <tr>
-                        <th>Tarih &amp; Saat</th>
-                        <th>Şube</th>
-                        <th>Hizmet</th>
-                        <th>Hekim</th>
-                        <th>Durum</th>
+                        <th scope="col">Tarih &amp; Saat</th>
+                        <th scope="col">Şube</th>
+                        <th scope="col">Hizmet</th>
+                        <th scope="col">Hekim</th>
+                        <th scope="col">Durum</th>
                     </tr>
                 </thead>
                 <tbody>

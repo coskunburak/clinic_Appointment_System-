@@ -5,9 +5,10 @@
     <title>Personel Yönetimi — Klinik Randevu Sistemi</title>
 </head>
 <body>
-<section>
-    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+<section class="page-admin page-staff">
+    <div class="page-header d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
         <div>
+            <div class="page-eyebrow">Kurum yönetimi</div>
             <h1 class="h3 fw-bold mb-1">Personel, Görevlendirme ve Hizmet Yetkinlikleri</h1>
             <p class="text-muted mb-0">Yetkili kapsamınızdaki doktor ve sağlık personelini kaydedin, şubelere atayın ve çalışma takvimlerini yönetin.</p>
         </div>
@@ -25,16 +26,17 @@
             <p class="mb-0">Yetkili kapsamınızda kayıtlı sağlık personeli bulunmamaktadır.</p>
         </div>
 
-        <div th:if="${not #lists.isEmpty(staffProfiles)}" class="table-responsive">
+        <div th:if="${not #lists.isEmpty(staffProfiles)}" class="table-responsive" tabindex="0" role="region" aria-label="Kayıt tablosu, yatay kaydırılabilir">
             <table class="clinic-table">
+                <caption class="visually-hidden">Kayıtlı Personel Listesi</caption>
                 <thead>
                     <tr>
-                        <th>Ad Soyad</th>
-                        <th>E-posta</th>
-                        <th>Rol</th>
-                        <th>Uzmanlık</th>
-                        <th>Durum</th>
-                        <th class="text-end">Takvim &amp; İzin</th>
+                        <th scope="col">Ad Soyad</th>
+                        <th scope="col">E-posta</th>
+                        <th scope="col">Rol</th>
+                        <th scope="col">Uzmanlık</th>
+                        <th scope="col">Durum</th>
+                        <th scope="col" class="text-end">Takvim &amp; İzin</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -42,7 +44,7 @@
                         <td class="fw-bold" th:text="${st.fullName}">Dr. Ahmet Yılmaz</td>
                         <td class="small text-muted" th:text="${st.email}">ahmet@clinic.test</td>
                         <td>
-                            <span class="badge bg-light text-dark border" th:text="${st.staffType != null ? st.staffType : 'DOCTOR'}">DOCTOR</span>
+                            <span class="badge bg-light text-dark border" th:text="${st.staffType == 'NURSE' ? 'Hemşire' : (st.staffType == 'TECHNICIAN' ? 'Teknisyen' : 'Hekim')}">Hekim</span>
                         </td>
                         <td th:text="${st.specialty != null and not #strings.isEmpty(st.specialty) ? st.specialty : '-'}">Kardiyoloji</td>
                         <td>
@@ -60,64 +62,79 @@
         </div>
     </div>
 
-    <div class="row g-4">
+    <h2 class="section-heading">Personel işlemleri</h2>
+    <div class="row g-4 management-layout staff-form-layout" id="staff-forms">
         <!-- 1. Yeni Personel Kaydı -->
         <div class="col-lg-4">
-            <div class="clinic-card h-100">
-                <h2 class="clinic-card-title mb-3">1. Yeni Personel Kaydet</h2>
+            <div class="clinic-card form-panel h-100">
+                <h3 class="clinic-card-title mb-3">1. Yeni Personel Kaydet</h3>
 
                 <form th:action="@{/admin/staff}" th:object="${staffForm}" method="post">
+                    <div class="error-summary" th:if="${#fields.hasErrors('*')}" tabindex="-1" role="alert" aria-labelledby="staffForm-error-title">
+                        <h2 id="staffForm-error-title">Bilgileri kontrol edin</h2>
+                        <p class="small mb-2">Aşağıdaki alanları düzeltip yeniden gönderin.</p>
+                        <ul>
+                            <li th:if="${#fields.hasErrors('branchId')}"><a href="#branchId" th:errors="*{branchId}"></a></li>
+                            <li th:if="${#fields.hasErrors('fullName')}"><a href="#fullName" th:errors="*{fullName}"></a></li>
+                            <li th:if="${#fields.hasErrors('email')}"><a href="#email" th:errors="*{email}"></a></li>
+                            <li th:if="${#fields.hasErrors('password')}"><a href="#password" th:errors="*{password}"></a></li>
+                            <li th:if="${#fields.hasErrors('staffType')}"><a href="#staffType" th:errors="*{staffType}"></a></li>
+                            <li th:if="${#fields.hasErrors('specialty')}"><a href="#staffSpecialty" th:errors="*{specialty}"></a></li>
+                            <li th:if="${#fields.hasErrors('phone')}"><a href="#phone" th:errors="*{phone}"></a></li>
+                        </ul>
+                    </div>
+
                     <input type="hidden" th:name="${_csrf != null ? _csrf.parameterName : '_csrf'}" th:value="${_csrf != null ? _csrf.token : ''}" />
 
                     <div class="mb-2">
                         <label for="branchId" class="form-label small">Kayıt Şubesi <span class="text-danger">*</span></label>
-                        <select id="branchId" th:field="*{branchId}" class="form-select form-select-sm" required>
+                        <select id="branchId" th:field="*{branchId}" class="form-select form-select-sm" required th:aria-invalid="${#fields.hasErrors('branchId')}" th:aria-describedby="${#fields.hasErrors('branchId')} ? 'staffForm-branchId-error' : null">
                             <option th:each="b : ${branches}" th:value="${b.id}" th:text="${b.name}">Kadıköy Şubesi</option>
                         </select>
-                        <div class="field-error-text" th:if="${#fields.hasErrors('branchId')}" th:errors="*{branchId}"></div>
+                        <div id="staffForm-branchId-error" class="field-error-text" th:if="${#fields.hasErrors('branchId')}" th:errors="*{branchId}"></div>
                     </div>
 
                     <div class="mb-2">
                         <label for="fullName" class="form-label small">Ad Soyad <span class="text-danger">*</span></label>
-                        <input type="text" id="fullName" th:field="*{fullName}" class="form-control form-control-sm" required maxlength="100" placeholder="Dr. Ad Soyad" />
-                        <div class="field-error-text" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></div>
+                        <input type="text" id="fullName" th:field="*{fullName}" class="form-control form-control-sm" required maxlength="100" placeholder="Dr. Ad Soyad" th:aria-invalid="${#fields.hasErrors('fullName')}" th:aria-describedby="${#fields.hasErrors('fullName')} ? 'staffForm-fullName-error' : null" />
+                        <div id="staffForm-fullName-error" class="field-error-text" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></div>
                     </div>
 
                     <div class="mb-2">
                         <label for="email" class="form-label small">E-posta <span class="text-danger">*</span></label>
-                        <input type="email" id="email" th:field="*{email}" class="form-control form-control-sm" required placeholder="doktor@clinic.test" />
-                        <div class="field-error-text" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                        <input type="email" id="email" th:field="*{email}" class="form-control form-control-sm" required placeholder="doktor@clinic.test" th:aria-invalid="${#fields.hasErrors('email')}" th:aria-describedby="${#fields.hasErrors('email')} ? 'staffForm-email-error' : null" />
+                        <div id="staffForm-email-error" class="field-error-text" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
                     </div>
 
                     <div class="mb-2">
                         <label for="password" class="form-label small">Geçici Şifre <span class="text-danger">*</span></label>
-                        <input type="password" id="password" th:field="*{password}" class="form-control form-control-sm" required minlength="6" />
-                        <div class="field-error-text" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                        <input type="password" id="password" th:field="*{password}" class="form-control form-control-sm" required minlength="6" th:aria-invalid="${#fields.hasErrors('password')}" th:aria-describedby="${#fields.hasErrors('password')} ? 'staffForm-password-error' : null" />
+                        <div id="staffForm-password-error" class="field-error-text" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
                     </div>
 
                     <div class="row g-2 mb-2">
                         <div class="col-6">
                             <label for="staffType" class="form-label small">Personel Türü <span class="text-danger">*</span></label>
-                            <select id="staffType" th:field="*{staffType}" class="form-select form-select-sm" required>
-                                <option value="DOCTOR">Hekim (DOCTOR)</option>
-                                <option value="NURSE">Hemşire (NURSE)</option>
-                                <option value="TECHNICIAN">Teknisyen (TECHNICIAN)</option>
+                            <select id="staffType" th:field="*{staffType}" class="form-select form-select-sm" required th:aria-invalid="${#fields.hasErrors('staffType')}" th:aria-describedby="${#fields.hasErrors('staffType')} ? 'staffForm-staffType-error' : null">
+                                <option value="DOCTOR">Hekim</option>
+                                <option value="NURSE">Hemşire</option>
+                                <option value="TECHNICIAN">Teknisyen</option>
                             </select>
-                            <div class="field-error-text" th:if="${#fields.hasErrors('staffType')}" th:errors="*{staffType}"></div>
+                            <div id="staffForm-staffType-error" class="field-error-text" th:if="${#fields.hasErrors('staffType')}" th:errors="*{staffType}"></div>
                         </div>
                         <div class="col-6">
                             <label for="staffSpecialty" class="form-label small">
                                 Uzmanlık <span id="specialtyRequiredMarker" class="text-danger">*</span>
                             </label>
-                            <input type="text" id="staffSpecialty" th:field="*{specialty}" class="form-control form-control-sm" maxlength="100" placeholder="Kardiyoloji" />
-                            <div class="field-error-text" th:if="${#fields.hasErrors('specialty')}" th:errors="*{specialty}"></div>
+                            <input type="text" id="staffSpecialty" th:field="*{specialty}" class="form-control form-control-sm" maxlength="100" placeholder="Kardiyoloji" th:aria-invalid="${#fields.hasErrors('specialty')}" th:aria-describedby="${#fields.hasErrors('specialty')} ? 'staffForm-specialty-error' : null" />
+                            <div id="staffForm-specialty-error" class="field-error-text" th:if="${#fields.hasErrors('specialty')}" th:errors="*{specialty}"></div>
                         </div>
                     </div>
 
                     <div class="mb-3">
                         <label for="phone" class="form-label small">Telefon</label>
-                        <input type="text" id="phone" th:field="*{phone}" class="form-control form-control-sm" maxlength="20" placeholder="+90 555 123 4567" />
-                        <div class="field-error-text" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
+                        <input type="text" id="phone" th:field="*{phone}" class="form-control form-control-sm" maxlength="20" placeholder="+90 555 123 4567" th:aria-invalid="${#fields.hasErrors('phone')}" th:aria-describedby="${#fields.hasErrors('phone')} ? 'staffForm-phone-error' : null" />
+                        <div id="staffForm-phone-error" class="field-error-text" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
                     </div>
 
                     <div class="d-grid mt-3">
@@ -129,37 +146,47 @@
 
         <!-- 2. Şubeye / Bölüme Görevlendirme -->
         <div class="col-lg-4">
-            <div class="clinic-card h-100">
-                <h2 class="clinic-card-title mb-3">2. Şube ve Bölüme Ata</h2>
+            <div class="clinic-card form-panel h-100">
+                <h3 class="clinic-card-title mb-3">2. Şube ve Bölüme Ata</h3>
 
                 <form th:action="@{/admin/staff/assign}" th:object="${assignmentForm}" method="post">
+                    <div class="error-summary" th:if="${#fields.hasErrors('*')}" tabindex="-1" role="alert" aria-labelledby="assignmentForm-error-title">
+                        <h2 id="assignmentForm-error-title">Bilgileri kontrol edin</h2>
+                        <p class="small mb-2">Aşağıdaki alanları düzeltip yeniden gönderin.</p>
+                        <ul>
+                            <li th:if="${#fields.hasErrors('staffId')}"><a href="#assignStaffId" th:errors="*{staffId}"></a></li>
+                            <li th:if="${#fields.hasErrors('branchId')}"><a href="#assignBranch" th:errors="*{branchId}"></a></li>
+                            <li th:if="${#fields.hasErrors('departmentId')}"><a href="#assignDepartment" th:errors="*{departmentId}"></a></li>
+                        </ul>
+                    </div>
+
                     <input type="hidden" th:name="${_csrf != null ? _csrf.parameterName : '_csrf'}" th:value="${_csrf != null ? _csrf.token : ''}" />
 
                     <div class="mb-3">
                         <label for="assignStaffId" class="form-label small">Personel Seçimi <span class="text-danger">*</span></label>
-                        <select id="assignStaffId" th:field="*{staffId}" class="form-select form-select-sm" required>
-                            <option th:each="st : ${staffProfiles}" th:value="${st.id}" th:text="${st.fullName + ' (' + (st.staffType != null ? st.staffType : 'DOCTOR') + ')'}">Dr. Ahmet Yılmaz</option>
+                        <select id="assignStaffId" th:field="*{staffId}" class="form-select form-select-sm" required th:aria-invalid="${#fields.hasErrors('staffId')}" th:aria-describedby="${#fields.hasErrors('staffId')} ? 'assignmentForm-staffId-error' : null">
+                            <option th:each="st : ${staffProfiles}" th:value="${st.id}" th:text="${st.fullName + ' (' + (st.staffType == 'NURSE' ? 'Hemşire' : (st.staffType == 'TECHNICIAN' ? 'Teknisyen' : 'Hekim')) + ')'}">Dr. Ahmet Yılmaz</option>
                         </select>
-                        <div class="field-error-text" th:if="${#fields.hasErrors('staffId')}" th:errors="*{staffId}"></div>
+                        <div id="assignmentForm-staffId-error" class="field-error-text" th:if="${#fields.hasErrors('staffId')}" th:errors="*{staffId}"></div>
                     </div>
 
                     <div class="mb-3">
                         <label for="assignBranch" class="form-label small">Şube <span class="text-danger">*</span></label>
-                        <select id="assignBranch" th:field="*{branchId}" class="form-select form-select-sm" required>
+                        <select id="assignBranch" th:field="*{branchId}" class="form-select form-select-sm" required th:aria-invalid="${#fields.hasErrors('branchId')}" th:aria-describedby="${#fields.hasErrors('branchId')} ? 'assignmentForm-branchId-error' : null">
                             <option th:each="b : ${branches}" th:value="${b.id}" th:text="${b.name}">Kadıköy Şubesi</option>
                         </select>
-                        <div class="field-error-text" th:if="${#fields.hasErrors('branchId')}" th:errors="*{branchId}"></div>
+                        <div id="assignmentForm-branchId-error" class="field-error-text" th:if="${#fields.hasErrors('branchId')}" th:errors="*{branchId}"></div>
                     </div>
 
                     <div class="mb-3">
                         <label for="assignDepartment" class="form-label small">Bağlı Bölüm <span class="text-danger">*</span></label>
-                        <select id="assignDepartment" th:field="*{departmentId}" class="form-select form-select-sm" required>
+                        <select id="assignDepartment" th:field="*{departmentId}" class="form-select form-select-sm" required th:aria-invalid="${#fields.hasErrors('departmentId')}" th:aria-describedby="${#fields.hasErrors('departmentId')} ? 'assignmentForm-departmentId-error' : null">
                             <option th:each="d : ${departments}"
                                     th:value="${d.id}"
                                     th:attr="data-branch-id=${d.branchId}"
                                     th:text="${d.name}">Kardiyoloji</option>
                         </select>
-                        <div class="field-error-text" th:if="${#fields.hasErrors('departmentId')}" th:errors="*{departmentId}"></div>
+                        <div id="assignmentForm-departmentId-error" class="field-error-text" th:if="${#fields.hasErrors('departmentId')}" th:errors="*{departmentId}"></div>
                     </div>
 
                     <div class="d-grid mt-4">
@@ -171,15 +198,23 @@
 
         <!-- 3. Hizmet Yetkinlikleri (Eligibility) -->
         <div class="col-lg-4">
-            <div class="clinic-card h-100">
-                <h2 class="clinic-card-title mb-3">3. Hizmet Yetkinliği Tanımla</h2>
+            <div class="clinic-card form-panel h-100">
+                <h3 class="clinic-card-title mb-3">3. Hizmet Yetkinliği Tanımla</h3>
 
                 <form th:action="@{/admin/staff/eligibility}" th:object="${eligibilityForm}" method="post">
+                    <div class="error-summary" th:if="${#fields.hasErrors('*')}" tabindex="-1" role="alert" aria-labelledby="eligibilityForm-error-title">
+                        <h2 id="eligibilityForm-error-title">Bilgileri kontrol edin</h2>
+                        <p class="small mb-2">Aşağıdaki alanları düzeltip yeniden gönderin.</p>
+                        <ul>
+                            <li th:if="${#fields.hasErrors('assignmentId')}"><a href="#eligAssignment" th:errors="*{assignmentId}"></a></li>
+                        </ul>
+                    </div>
+
                     <input type="hidden" th:name="${_csrf != null ? _csrf.parameterName : '_csrf'}" th:value="${_csrf != null ? _csrf.token : ''}" />
 
                     <div class="mb-3">
                         <label for="eligAssignment" class="form-label small">Personel Görevlendirmesi <span class="text-danger">*</span></label>
-                        <select id="eligAssignment" th:field="*{assignmentId}" class="form-select form-select-sm" required>
+                        <select id="eligAssignment" th:field="*{assignmentId}" class="form-select form-select-sm" required th:aria-invalid="${#fields.hasErrors('assignmentId')}" th:aria-describedby="${#fields.hasErrors('assignmentId')} ? 'eligibilityForm-assignmentId-error' : null">
                             <option th:each="asg : ${assignments}"
                                     th:value="${asg.id}"
                                     th:attr="data-branch-id=${asg.branchId}"
@@ -187,7 +222,7 @@
                                 Dr. Ahmet Yılmaz — Şube / Bölüm
                             </option>
                         </select>
-                        <div class="field-error-text" th:if="${#fields.hasErrors('assignmentId')}" th:errors="*{assignmentId}"></div>
+                        <div id="eligibilityForm-assignmentId-error" class="field-error-text" th:if="${#fields.hasErrors('assignmentId')}" th:errors="*{assignmentId}"></div>
                     </div>
 
                     <div class="mb-3">
@@ -195,7 +230,7 @@
                         <div th:if="${#lists.isEmpty(branchServices)}" class="small text-muted">
                             Şubeye atanmış hizmet bulunmamaktadır.
                         </div>
-                        <div th:if="${not #lists.isEmpty(branchServices)}" style="max-height: 175px; overflow-y: auto;" class="border rounded p-2 bg-light">
+                        <div th:if="${not #lists.isEmpty(branchServices)}" class="eligibility-list border rounded p-2 bg-light">
                             <div th:each="srv : ${branchServices}"
                                  class="form-check elig-service-item"
                                  th:attr="data-branch-id=${srv.branchId}">

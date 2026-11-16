@@ -5,85 +5,111 @@
     <title>Yönetici Paneli — Klinik Randevu Sistemi</title>
 </head>
 <body>
-<section>
-    <div class="row mb-4">
+<section class="page-admin page-dashboard">
+    <div class="page-header row mb-4">
         <div class="col-12">
+            <div class="page-eyebrow">Kurum yönetimi</div>
             <h1 class="h3 fw-bold text-dark mb-1">Klinik ve Kurum Yönetim Paneli</h1>
             <p class="text-muted mb-0">Kurum, şube, tıbbi bölüm, hizmet kataloğu ve personel operasyonlarını buradan yönetebilirsiniz.</p>
         </div>
     </div>
 
     <!-- Metrik Kartları -->
-    <div class="row g-3 mb-4">
-        <div class="col-sm-6 col-lg-3">
-            <div class="clinic-card py-3 px-4 mb-0 border-start border-primary border-4">
-                <div class="text-muted small">Aktif Kurumlar</div>
-                <div class="h3 fw-bold text-primary mb-0" th:text="${organizationCount}">0</div>
+    <div class="metric-strip">
+        <div class="metric-with-icon">
+            <span class="clinical-icon-box" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M4 21V5h10v16M14 10h6v11M2 21h20M9 9v4M7 11h4"/></svg>
+            </span>
+            <div class="metric">
+                <div class="metric-label">Aktif Kurumlar</div>
+                <div class="metric-value" th:text="${organizationCount}">0</div>
             </div>
         </div>
-        <div class="col-sm-6 col-lg-3">
-            <div class="clinic-card py-3 px-4 mb-0 border-start border-info border-4">
-                <div class="text-muted small">Tanımlı Şubeler</div>
-                <div class="h3 fw-bold text-info mb-0" th:text="${branchCount}">0</div>
+        <div class="metric-with-icon">
+            <span class="clinical-icon-box" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-5h6v5M9 10h6"/></svg>
+            </span>
+            <div class="metric">
+                <div class="metric-label">Tanımlı Şubeler</div>
+                <div class="metric-value" th:text="${branchCount}">0</div>
             </div>
         </div>
-        <div class="col-sm-6 col-lg-3">
-            <div class="clinic-card py-3 px-4 mb-0 border-start border-success border-4">
-                <div class="text-muted small">Tıbbi Bölümler</div>
-                <div class="h3 fw-bold text-success mb-0" th:text="${departmentCount}">0</div>
+        <div class="metric-with-icon">
+            <span class="clinical-icon-box" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><rect x="8" y="3" width="8" height="5" rx="1"/><path d="M12 8v4M5 16v-4h14v4"/><rect x="2" y="16" width="6" height="5" rx="1"/><rect x="16" y="16" width="6" height="5" rx="1"/></svg>
+            </span>
+            <div class="metric">
+                <div class="metric-label">Tıbbi Bölümler</div>
+                <div class="metric-value" th:text="${departmentCount}">0</div>
             </div>
         </div>
-        <div class="col-sm-6 col-lg-3">
-            <div class="clinic-card py-3 px-4 mb-0 border-start border-warning border-4">
-                <div class="text-muted small">Kayıtlı Personel</div>
-                <div class="h3 fw-bold text-warning mb-0" th:text="${staffCount}">0</div>
+        <div class="metric-with-icon">
+            <span class="clinical-icon-box clinical-icon-box-success" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="3"/><path d="M3 21v-3a6 6 0 0 1 12 0v3m2-17a3 3 0 0 1 0 6m1 4a5 5 0 0 1 3 4v3"/></svg>
+            </span>
+            <div class="metric">
+                <div class="metric-label">Kayıtlı Personel</div>
+                <div class="metric-value" th:text="${staffCount}">0</div>
             </div>
         </div>
     </div>
 
-    <!-- Yönetim Modülleri Hızlı Erişim Kartları -->
-    <div class="row g-4">
-        <div class="col-md-6 col-lg-3">
-            <div class="clinic-card h-100 d-flex flex-column justify-content-between p-4">
+    <h2 class="section-heading">Yönetim alanları</h2>
+    <!-- Mevcut yönetim bağlantıları -->
+    <div class="management-directory">
+        <div class="management-entry">
+            <div class="directory-main">
+                <span class="clinical-icon-box" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M4 21V5h10v16M14 10h6v11M2 21h20M8 9h2m-2 4h2m-2 4h2m7-3h1m-1 3h1"/></svg>
+                </span>
                 <div>
-                    <h2 class="h5 fw-bold text-dark mb-2">Şube &amp; Çalışma Saatleri</h2>
+                    <h3 class="h5 fw-bold text-dark mb-2">Şube &amp; Çalışma Saatleri</h3>
                     <p class="text-muted small">Yeni şube oluşturma, adres/zaman dilimi yapılandırması ve mesai saatleri yönetimi.</p>
                 </div>
-                <div class="d-flex flex-wrap gap-2 mt-3">
-                    <a th:href="@{/admin/branches}" class="btn btn-outline-primary btn-sm">Şubeleri Yönet &rarr;</a>
-                    <a th:href="@{/admin/hours}" class="btn btn-outline-secondary btn-sm">Çalışma Saatleri &rarr;</a>
-                </div>
+            </div>
+            <div class="d-flex flex-wrap gap-2 mt-3">
+                <a th:href="@{/admin/branches}" class="btn btn-outline-primary btn-sm">Şubeleri Yönet &rarr;</a>
+                <a th:href="@{/admin/hours}" class="btn btn-outline-secondary btn-sm">Çalışma Saatleri &rarr;</a>
             </div>
         </div>
 
-        <div class="col-md-6 col-lg-3">
-            <div class="clinic-card h-100 d-flex flex-column justify-content-between p-4">
+        <div class="management-entry">
+            <div class="directory-main">
+                <span class="clinical-icon-box" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><rect x="8" y="3" width="8" height="5" rx="1"/><path d="M12 8v4M5 16v-4h14v4"/><rect x="2" y="16" width="6" height="5" rx="1"/><rect x="16" y="16" width="6" height="5" rx="1"/></svg>
+                </span>
                 <div>
-                    <h2 class="h5 fw-bold text-dark mb-2">Tıbbi Bölümler</h2>
+                    <h3 class="h5 fw-bold text-dark mb-2">Tıbbi Bölümler</h3>
                     <p class="text-muted small">Şube bazında poliklinik ve tıbbi bölüm tanımları (Kardiyoloji, Radyoloji vb.).</p>
                 </div>
-                <a th:href="@{/admin/departments}" class="btn btn-outline-primary btn-sm mt-3">Bölümleri Yönet &rarr;</a>
             </div>
+            <a th:href="@{/admin/departments}" class="btn btn-outline-primary btn-sm mt-3">Bölümleri Yönet &rarr;</a>
         </div>
 
-        <div class="col-md-6 col-lg-3">
-            <div class="clinic-card h-100 d-flex flex-column justify-content-between p-4">
+        <div class="management-entry">
+            <div class="directory-main">
+                <span class="clinical-icon-box" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8m-8 4h8m-8 4h5"/></svg>
+                </span>
                 <div>
-                    <h2 class="h5 fw-bold text-dark mb-2">Hizmet Kataloğu</h2>
+                    <h3 class="h5 fw-bold text-dark mb-2">Hizmet Kataloğu</h3>
                     <p class="text-muted small">Katalog hizmet tanımları, <span th:text="${serviceCount != null ? serviceCount : 0}">0</span> aktif şube hizmeti ve süre/ücret politikaları.</p>
                 </div>
-                <a th:href="@{/admin/services}" class="btn btn-outline-primary btn-sm mt-3">Hizmetleri Yönet &rarr;</a>
             </div>
+            <a th:href="@{/admin/services}" class="btn btn-outline-primary btn-sm mt-3">Hizmetleri Yönet &rarr;</a>
         </div>
 
-        <div class="col-md-6 col-lg-3">
-            <div class="clinic-card h-100 d-flex flex-column justify-content-between p-4">
+        <div class="management-entry">
+            <div class="directory-main">
+                <span class="clinical-icon-box" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="3"/><path d="M3 21v-3a6 6 0 0 1 12 0v3m2-17a3 3 0 0 1 0 6m1 4a5 5 0 0 1 3 4v3"/></svg>
+                </span>
                 <div>
-                    <h2 class="h5 fw-bold text-dark mb-2">Personel &amp; Mesai</h2>
+                    <h3 class="h5 fw-bold text-dark mb-2">Personel &amp; Mesai</h3>
                     <p class="text-muted small">Doktor ve teknisyen kaydı, uzmanlık tanımlama, haftalık uygunluk ve izin istisnaları.</p>
                 </div>
-                <a th:href="@{/admin/staff}" class="btn btn-outline-primary btn-sm mt-3">Personeli Yönet &rarr;</a>
             </div>
+            <a th:href="@{/admin/staff}" class="btn btn-outline-primary btn-sm mt-3">Personeli Yönet &rarr;</a>
         </div>
     </div>
 </section>
